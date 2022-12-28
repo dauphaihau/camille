@@ -9,6 +9,9 @@ import { db } from "lib/db"
 
 // const postmarkClient = new Client(process.env.POSTMARK_API_TOKEN)
 
+// console.log('dauphaihau debug: process-env-github-client-id', process.env.GITHUB_CLIENT_ID)
+// console.log('dauphaihau debug: process-env-github-client-id', process.env.GITHUB_CLIENT_SECRET)
+
 export const authOptions: NextAuthOptions = {
   // huh any! I know.
   // This is a temporary fix for prisma client.
@@ -22,8 +25,10 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      clientId: '218f47710a46d7888172',
+      clientSecret: '7f7018c73880d77c42ed001bbf71d1cd14112cbf',
+      // clientId: process.env.GITHUB_CLIENT_ID,
+      // clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }),
     // EmailProvider({
     //   from: process.env.SMTP_FROM,

@@ -3,10 +3,10 @@ import React from "react";
 import { Inter as FontSans } from "@next/font/google"
 import { cn } from 'core/helpers';
 
-// const fontSans = FontSans({
-//   subsets: ["latin"],
-//   variable: "--font-inter",
-// })
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-inter",
+})
 
 export default function RootLayout({
   children,
@@ -18,7 +18,7 @@ export default function RootLayout({
     <html
       className={cn(
         "bg-white font-sans text-slate-900 antialiased",
-        // fontSans.variable
+        fontSans.variable
       )}
     >
     <head/>

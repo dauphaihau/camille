@@ -54,8 +54,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     })
   }
 
-  console.log('dauphaihau debug: process-env-github-client-id', process.env.GITHUB_CLIENT_ID)
-  console.log('dauphaihau debug: process-env-github-client-id', process.env.GITHUB_CLIENT_SECRET)
+  // console.log('dauphaihau debug: process-env-github-client-id', process.env.GITHUB_CLIENT_ID)
+  // console.log('dauphaihau debug: process-env-github-client-id', process.env.GITHUB_CLIENT_SECRET)
 
   return (
     <div className={cn("grid gap-6", className)} {...props}>
