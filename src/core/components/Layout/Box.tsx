@@ -1,6 +1,7 @@
 import { forwardRef, ReactNode } from "react";
 import { cn } from "core/helpers";
 import { ClassValue } from "clsx";
+import Grid from "./Grid";
 
 interface BoxProps {
   classes: string | ClassValue[],
@@ -41,4 +42,5 @@ const Box = forwardRef((props: Partial<BoxProps>, ref: any) => {
   return (<div ref={ref} className={className} {...others}>{children}</div>);
 })
 
+Box.displayName = 'Box';
 export default Box;

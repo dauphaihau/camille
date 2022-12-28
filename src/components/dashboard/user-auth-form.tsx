@@ -1,16 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { useSearchParams } from "next/navigation"
-import { signIn } from "next-auth/react"
 import * as z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useSearchParams } from "next/navigation"
+import { signIn } from "next-auth/react"
 
-import { cn } from "@/lib/utils"
-import { userAuthSchema } from "@/lib/validations/auth"
-import { toast } from "@/ui/toast"
-import { Icons } from "@/components/icons"
+import { userAuthSchema } from "lib/validations/auth";
+import { cn } from "core/helpers"
+import { Icons } from "core/components"
+import { toast } from "ui/toast"
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 

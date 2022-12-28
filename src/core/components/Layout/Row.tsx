@@ -1,6 +1,7 @@
 import React, { ComponentPropsWithoutRef, forwardRef } from "react";
 import { cn } from "core/helpers";
 import { ClassValue } from "clsx";
+import Box from "./Box";
 
 enum GAP {
   FIRST = 1,
@@ -98,4 +99,5 @@ const Row = forwardRef(({
   );
 })
 
+Row.displayName = 'Row';
 export default Row;

@@ -1,4 +1,3 @@
-import React, { memo } from "react";
 import type { NextPage } from "next";
 // import { GroceryList } from "@prisma/client";
 
@@ -59,6 +58,8 @@ export const List: NextPage<CardProps> = ({ children }) => {
 };
 
 interface ListItemProps {
+  item: object[];
+  onUpdate?: (item) => void;
   // item: GroceryList;
   // onUpdate?: (item: GroceryList) => void;
 }
