@@ -1,6 +1,8 @@
+import { withContentlayer } from "next-contentlayer"
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   experimental: {
     appDir: true,
     serverComponentsExternalPackages: ["@prisma/client"]
@@ -14,4 +16,4 @@ const nextConfig = {
   }
 }
 
-module.exports = nextConfig
+withContentlayer(nextConfig)
