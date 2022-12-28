@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: 'A0xmr7mfTyz4HXvs+7019FelH+pktOHRlAdBGXYkAUU=',
   providers: [
     GitHubProvider({
       clientId: '218f47710a46d7888172',
