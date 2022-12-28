@@ -1,4 +1,4 @@
-import { withContentlayer } from "next-contentlayer"
+// import { withContentlayer } from "next-contentlayer"
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -16,4 +16,5 @@ const nextConfig = {
   }
 }
 
-withContentlayer(nextConfig)
+// export default withContentlayer(nextConfig)
+module.exports = nextConfig
