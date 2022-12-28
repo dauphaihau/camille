@@ -1,7 +1,11 @@
+'use client'
+
 import 'styles/globals.css'
 import React from "react";
 import { Inter as FontSans } from "@next/font/google"
 import { cn } from 'core/helpers';
+import { session } from "next-auth/core/routes";
+import { SessionProvider } from "next-auth/react";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -9,9 +13,10 @@ const fontSans = FontSans({
 })
 
 export default function RootLayout({
+  // pageProps: { session, ...pageProps },
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode,
 }) {
 
   return (
@@ -23,7 +28,9 @@ export default function RootLayout({
     >
     <head/>
     <body className="min-h-screen">
+    <SessionProvider basePath="/api/auth">
       {children}
+    </SessionProvider>
     </body>
 
     {/*<main>*/}
