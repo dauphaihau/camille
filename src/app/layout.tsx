@@ -6,6 +6,7 @@ import { Inter as FontSans } from "@next/font/google"
 import { cn } from 'core/helpers';
 import { session } from "next-auth/core/routes";
 import { SessionProvider } from "next-auth/react";
+import { Toaster } from 'ui/toast';
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -28,9 +29,9 @@ export default function RootLayout({
     >
     <head/>
     <body className="min-h-screen">
-    <SessionProvider basePath="/api/auth">
-      {children}
-    </SessionProvider>
+    {children}
+
+    <Toaster position="bottom-right" />
     </body>
 
     {/*<main>*/}
