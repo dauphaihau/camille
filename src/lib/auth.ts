@@ -10,10 +10,7 @@ import { db } from "lib/db"
 
 // const postmarkClient = new Client(process.env.POSTMARK_API_TOKEN)
 
-// console.log('dauphaihau debug: process-env-github-client-id', process.env.GITHUB_CLIENT_ID)
-// console.log('dauphaihau debug: process-env-github-client-id', process.env.GITHUB_CLIENT_SECRET)
-
-const ab = {
+const configEmail = {
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USERNAME,
@@ -23,9 +20,6 @@ const ab = {
 }
 
 export const authOptions: NextAuthOptions = {
-  // huh any! I know.
-  // This is a temporary fix for prisma client.
-  // @see https://github.com/prisma/prisma/issues/16117
   adapter: PrismaAdapter(db as any),
   session: {
     strategy: "jwt",
@@ -57,21 +51,17 @@ export const authOptions: NextAuthOptions = {
           },
         })
 
-        console.log('dauphaihau debug: user', user)
-
-        const templateId = user?.emailVerified
-          ? process.env.POSTMARK_SIGN_IN_TEMPLATE
-          : process.env.POSTMARK_ACTIVATION_TEMPLATE
+        // console.log('dauphaihau debug: user', user)
 
         // const { identifier, url, provider, theme } = params
         const { host } = new URL(url)
 
         // NOTE: You are not required to use `nodemailer`, use whatever you want.
-        const transport = createTransport(ab)
+        const transport = createTransport(configEmail)
         // const transport = createTransport(server)
         const result = await transport.sendMail({
-          to: email,
           from,
+          to: email,
           subject: `Sign in to ${host}`,
           text: text({ url, host }),
           html:
@@ -126,27 +116,43 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async session({ token, session }) {
-      console.log('dauphaihau debug: token from callback session', token)
-      console.log('dauphaihau debug: session from callback session', session)
+      // console.log('dauphaihau debug: token from callback session', token)
+      // console.log('dauphaihau debug: session from callback session', session)
+
       if (token) {
         session.user.id = token.id
         session.user.name = token.name
         session.user.email = token.email
         session.user.image = token.picture
+        session.user.workspace = token.workspace
+        // session.user.domain = token.domain
       }
+
+      // console.log('dauphaihau debug: modified session', session)
 
       return session
     },
     async jwt({ token, user }) {
-      console.log('dauphaihau debug: token from jwt', token)
-      console.log('dauphaihau debug: user from jwt', user)
+      // console.log('dauphaihau debug: token from jwt', token)
+      // console.log('dauphaihau debug: user from jwt', user)
+
+      // console.log('dauphaihau debug: token at jwt', token)
+
       const dbUser = await db.user.findFirst({
         where: {
           email: token.email,
         },
+        // select: {
+        //   workspaces: true
+        // }
+        include: {
+          workspaces: true
+        },
       })
 
-      console.log('dauphaihau debug: db-user', dbUser)
+      // console.log('dauphaihau debug: db-user', dbUser)
+
+      // console.log('dauphaihau debug: db-user', dbUser)
 
       if (!dbUser) {
         token.id = user.id
@@ -155,16 +161,71 @@ export const authOptions: NextAuthOptions = {
 
       return {
         id: dbUser.id,
-        name: dbUser.name,
+        // name: dbUser?.name ?? '',
         email: dbUser.email,
         picture: dbUser.image,
+        workspace: dbUser.workspaces,
+        // domain: dbUser.domain.name,
       }
+
+      // const res = {
+      //   id: dbUser.id,
+      //   // name: dbUser?.name ?? '',
+      //   email: dbUser.email,
+      //   picture: dbUser.image,
+      //   // domain: dbUser.domain.name,
+      // }
+      //
+      // if (dbUser?.name) {
+      //   res.name = dbUser.name
+      // }
+      //
+      // return res
     },
+    async signIn({ user, account, profile, email, credentials }) {
+
+      // console.log('dauphaihau debug: user', user)
+      // console.log('dauphaihau debug: account', account)
+      // console.log('dauphaihau debug: profile', profile)
+      // console.log('dauphaihau debug: email', email)
+      // console.log('dauphaihau debug: credentials', credentials)
+
+      // await db.user.update({
+      //   where: {
+      //     id: user.id,
+      //   },
+      //   data: {
+      //     name: '',
+      //   },
+      // })
+
+      return true
+      // const response = await axios.post(
+      //   process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/userExists",
+      //   { email: profile?.email }
+      // );
+      // if (response && response.data?.value === true) {
+      //   return true;
+      // } else {
+      //   const data = {
+      //     firstName: profile.given_name,
+      //     lastName: profile.family_name,
+      //     email: profile.email,
+      //     profileUrl: profile.picture,
+      //   };
+      //   const response = await axios.post(
+      //     process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/signup",
+      //     data
+      //   );
+      //   return true;
+      // }
+    }
   },
 }
 
 function htmlSignIn(params: {url: string; host: string; theme}) {
   const { url, host, theme } = params
+  // console.log('dauphaihau debug: url', url)
 
   const escapedHost = host.replace(/\./g, "&#8203;.")
 
@@ -216,6 +277,7 @@ function htmlSignIn(params: {url: string; host: string; theme}) {
 
 function htmlActivation(params: {url: string; host: string; theme}) {
   const { url, host, theme } = params
+  // console.log('dauphaihau debug: url', url)
 
   const escapedHost = host.replace(/\./g, "&#8203;.")
 
@@ -231,7 +293,7 @@ function htmlActivation(params: {url: string; host: string; theme}) {
 
   return `
       <h1 style="margin: 10px 0; color: rgba(51, 51, 51, 1); font-size: 22px; font-weight: bold; text-align: left"
-      >Welcome to Taxonomy,</h1>
+      >Welcome to Camille,</h1>
       <p
       style="margin-bottom: 10px; font-size: 16px; line-height: 1.625; color: ${color.text}"
       >Click the link below to activate your account.</p>

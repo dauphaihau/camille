@@ -31,6 +31,8 @@ export const isDarkMode = () => {
   }
 }
 
+export const wordInString = (s, word) => new RegExp('\\b' + word + '\\b', 'i').test(s);
+
 export const uniqElement = (arr) => {
   return [...new Set(arr.filter((value, index, self) => self.indexOf(value) === index))];
 }
@@ -48,17 +50,6 @@ export const toLower = (value) => {
 
 export const isEmptyObject = (obj = {}) => {
   return Object.keys(obj).length === 0
-}
-
-export function isEmpty(value): boolean {
-  try {
-    return typeof value === "undefined" ||
-      value === null ||
-      value === "" ||
-      value.length === 0;
-  } catch (e) {
-    return true;
-  }
 }
 
 export function parseJSON<T>(value: string | null): T | undefined {
@@ -93,8 +84,12 @@ export const isDateString = (value) => {
 }
 
 export const omitFieldNullish = (obj) => {
-  return Object.fromEntries(
-    Object.entries(obj).filter(([, value]) => value != null && value !== ''))
+  return Object.entries(obj)
+  .filter(([_, v]) => v || v === 0)
+  .reduce(
+    (acc, [k, v]) => ({ ...acc, [k]: v === Object(v) ? omitFieldNullish(v) : v }),
+    {}
+  );
 }
 
 export const convertDateString = (value) => {
@@ -102,30 +97,30 @@ export const convertDateString = (value) => {
 }
 
 // ----------------- components
-export const filterRows = (rows, filters) => {
-  if (isEmpty(filters)) return rows
-
-  return rows.filter((row) => {
-    return Object.keys(filters).every((accessor) => {
-      const value = row[accessor]
-      const searchValue = filters[accessor]
-
-      if (isString(value)) {
-        return toLower(value).includes(toLower(searchValue))
-      }
-
-      if (isBoolean(value)) {
-        return (searchValue === 'true' && value) || (searchValue === 'false' && !value)
-      }
-
-      if (isNumber(value)) {
-        return value == searchValue
-      }
-
-      return false
-    })
-  })
-}
+// export const filterRows = (rows, filters) => {
+//   if (isEmpty(filters)) return rows
+//
+//   return rows.filter((row) => {
+//     return Object.keys(filters).every((accessor) => {
+//       const value = row[accessor]
+//       const searchValue = filters[accessor]
+//
+//       if (isString(value)) {
+//         return toLower(value).includes(toLower(searchValue))
+//       }
+//
+//       if (isBoolean(value)) {
+//         return (searchValue === 'true' && value) || (searchValue === 'false' && !value)
+//       }
+//
+//       if (isNumber(value)) {
+//         return value == searchValue
+//       }
+//
+//       return false
+//     })
+//   })
+// }
 
 export const sortRows = (rows, sort) => {
   return rows.sort((a, b) => {

@@ -2,24 +2,21 @@
 
 import 'styles/globals.css'
 import React from "react";
+import { HydrationProvider, Client } from "react-hydration-provider";
 import { Inter as FontSans } from "@next/font/google"
 import { cn } from 'core/helpers';
-import { session } from "next-auth/core/routes";
-import { SessionProvider } from "next-auth/react";
-import { Toaster } from 'ui/toast';
+import { Toaster } from 'core/components/Toast';
+import { UIControllerProvider } from "../components/context/UIControllerContext";
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-inter",
 })
 
-export default function RootLayout({
-  // pageProps: { session, ...pageProps },
-  children,
-}: {
+export default function RootLayout({ children }: {
   children: React.ReactNode,
 }) {
-
+  // console.log('dauphaihau debug: font-sans', fontSans)
   return (
     <html
       className={cn(
@@ -29,9 +26,14 @@ export default function RootLayout({
     >
     <head/>
     <body className="min-h-screen">
-    {children}
-
-    <Toaster position="bottom-right" />
+    <HydrationProvider>
+      <Client>
+        <UIControllerProvider>
+          {children}
+          <Toaster position="bottom-right"/>
+        </UIControllerProvider>
+      </Client>
+    </HydrationProvider>
     </body>
 
     {/*<main>*/}
