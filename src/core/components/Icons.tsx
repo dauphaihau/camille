@@ -1,68 +1,44 @@
-
-import {
-  AlertTriangle, ArrowLeft,
-  ArrowRight,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Command,
-  CreditCard,
-  File,
-  FileText,
-  Github,
-  HelpCircle,
-  Image,
-  Loader2, MoreHorizontal,
-  MoreVertical,
-  Pizza,
-  Plus,
-  Settings,
-  Trash,
-  Twitter,
-  User,
-  X,
-} from "lucide-react"
-import type { Icon as LucideIcon } from "lucide-react"
-import { FaGithub, FaLinkedin, FaStar, FaTwitter } from "react-icons/fa";
-// import { BiDotsVertical, BiLogIn, BsThreeDotsVertical, RxClock } from "react-icons/all";
+import { FaGithub } from "react-icons/fa";
 import { RxClock } from "react-icons/rx";
-import { BiDotsVertical, BiLogIn } from "react-icons/bi";
-import { BsThreeDotsVertical, BsPlus } from "react-icons/bs";
-import { RiArrowLeftSLine, RiArrowRightSLine} from "react-icons/ri";
-import { RxDoubleArrowLeft, RxDoubleArrowRight   } from "react-icons/rx";
+import { BiLogIn } from "react-icons/bi";
+import { GiWhiteBook } from "react-icons/gi";
+import { BsThreeDotsVertical, BsPlus, BsTrash2Fill, BsThreeDots } from "react-icons/bs";
+import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
+import { RxDoubleArrowLeft, RxDoubleArrowRight } from "react-icons/rx";
 import { HiBars4, HiStar, HiOutlineStar } from "react-icons/hi2";
-import {AiOutlinePlus, AiOutlineSetting,AiOutlineSearch} from "react-icons/ai";
-
-export type Icon = LucideIcon
+import { AiOutlineSetting, AiOutlineSearch } from "react-icons/ai";
+import { TiArrowBack } from "react-icons/ti";
+import { HiOutlineTrash } from "react-icons/hi";
+import { GoCheck } from "react-icons/go";
+import { IoArrowForwardSharp } from "react-icons/io5";
 
 export const Icons = {
-  logo: Command,
-  close: X,
-  spinner: Loader2,
-  chevronLeft: ChevronLeft,
-  chevronRight: ChevronRight,
-  trash: Trash,
-  post: FileText,
-  page: File,
-  media: Image,
-  settings: Settings,
-  billing: CreditCard,
-  ellipsis: MoreVertical,
-  ellipsisHorizontal: MoreHorizontal,
-  add: Plus,
-  warning: AlertTriangle,
-  user: User,
-  arrowRight: ArrowRight,
+  // close: X,
+  // spinner: Loader2,
+  // chevronLeft: ChevronLeft,
+  // chevronRight: ChevronRight,
+  basket: BsTrash2Fill,
+  trash: HiOutlineTrash,
+  // page: File,
+  // media: Image,
+  // settings: Settings,
+  // billing: CreditCard,
+  // ellipsis: MoreVertical,
+  ellipsisHorizontal: BsThreeDots,
+  // add: Plus,
+  // warning: AlertTriangle,
+  // user: User,
+  arrowRight: IoArrowForwardSharp,
+  // arrowLeft: ArrowLeft,
   arrowLeftSline: RiArrowLeftSLine,
   arrowRightSline: RiArrowRightSLine,
   doubleArrowLeft: RxDoubleArrowLeft,
   doubleArrowRight: RxDoubleArrowRight,
-  arrowLeft: ArrowLeft,
-  help: HelpCircle,
-  pizza: Pizza,
-  gitHub: Github,
-  twitter: Twitter,
-  check: Check,
+  // help: HelpCircle,
+  // pizza: Pizza,
+  // gitHub: Github,
+  // twitter: Twitter,
+  check: GoCheck,
   github: FaGithub,
   star: HiStar,
   starOutline: HiOutlineStar,
@@ -71,6 +47,8 @@ export const Icons = {
   logout: BiLogIn,
   menu: HiBars4,
   search: AiOutlineSearch,
-  setting: AiOutlineSetting,
+  settings: AiOutlineSetting,
   plus: BsPlus,
+  book: GiWhiteBook,
+  arrowBack: TiArrowBack,
 }

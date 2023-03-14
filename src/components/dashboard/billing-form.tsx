@@ -9,12 +9,14 @@ import { toast } from "core/components/Toast"
 import { Button, Icons } from "core/components"
 
 interface BillingFormProps extends React.HTMLAttributes<HTMLFormElement> {
+  workspace: object
   subscriptionPlan: UserSubscriptionPlan & {
     isCanceled: boolean
   }
 }
 
 export function BillingForm({
+  workspace,
   subscriptionPlan,
   className,
   ...props
@@ -26,7 +28,10 @@ export function BillingForm({
     setIsLoading(!isLoading)
 
     // Get a Stripe session URL.
-    const response = await fetch("/api/users/stripe")
+    const response = await fetch("http://localhost:3000/api/settings/workspace/stripe?" + new URLSearchParams({
+      workspaceId: workspace.id
+    }))
+    // const response = await fetch("/api/users/stripe")
 
     if (!response?.ok) {
       return toast({

@@ -1,5 +1,8 @@
-import { Button, Icons } from "core/components";
+'use client'
+
 import Link from "next/link";
+
+import { Button, Icons } from "core/components";
 import { PATH } from "config/const";
 
 export default function HomePage() {

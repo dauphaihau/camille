@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useContext, useState } from "react";
 import * as React from "react";
 
@@ -6,10 +8,6 @@ const initialState = {
   progress: 0,
 };
 
-type Category  = {
-  _id: string,
-  count: number
-}
 
 export interface UIControllerProps {
   progress: number,
@@ -29,13 +27,15 @@ export function useUIController() {
 
 export const UIControllerProvider = ({ children }) => {
   // const { categories } = useCategories();
+  // const [urlBeforeNavigateSettingPage, setUrlBeforeNavigateSettingPage] = useState()
   const [amountAllItemsCart, setAmountAllItemsCart] = useState(0)
   const [progress, setProgress] = useState(0)
   const [showSidebar, setShowSidebar] = useState(true)
 
   const providerValues: UIControllerProps = {
     // categories,
-    progress, setProgress, amountAllItemsCart, setAmountAllItemsCart, showSidebar, setShowSidebar
+    progress, setProgress, amountAllItemsCart, setAmountAllItemsCart, showSidebar, setShowSidebar,
+    // setUrlBeforeNavigateSettingPage, urlBeforeNavigateSettingPage
   };
 
   return (

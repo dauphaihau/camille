@@ -9,11 +9,11 @@ import * as z from "zod"
 
 import { pagePatchSchema } from "lib/validations/page"
 import { toast } from "core/components/Toast"
-// import { toast } from "core/components"
 import { debounce } from "core/helpers";
 import { useCallback, useEffect, useRef, useState } from "react"
-// import { updatePage } from "services/notebook"
 import { useRouter } from "next/navigation"
+import { useWorkspaceContext } from "components/context/WorkspaceContext";
+import { updatePage } from "lib/request-by-swr/page";
 
 interface EditorProps {
   page: Pick<Page, "id" | "title" | "content" | "published">
@@ -25,6 +25,7 @@ export function Editor({ page }: EditorProps) {
   const ref = useRef<EditorJS>()
   const router = useRouter();
   const [isMounted, setIsMounted] = useState<boolean>(false)
+  const { setPage } = useWorkspaceContext()
 
   async function initializeEditor() {
     const EditorJS = (await import("@editorjs/editorjs")).default
@@ -46,7 +47,7 @@ export function Editor({ page }: EditorProps) {
         },
         onChange: async (api: API, event: CustomEvent) => {
           const blocks = await ref.current.save()
-          await updatePage(page.id, { content: blocks })
+          await handleUpdatePage(page.id, { content: blocks })
         },
         placeholder: "Type here to write your page...",
         inlineToolbar: true,
@@ -78,6 +79,7 @@ export function Editor({ page }: EditorProps) {
 
   useEffect(() => {
     if (isMounted) {
+      setPage(page)
       initializeEditor()
 
       return () => {
@@ -88,14 +90,9 @@ export function Editor({ page }: EditorProps) {
   }, [isMounted])
 
 
-  async function updatePage(id, values: FormData) {
-    const response = await fetch(`/api/notebook/pages/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    })
+  async function handleUpdatePage(id, values: FormData) {
+    const response = await updatePage(id, values)
+
     if (!response?.ok) {
       return toast({
         title: "Something went wrong.",
@@ -103,16 +100,12 @@ export function Editor({ page }: EditorProps) {
         type: "error",
       })
     }
-    // router.refresh()
-    // return toast({
-    //   message: "Your page has been saved.",
-    //   type: "success",
-    // })
+    router.refresh()
   }
 
   const debounceTitle = useCallback(
     debounce((value) => {
-      updatePage(page.id, { title: value })
+      handleUpdatePage(page.id, { title: value })
     }, 300),
     []
   );
@@ -130,8 +123,12 @@ export function Editor({ page }: EditorProps) {
           id="title"
           defaultValue={page.title}
           placeholder="Page title"
-          className="w-full resize-none appearance-none overflow-hidden text-5xl font-bold focus:outline-none"
-          onChange={(event) => debounceTitle(event.target.value)}
+          className="w-full resize-none appearance-none text-5xl font-bold focus:outline-none z-0"
+          // className="w-full resize-none appearance-none overflow-hidden text-5xl font-bold focus:outline-none z-0"
+          onChange={(event) => {
+            setPage((prev) => ({...prev, title:event.target.value }))
+            debounceTitle(event.target.value)
+          }}
         />
         <div id="editor" className="min-h-[500px]"/>
         <p className="text-sm text-gray-500">

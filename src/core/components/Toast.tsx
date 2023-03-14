@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import hotToast, { Toaster as HotToaster } from "react-hot-toast"
+import hotToast, { Toaster as HotToaster, ToastPosition } from "react-hot-toast"
 
 import { Icons } from "core/components";
 import { cn } from "core/helpers";
@@ -16,7 +16,9 @@ export function Toast({ visible, className, ...props }: ToastProps) {
   return (
     <div
       className={cn(
-        "min-h-16 mb-2 flex w-[350px] flex-col items-start gap-1 rounded-md bg-white px-6 py-4 shadow-lg",
+        "h-[33px] mb-2 flex w-auto flex-col items-start gap-1 rounded-[4px] bg-white py-[6px] px-3 shadow-lg",
+        // "min-h-16 mb-2 flex w-auto flex-col items-start gap-1 rounded-md bg-white px-[6px] py-3 shadow-lg",
+        // "min-h-16 mb-2 flex w-[350px] flex-col items-start gap-1 rounded-md bg-white px-6 py-4 shadow-lg",
         visible && "animate-in slide-in-from-bottom-5",
         className
       )}
@@ -58,7 +60,8 @@ Toast.Description = function ToastDescription({
   className,
   ...props
 }: ToastDescriptionProps) {
-  return <p className={cn("text-sm opacity-80", className)} {...props} />
+  return <p className={cn("text-sm", className)} {...props} />
+  // return <p className={cn("text-sm opacity-80", className)} {...props} />
 }
 
 interface ToastOpts {
@@ -66,10 +69,11 @@ interface ToastOpts {
   message: string
   type?: "success" | "error" | "default"
   duration?: number
+  position?: ToastPosition
 }
 
 export function toast(opts: ToastOpts) {
-  const { title, message, type = "default", duration = 3000 } = opts
+  const { title, message, type = "default", duration = 3000, position = 'bottom-center' } = opts
 
   return hotToast.custom(
     ({ visible }) => (
@@ -80,10 +84,10 @@ export function toast(opts: ToastOpts) {
           "bg-black text-white": type === "success",
         })}
       >
-        <Toast.Title>{title}</Toast.Title>
+        {/*{title && <Toast.Title>{title}</Toast.Title>}*/}
         {message && <Toast.Description>{message}</Toast.Description>}
       </Toast>
     ),
-    { duration }
+    { duration, position }
   )
 }

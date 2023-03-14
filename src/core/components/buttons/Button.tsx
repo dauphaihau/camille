@@ -48,8 +48,9 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
   return (
     <button
       type={type}
+      disabled={disabled}
       className={cn(
-          // font-semibold
+        // font-semibold
         `
           inline-flex items-center justify-center rounded 
           font-medium
@@ -63,25 +64,31 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
           size === 'md' && ['px-[22px] h-[42px] text-base'],
         ],
         [
-          // variant === 'filled' && !disabled && [
-          color === 'black' && !disabled && [
-            { 'bg-black text-white': variant === 'filled' },
-            { 'bg-white text-black': variant === 'outline' },
-            { 'bg-transparent text-primary-black hover:text-primary-black hover:opacity-70': variant === 'text' },
+          color === 'black' && [
+            { 'bg-black text-white hover:opacity-80': variant === 'filled' },
+            { 'bg-white text-black hover:bg-[#e9eaeb]': variant === 'outline' },
+
+            { 'bg-transparent text-primary-black hover:text-primary-black hover:bg-[#efefef]': variant === 'text' },
+            // { 'bg-transparent text-primary-black hover:text-primary-black hover:bg-zinc-100': variant === 'text' },
+
             // 'border-2 border-black dark:border-white',
-            { 'border-[1px] border-solid border-black': variant !== 'text' },
+            { 'border-[1px] border-solid border-black': variant !== 'text' && !disabled },
 
             'dark:bg-white dark:text-black',
             // 'dark:hover:bg-black dark:hover:text-white',
             // 'dark:hover:bg-black',
             // 'dark:hover:bg-gray-300',
             'dark:hover:bg-[#f8f9fa]',
-            'hover:bg-white hover:text-black',
+
+            // { 'hover:bg-white hover:text-black': !disabled && variant === 'filled' }
+            // { 'hover:opacity-80': !disabled && variant === 'filled' }
+
+            // 'hover:bg-white hover:text-black',
             // 'active:bg-primary-500',
             // 'disabled:bg-primary-400 disabled:hover:bg-primary-400',
           ],
 
-          color === 'red' && !disabled && [
+          color === 'red' && [
             { 'bg-[#eb5757] text-white': variant === 'filled' },
             { 'bg-white text-black': variant === 'outline' },
             // 'border-[1px] border-solid border-black',
@@ -95,21 +102,18 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
           ],
 
           variant === 'default' && [
-            'border-[1px] border-solid border-[#cfd4d9]',
-            'hover:bg-[#f8f9fa]',
+            { 'border-[1px] border-solid border-[#cfd4d9]': variant !== 'default' && !disabled },
+            { 'hover:bg-[#f8f9fa]': !disabled }
           ],
-
-          // variant === 'text' && [
-          //   'bg-transparent text-primary-black hover:text-primary-black hover:opacity-70',
-          // ],
         ],
         [
-          disabled && [
+          disabled && !isLoading && [
             'bg-[#e9ecef] text-[#aeb5bc] dark:bg-[#383a3f] dark:text-[#25262b] cursor-not-allowed'
           ]
         ],
         {
-          'opacity-30 hover:opacity-30': disabled || isLoading,
+          // 'opacity-30 hover:opacity-30': disabled || isLoading,
+          'opacity-30 hover:opacity-30': isLoading,
           'cursor-wait': isLoading,
           'cursor-not-allow': buttonDisabled,
           'drop-shadow-xl': shadow,
@@ -125,7 +129,7 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
         isLoading &&
         <svg
           role="status"
-          className="inline w-3 h-2 mr-2 text-black animate-spin"
+          className="inline w-3 h-[18px] mr-2.5 text-gray-300 animate-spin"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

@@ -12,21 +12,24 @@ export const schema = z.object({
 export function withPage(handler: NextApiHandler) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
     try {
-      console.log('dauphaihau debug: req-query', req.query)
+      console.log('dauphaihau debug: req-query at withPage', req.query)
       const query = await schema.parse(req.query)
 
       // Check if the user has access to this page.
       // const session = await unstable_getServerSession(req, res, authOptions)
-      const count = await db.page.count({
-        where: {
-          id: query.pageId,
-          // authorId: session.user.id,
-        },
-      })
 
-      if (count < 1) {
-        return res.status(403).end()
-      }
+      // const count = await db.page.count({
+      //   where: {
+      //     id: query.pageId,
+      //     // authorId: session.user.id,
+      //   },
+      // })
+      //
+      // console.log('dauphaihau debug: count', count)
+      //
+      // if (count < 1) {
+      //   return res.status(403).end()
+      // }
 
       return handler(req, res)
     } catch (error) {

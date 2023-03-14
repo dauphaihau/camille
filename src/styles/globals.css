@@ -41,12 +41,19 @@
     /*color: rgba(0, 0, 0, .8);*/
     /*font-family: Eina, serif;*/
   }
-
+  /* #endregion  /**======== Default Typography =========== */
 
   .btn-icon {
     @apply text-[#73726e] text-base hover:bg-[#dedddb] rounded-sm w-[20px] h-[20px];
   }
-  /* #endregion  /**======== Default Typography =========== */
+
+  .btn-icon-header {
+    @apply cursor-pointer inline-flex justify-center items-center text-[#73726e] text-base hover:bg-[#efefef] rounded-[3px] w-[32px] h-[28px];
+  }
+
+  .codex-editor {
+    z-index: 0 !important;
+  }
 }
 
 /* reset */

@@ -60,18 +60,38 @@ export type User = {
   stripeSubscriptionId: string | null
   stripePriceId: string | null
   stripeCurrentPeriodEnd: Date | null
+  lastAccessWorkspaceId: string | null
 }
 
 /**
- * Model Domain
+ * Model TrackingUserAccess
  * 
  */
-export type Domain = {
+export type TrackingUserAccess = {
+  id: string
+  userId: string
+  lastAccessWorkspaceId: string | null
+  lastAccessNotebookId: string | null
+  lastAccessPageId: string | null
+  createdAt: Date
+}
+
+/**
+ * Model Workspace
+ * 
+ */
+export type Workspace = {
   id: string
   name: string
+  domain: string
+  stripeCustomerId: string | null
+  stripeWorkspaceId: string | null
+  stripeSubscriptionId: string | null
+  stripePriceId: string | null
+  stripeCurrentPeriodEnd: Date | null
+  createdBy: string
   createdAt: Date
   updatedAt: Date
-  ownerId: string
 }
 
 /**
@@ -95,7 +115,7 @@ export type Notebook = {
   published: boolean
   createdAt: Date
   updatedAt: Date
-  authorId: string
+  workspaceId: string
 }
 
 /**
@@ -108,7 +128,10 @@ export type Page = {
   content: Prisma.JsonValue | null
   published: boolean
   createdAt: Date
+  updatedBy: string | null
   updatedAt: Date
+  deletedBy: string | null
+  deletedAt: Date | null
   notebookId: string
 }
 
@@ -261,14 +284,24 @@ export class PrismaClient<
   get user(): Prisma.UserDelegate<GlobalReject>;
 
   /**
-   * `prisma.domain`: Exposes CRUD operations for the **Domain** model.
+   * `prisma.trackingUserAccess`: Exposes CRUD operations for the **TrackingUserAccess** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more Domains
-    * const domains = await prisma.domain.findMany()
+    * // Fetch zero or more TrackingUserAccesses
+    * const trackingUserAccesses = await prisma.trackingUserAccess.findMany()
     * ```
     */
-  get domain(): Prisma.DomainDelegate<GlobalReject>;
+  get trackingUserAccess(): Prisma.TrackingUserAccessDelegate<GlobalReject>;
+
+  /**
+   * `prisma.workspace`: Exposes CRUD operations for the **Workspace** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Workspaces
+    * const workspaces = await prisma.workspace.findMany()
+    * ```
+    */
+  get workspace(): Prisma.WorkspaceDelegate<GlobalReject>;
 
   /**
    * `prisma.verificationToken`: Exposes CRUD operations for the **VerificationToken** model.
@@ -341,7 +374,7 @@ export namespace Prisma {
 
   /**
    * Prisma Client JS version: 4.8.0
-   * Query Engine version: d6e67a83f971b175a593ccc12e15c4a757f93ffe
+   * Query Engine version: 8fde8fef4033376662cad983758335009d522acb
    */
   export type PrismaVersion = {
     client: string
@@ -786,7 +819,8 @@ export namespace Prisma {
     Account: 'Account',
     Session: 'Session',
     User: 'User',
-    Domain: 'Domain',
+    TrackingUserAccess: 'TrackingUserAccess',
+    Workspace: 'Workspace',
     VerificationToken: 'VerificationToken',
     Notebook: 'Notebook',
     Page: 'Page'
@@ -962,13 +996,15 @@ export namespace Prisma {
   export type UserCountOutputType = {
     accounts: number
     sessions: number
-    Notebook: number
+    workspaces: number
+    trackingUserAccess: number
   }
 
   export type UserCountOutputTypeSelect = {
     accounts?: boolean
     sessions?: boolean
-    Notebook?: boolean
+    workspaces?: boolean
+    trackingUserAccess?: boolean
   }
 
   export type UserCountOutputTypeGetPayload<S extends boolean | null | undefined | UserCountOutputTypeArgs> =
@@ -998,6 +1034,54 @@ export namespace Prisma {
      * 
     **/
     select?: UserCountOutputTypeSelect | null
+  }
+
+
+
+  /**
+   * Count Type WorkspaceCountOutputType
+   */
+
+
+  export type WorkspaceCountOutputType = {
+    users: number
+    notebooks: number
+    trackingUserAccess: number
+  }
+
+  export type WorkspaceCountOutputTypeSelect = {
+    users?: boolean
+    notebooks?: boolean
+    trackingUserAccess?: boolean
+  }
+
+  export type WorkspaceCountOutputTypeGetPayload<S extends boolean | null | undefined | WorkspaceCountOutputTypeArgs> =
+    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
+    S extends true ? WorkspaceCountOutputType :
+    S extends undefined ? never :
+    S extends { include: any } & (WorkspaceCountOutputTypeArgs)
+    ? WorkspaceCountOutputType 
+    : S extends { select: any } & (WorkspaceCountOutputTypeArgs)
+      ? {
+    [P in TruthyKeys<S['select']>]:
+    P extends keyof WorkspaceCountOutputType ? WorkspaceCountOutputType[P] : never
+  } 
+      : WorkspaceCountOutputType
+
+
+
+
+  // Custom InputTypes
+
+  /**
+   * WorkspaceCountOutputType without action
+   */
+  export type WorkspaceCountOutputTypeArgs = {
+    /**
+     * Select specific fields to fetch from the WorkspaceCountOutputType
+     * 
+    **/
+    select?: WorkspaceCountOutputTypeSelect | null
   }
 
 
@@ -3147,6 +3231,7 @@ export namespace Prisma {
     stripeSubscriptionId: string | null
     stripePriceId: string | null
     stripeCurrentPeriodEnd: Date | null
+    lastAccessWorkspaceId: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -3161,6 +3246,7 @@ export namespace Prisma {
     stripeSubscriptionId: string | null
     stripePriceId: string | null
     stripeCurrentPeriodEnd: Date | null
+    lastAccessWorkspaceId: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -3175,6 +3261,7 @@ export namespace Prisma {
     stripeSubscriptionId: number
     stripePriceId: number
     stripeCurrentPeriodEnd: number
+    lastAccessWorkspaceId: number
     _all: number
   }
 
@@ -3191,6 +3278,7 @@ export namespace Prisma {
     stripeSubscriptionId?: true
     stripePriceId?: true
     stripeCurrentPeriodEnd?: true
+    lastAccessWorkspaceId?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -3205,6 +3293,7 @@ export namespace Prisma {
     stripeSubscriptionId?: true
     stripePriceId?: true
     stripeCurrentPeriodEnd?: true
+    lastAccessWorkspaceId?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -3219,6 +3308,7 @@ export namespace Prisma {
     stripeSubscriptionId?: true
     stripePriceId?: true
     stripeCurrentPeriodEnd?: true
+    lastAccessWorkspaceId?: true
     _all?: true
   }
 
@@ -3312,6 +3402,7 @@ export namespace Prisma {
     stripeSubscriptionId: string | null
     stripePriceId: string | null
     stripeCurrentPeriodEnd: Date | null
+    lastAccessWorkspaceId: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -3343,10 +3434,14 @@ export namespace Prisma {
     stripeSubscriptionId?: boolean
     stripePriceId?: boolean
     stripeCurrentPeriodEnd?: boolean
+    lastAccessWorkspaceId?: boolean
     accounts?: boolean | UserAccountsArgs
     sessions?: boolean | UserSessionsArgs
-    Notebook?: boolean | UserNotebookArgs
-    CustomDomain?: boolean | DomainArgs
+    workspaces?: boolean | UserWorkspacesArgs
+    trackingUserAccess?: boolean | UserTrackingUserAccessArgs
+    lastAccessWorkspace?: boolean | WorkspaceArgs
+    pagesUserUpdated?: boolean | PageArgs
+    pagesUserDeleted?: boolean | PageArgs
     _count?: boolean | UserCountOutputTypeArgs
   }
 
@@ -3354,8 +3449,11 @@ export namespace Prisma {
   export type UserInclude = {
     accounts?: boolean | UserAccountsArgs
     sessions?: boolean | UserSessionsArgs
-    Notebook?: boolean | UserNotebookArgs
-    CustomDomain?: boolean | DomainArgs
+    workspaces?: boolean | UserWorkspacesArgs
+    trackingUserAccess?: boolean | UserTrackingUserAccessArgs
+    lastAccessWorkspace?: boolean | WorkspaceArgs
+    pagesUserUpdated?: boolean | PageArgs
+    pagesUserDeleted?: boolean | PageArgs
     _count?: boolean | UserCountOutputTypeArgs
   } 
 
@@ -3368,8 +3466,11 @@ export namespace Prisma {
     [P in TruthyKeys<S['include']>]:
         P extends 'accounts' ? Array < AccountGetPayload<S['include'][P]>>  :
         P extends 'sessions' ? Array < SessionGetPayload<S['include'][P]>>  :
-        P extends 'Notebook' ? Array < NotebookGetPayload<S['include'][P]>>  :
-        P extends 'CustomDomain' ? DomainGetPayload<S['include'][P]> | null :
+        P extends 'workspaces' ? Array < WorkspaceGetPayload<S['include'][P]>>  :
+        P extends 'trackingUserAccess' ? Array < TrackingUserAccessGetPayload<S['include'][P]>>  :
+        P extends 'lastAccessWorkspace' ? WorkspaceGetPayload<S['include'][P]> | null :
+        P extends 'pagesUserUpdated' ? PageGetPayload<S['include'][P]> | null :
+        P extends 'pagesUserDeleted' ? PageGetPayload<S['include'][P]> | null :
         P extends '_count' ? UserCountOutputTypeGetPayload<S['include'][P]> :  never
   } 
     : S extends { select: any } & (UserArgs | UserFindManyArgs)
@@ -3377,8 +3478,11 @@ export namespace Prisma {
     [P in TruthyKeys<S['select']>]:
         P extends 'accounts' ? Array < AccountGetPayload<S['select'][P]>>  :
         P extends 'sessions' ? Array < SessionGetPayload<S['select'][P]>>  :
-        P extends 'Notebook' ? Array < NotebookGetPayload<S['select'][P]>>  :
-        P extends 'CustomDomain' ? DomainGetPayload<S['select'][P]> | null :
+        P extends 'workspaces' ? Array < WorkspaceGetPayload<S['select'][P]>>  :
+        P extends 'trackingUserAccess' ? Array < TrackingUserAccessGetPayload<S['select'][P]>>  :
+        P extends 'lastAccessWorkspace' ? WorkspaceGetPayload<S['select'][P]> | null :
+        P extends 'pagesUserUpdated' ? PageGetPayload<S['select'][P]> | null :
+        P extends 'pagesUserDeleted' ? PageGetPayload<S['select'][P]> | null :
         P extends '_count' ? UserCountOutputTypeGetPayload<S['select'][P]> :  P extends keyof User ? User[P] : never
   } 
       : User
@@ -3757,9 +3861,15 @@ export namespace Prisma {
 
     sessions<T extends UserSessionsArgs= {}>(args?: Subset<T, UserSessionsArgs>): PrismaPromise<Array<SessionGetPayload<T>>| Null>;
 
-    Notebook<T extends UserNotebookArgs= {}>(args?: Subset<T, UserNotebookArgs>): PrismaPromise<Array<NotebookGetPayload<T>>| Null>;
+    workspaces<T extends UserWorkspacesArgs= {}>(args?: Subset<T, UserWorkspacesArgs>): PrismaPromise<Array<WorkspaceGetPayload<T>>| Null>;
 
-    CustomDomain<T extends DomainArgs= {}>(args?: Subset<T, DomainArgs>): Prisma__DomainClient<DomainGetPayload<T> | Null>;
+    trackingUserAccess<T extends UserTrackingUserAccessArgs= {}>(args?: Subset<T, UserTrackingUserAccessArgs>): PrismaPromise<Array<TrackingUserAccessGetPayload<T>>| Null>;
+
+    lastAccessWorkspace<T extends WorkspaceArgs= {}>(args?: Subset<T, WorkspaceArgs>): Prisma__WorkspaceClient<WorkspaceGetPayload<T> | Null>;
+
+    pagesUserUpdated<T extends PageArgs= {}>(args?: Subset<T, PageArgs>): Prisma__PageClient<PageGetPayload<T> | Null>;
+
+    pagesUserDeleted<T extends PageArgs= {}>(args?: Subset<T, PageArgs>): Prisma__PageClient<PageGetPayload<T> | Null>;
 
     private get _document();
     /**
@@ -4211,25 +4321,48 @@ export namespace Prisma {
 
 
   /**
-   * User.Notebook
+   * User.workspaces
    */
-  export type UserNotebookArgs = {
+  export type UserWorkspacesArgs = {
     /**
-     * Select specific fields to fetch from the Notebook
+     * Select specific fields to fetch from the Workspace
      * 
     **/
-    select?: NotebookSelect | null
+    select?: WorkspaceSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: NotebookInclude | null
-    where?: NotebookWhereInput
-    orderBy?: Enumerable<NotebookOrderByWithRelationInput>
-    cursor?: NotebookWhereUniqueInput
+    include?: WorkspaceInclude | null
+    where?: WorkspaceWhereInput
+    orderBy?: Enumerable<WorkspaceOrderByWithRelationInput>
+    cursor?: WorkspaceWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: Enumerable<NotebookScalarFieldEnum>
+    distinct?: Enumerable<WorkspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * User.trackingUserAccess
+   */
+  export type UserTrackingUserAccessArgs = {
+    /**
+     * Select specific fields to fetch from the TrackingUserAccess
+     * 
+    **/
+    select?: TrackingUserAccessSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: TrackingUserAccessInclude | null
+    where?: TrackingUserAccessWhereInput
+    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
+    cursor?: TrackingUserAccessWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<TrackingUserAccessScalarFieldEnum>
   }
 
 
@@ -4252,348 +4385,360 @@ export namespace Prisma {
 
 
   /**
-   * Model Domain
+   * Model TrackingUserAccess
    */
 
 
-  export type AggregateDomain = {
-    _count: DomainCountAggregateOutputType | null
-    _min: DomainMinAggregateOutputType | null
-    _max: DomainMaxAggregateOutputType | null
+  export type AggregateTrackingUserAccess = {
+    _count: TrackingUserAccessCountAggregateOutputType | null
+    _min: TrackingUserAccessMinAggregateOutputType | null
+    _max: TrackingUserAccessMaxAggregateOutputType | null
   }
 
-  export type DomainMinAggregateOutputType = {
+  export type TrackingUserAccessMinAggregateOutputType = {
     id: string | null
-    name: string | null
+    userId: string | null
+    lastAccessWorkspaceId: string | null
+    lastAccessNotebookId: string | null
+    lastAccessPageId: string | null
     createdAt: Date | null
-    updatedAt: Date | null
-    ownerId: string | null
   }
 
-  export type DomainMaxAggregateOutputType = {
+  export type TrackingUserAccessMaxAggregateOutputType = {
     id: string | null
-    name: string | null
+    userId: string | null
+    lastAccessWorkspaceId: string | null
+    lastAccessNotebookId: string | null
+    lastAccessPageId: string | null
     createdAt: Date | null
-    updatedAt: Date | null
-    ownerId: string | null
   }
 
-  export type DomainCountAggregateOutputType = {
+  export type TrackingUserAccessCountAggregateOutputType = {
     id: number
-    name: number
+    userId: number
+    lastAccessWorkspaceId: number
+    lastAccessNotebookId: number
+    lastAccessPageId: number
     createdAt: number
-    updatedAt: number
-    ownerId: number
     _all: number
   }
 
 
-  export type DomainMinAggregateInputType = {
+  export type TrackingUserAccessMinAggregateInputType = {
     id?: true
-    name?: true
+    userId?: true
+    lastAccessWorkspaceId?: true
+    lastAccessNotebookId?: true
+    lastAccessPageId?: true
     createdAt?: true
-    updatedAt?: true
-    ownerId?: true
   }
 
-  export type DomainMaxAggregateInputType = {
+  export type TrackingUserAccessMaxAggregateInputType = {
     id?: true
-    name?: true
+    userId?: true
+    lastAccessWorkspaceId?: true
+    lastAccessNotebookId?: true
+    lastAccessPageId?: true
     createdAt?: true
-    updatedAt?: true
-    ownerId?: true
   }
 
-  export type DomainCountAggregateInputType = {
+  export type TrackingUserAccessCountAggregateInputType = {
     id?: true
-    name?: true
+    userId?: true
+    lastAccessWorkspaceId?: true
+    lastAccessNotebookId?: true
+    lastAccessPageId?: true
     createdAt?: true
-    updatedAt?: true
-    ownerId?: true
     _all?: true
   }
 
-  export type DomainAggregateArgs = {
+  export type TrackingUserAccessAggregateArgs = {
     /**
-     * Filter which Domain to aggregate.
+     * Filter which TrackingUserAccess to aggregate.
      * 
     **/
-    where?: DomainWhereInput
+    where?: TrackingUserAccessWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Domains to fetch.
+     * Determine the order of TrackingUserAccesses to fetch.
      * 
     **/
-    orderBy?: Enumerable<DomainOrderByWithRelationInput>
+    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      * 
     **/
-    cursor?: DomainWhereUniqueInput
+    cursor?: TrackingUserAccessWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Domains from the position of the cursor.
+     * Take `±n` TrackingUserAccesses from the position of the cursor.
      * 
     **/
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Domains.
+     * Skip the first `n` TrackingUserAccesses.
      * 
     **/
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned Domains
+     * Count returned TrackingUserAccesses
     **/
-    _count?: true | DomainCountAggregateInputType
+    _count?: true | TrackingUserAccessCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: DomainMinAggregateInputType
+    _min?: TrackingUserAccessMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: DomainMaxAggregateInputType
+    _max?: TrackingUserAccessMaxAggregateInputType
   }
 
-  export type GetDomainAggregateType<T extends DomainAggregateArgs> = {
-        [P in keyof T & keyof AggregateDomain]: P extends '_count' | 'count'
+  export type GetTrackingUserAccessAggregateType<T extends TrackingUserAccessAggregateArgs> = {
+        [P in keyof T & keyof AggregateTrackingUserAccess]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateDomain[P]>
-      : GetScalarType<T[P], AggregateDomain[P]>
+        : GetScalarType<T[P], AggregateTrackingUserAccess[P]>
+      : GetScalarType<T[P], AggregateTrackingUserAccess[P]>
   }
 
 
 
 
-  export type DomainGroupByArgs = {
-    where?: DomainWhereInput
-    orderBy?: Enumerable<DomainOrderByWithAggregationInput>
-    by: Array<DomainScalarFieldEnum>
-    having?: DomainScalarWhereWithAggregatesInput
+  export type TrackingUserAccessGroupByArgs = {
+    where?: TrackingUserAccessWhereInput
+    orderBy?: Enumerable<TrackingUserAccessOrderByWithAggregationInput>
+    by: Array<TrackingUserAccessScalarFieldEnum>
+    having?: TrackingUserAccessScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: DomainCountAggregateInputType | true
-    _min?: DomainMinAggregateInputType
-    _max?: DomainMaxAggregateInputType
+    _count?: TrackingUserAccessCountAggregateInputType | true
+    _min?: TrackingUserAccessMinAggregateInputType
+    _max?: TrackingUserAccessMaxAggregateInputType
   }
 
 
-  export type DomainGroupByOutputType = {
+  export type TrackingUserAccessGroupByOutputType = {
     id: string
-    name: string
+    userId: string
+    lastAccessWorkspaceId: string | null
+    lastAccessNotebookId: string | null
+    lastAccessPageId: string | null
     createdAt: Date
-    updatedAt: Date
-    ownerId: string
-    _count: DomainCountAggregateOutputType | null
-    _min: DomainMinAggregateOutputType | null
-    _max: DomainMaxAggregateOutputType | null
+    _count: TrackingUserAccessCountAggregateOutputType | null
+    _min: TrackingUserAccessMinAggregateOutputType | null
+    _max: TrackingUserAccessMaxAggregateOutputType | null
   }
 
-  type GetDomainGroupByPayload<T extends DomainGroupByArgs> = PrismaPromise<
+  type GetTrackingUserAccessGroupByPayload<T extends TrackingUserAccessGroupByArgs> = PrismaPromise<
     Array<
-      PickArray<DomainGroupByOutputType, T['by']> &
+      PickArray<TrackingUserAccessGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof DomainGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof TrackingUserAccessGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], DomainGroupByOutputType[P]>
-            : GetScalarType<T[P], DomainGroupByOutputType[P]>
+              : GetScalarType<T[P], TrackingUserAccessGroupByOutputType[P]>
+            : GetScalarType<T[P], TrackingUserAccessGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type DomainSelect = {
+  export type TrackingUserAccessSelect = {
     id?: boolean
-    name?: boolean
+    userId?: boolean
+    lastAccessWorkspaceId?: boolean
+    lastAccessNotebookId?: boolean
+    lastAccessPageId?: boolean
     createdAt?: boolean
-    updatedAt?: boolean
-    ownerId?: boolean
-    owner?: boolean | UserArgs
+    user?: boolean | UserArgs
+    workspace?: boolean | WorkspaceArgs
   }
 
 
-  export type DomainInclude = {
-    owner?: boolean | UserArgs
+  export type TrackingUserAccessInclude = {
+    user?: boolean | UserArgs
+    workspace?: boolean | WorkspaceArgs
   } 
 
-  export type DomainGetPayload<S extends boolean | null | undefined | DomainArgs> =
+  export type TrackingUserAccessGetPayload<S extends boolean | null | undefined | TrackingUserAccessArgs> =
     S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? Domain :
+    S extends true ? TrackingUserAccess :
     S extends undefined ? never :
-    S extends { include: any } & (DomainArgs | DomainFindManyArgs)
-    ? Domain  & {
+    S extends { include: any } & (TrackingUserAccessArgs | TrackingUserAccessFindManyArgs)
+    ? TrackingUserAccess  & {
     [P in TruthyKeys<S['include']>]:
-        P extends 'owner' ? UserGetPayload<S['include'][P]> :  never
+        P extends 'user' ? UserGetPayload<S['include'][P]> :
+        P extends 'workspace' ? WorkspaceGetPayload<S['include'][P]> | null :  never
   } 
-    : S extends { select: any } & (DomainArgs | DomainFindManyArgs)
+    : S extends { select: any } & (TrackingUserAccessArgs | TrackingUserAccessFindManyArgs)
       ? {
     [P in TruthyKeys<S['select']>]:
-        P extends 'owner' ? UserGetPayload<S['select'][P]> :  P extends keyof Domain ? Domain[P] : never
+        P extends 'user' ? UserGetPayload<S['select'][P]> :
+        P extends 'workspace' ? WorkspaceGetPayload<S['select'][P]> | null :  P extends keyof TrackingUserAccess ? TrackingUserAccess[P] : never
   } 
-      : Domain
+      : TrackingUserAccess
 
 
-  type DomainCountArgs = Merge<
-    Omit<DomainFindManyArgs, 'select' | 'include'> & {
-      select?: DomainCountAggregateInputType | true
+  type TrackingUserAccessCountArgs = Merge<
+    Omit<TrackingUserAccessFindManyArgs, 'select' | 'include'> & {
+      select?: TrackingUserAccessCountAggregateInputType | true
     }
   >
 
-  export interface DomainDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
+  export interface TrackingUserAccessDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
     /**
-     * Find zero or one Domain that matches the filter.
-     * @param {DomainFindUniqueArgs} args - Arguments to find a Domain
+     * Find zero or one TrackingUserAccess that matches the filter.
+     * @param {TrackingUserAccessFindUniqueArgs} args - Arguments to find a TrackingUserAccess
      * @example
-     * // Get one Domain
-     * const domain = await prisma.domain.findUnique({
+     * // Get one TrackingUserAccess
+     * const trackingUserAccess = await prisma.trackingUserAccess.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
     **/
-    findUnique<T extends DomainFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, DomainFindUniqueArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Domain'> extends True ? Prisma__DomainClient<DomainGetPayload<T>> : Prisma__DomainClient<DomainGetPayload<T> | null, null>
+    findUnique<T extends TrackingUserAccessFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, TrackingUserAccessFindUniqueArgs>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'TrackingUserAccess'> extends True ? Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>> : Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T> | null, null>
 
     /**
-     * Find one Domain that matches the filter or throw an error  with `error.code='P2025'` 
+     * Find one TrackingUserAccess that matches the filter or throw an error  with `error.code='P2025'` 
      *     if no matches were found.
-     * @param {DomainFindUniqueOrThrowArgs} args - Arguments to find a Domain
+     * @param {TrackingUserAccessFindUniqueOrThrowArgs} args - Arguments to find a TrackingUserAccess
      * @example
-     * // Get one Domain
-     * const domain = await prisma.domain.findUniqueOrThrow({
+     * // Get one TrackingUserAccess
+     * const trackingUserAccess = await prisma.trackingUserAccess.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
     **/
-    findUniqueOrThrow<T extends DomainFindUniqueOrThrowArgs>(
-      args?: SelectSubset<T, DomainFindUniqueOrThrowArgs>
-    ): Prisma__DomainClient<DomainGetPayload<T>>
+    findUniqueOrThrow<T extends TrackingUserAccessFindUniqueOrThrowArgs>(
+      args?: SelectSubset<T, TrackingUserAccessFindUniqueOrThrowArgs>
+    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
 
     /**
-     * Find the first Domain that matches the filter.
+     * Find the first TrackingUserAccess that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {DomainFindFirstArgs} args - Arguments to find a Domain
+     * @param {TrackingUserAccessFindFirstArgs} args - Arguments to find a TrackingUserAccess
      * @example
-     * // Get one Domain
-     * const domain = await prisma.domain.findFirst({
+     * // Get one TrackingUserAccess
+     * const trackingUserAccess = await prisma.trackingUserAccess.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
     **/
-    findFirst<T extends DomainFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, DomainFindFirstArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Domain'> extends True ? Prisma__DomainClient<DomainGetPayload<T>> : Prisma__DomainClient<DomainGetPayload<T> | null, null>
+    findFirst<T extends TrackingUserAccessFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, TrackingUserAccessFindFirstArgs>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'TrackingUserAccess'> extends True ? Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>> : Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T> | null, null>
 
     /**
-     * Find the first Domain that matches the filter or
+     * Find the first TrackingUserAccess that matches the filter or
      * throw `NotFoundError` if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {DomainFindFirstOrThrowArgs} args - Arguments to find a Domain
+     * @param {TrackingUserAccessFindFirstOrThrowArgs} args - Arguments to find a TrackingUserAccess
      * @example
-     * // Get one Domain
-     * const domain = await prisma.domain.findFirstOrThrow({
+     * // Get one TrackingUserAccess
+     * const trackingUserAccess = await prisma.trackingUserAccess.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
     **/
-    findFirstOrThrow<T extends DomainFindFirstOrThrowArgs>(
-      args?: SelectSubset<T, DomainFindFirstOrThrowArgs>
-    ): Prisma__DomainClient<DomainGetPayload<T>>
+    findFirstOrThrow<T extends TrackingUserAccessFindFirstOrThrowArgs>(
+      args?: SelectSubset<T, TrackingUserAccessFindFirstOrThrowArgs>
+    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
 
     /**
-     * Find zero or more Domains that matches the filter.
+     * Find zero or more TrackingUserAccesses that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {DomainFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @param {TrackingUserAccessFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all Domains
-     * const domains = await prisma.domain.findMany()
+     * // Get all TrackingUserAccesses
+     * const trackingUserAccesses = await prisma.trackingUserAccess.findMany()
      * 
-     * // Get first 10 Domains
-     * const domains = await prisma.domain.findMany({ take: 10 })
+     * // Get first 10 TrackingUserAccesses
+     * const trackingUserAccesses = await prisma.trackingUserAccess.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const domainWithIdOnly = await prisma.domain.findMany({ select: { id: true } })
+     * const trackingUserAccessWithIdOnly = await prisma.trackingUserAccess.findMany({ select: { id: true } })
      * 
     **/
-    findMany<T extends DomainFindManyArgs>(
-      args?: SelectSubset<T, DomainFindManyArgs>
-    ): PrismaPromise<Array<DomainGetPayload<T>>>
+    findMany<T extends TrackingUserAccessFindManyArgs>(
+      args?: SelectSubset<T, TrackingUserAccessFindManyArgs>
+    ): PrismaPromise<Array<TrackingUserAccessGetPayload<T>>>
 
     /**
-     * Create a Domain.
-     * @param {DomainCreateArgs} args - Arguments to create a Domain.
+     * Create a TrackingUserAccess.
+     * @param {TrackingUserAccessCreateArgs} args - Arguments to create a TrackingUserAccess.
      * @example
-     * // Create one Domain
-     * const Domain = await prisma.domain.create({
+     * // Create one TrackingUserAccess
+     * const TrackingUserAccess = await prisma.trackingUserAccess.create({
      *   data: {
-     *     // ... data to create a Domain
+     *     // ... data to create a TrackingUserAccess
      *   }
      * })
      * 
     **/
-    create<T extends DomainCreateArgs>(
-      args: SelectSubset<T, DomainCreateArgs>
-    ): Prisma__DomainClient<DomainGetPayload<T>>
+    create<T extends TrackingUserAccessCreateArgs>(
+      args: SelectSubset<T, TrackingUserAccessCreateArgs>
+    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
 
     /**
-     * Create many Domains.
-     *     @param {DomainCreateManyArgs} args - Arguments to create many Domains.
+     * Create many TrackingUserAccesses.
+     *     @param {TrackingUserAccessCreateManyArgs} args - Arguments to create many TrackingUserAccesses.
      *     @example
-     *     // Create many Domains
-     *     const domain = await prisma.domain.createMany({
+     *     // Create many TrackingUserAccesses
+     *     const trackingUserAccess = await prisma.trackingUserAccess.createMany({
      *       data: {
      *         // ... provide data here
      *       }
      *     })
      *     
     **/
-    createMany<T extends DomainCreateManyArgs>(
-      args?: SelectSubset<T, DomainCreateManyArgs>
+    createMany<T extends TrackingUserAccessCreateManyArgs>(
+      args?: SelectSubset<T, TrackingUserAccessCreateManyArgs>
     ): PrismaPromise<BatchPayload>
 
     /**
-     * Delete a Domain.
-     * @param {DomainDeleteArgs} args - Arguments to delete one Domain.
+     * Delete a TrackingUserAccess.
+     * @param {TrackingUserAccessDeleteArgs} args - Arguments to delete one TrackingUserAccess.
      * @example
-     * // Delete one Domain
-     * const Domain = await prisma.domain.delete({
+     * // Delete one TrackingUserAccess
+     * const TrackingUserAccess = await prisma.trackingUserAccess.delete({
      *   where: {
-     *     // ... filter to delete one Domain
+     *     // ... filter to delete one TrackingUserAccess
      *   }
      * })
      * 
     **/
-    delete<T extends DomainDeleteArgs>(
-      args: SelectSubset<T, DomainDeleteArgs>
-    ): Prisma__DomainClient<DomainGetPayload<T>>
+    delete<T extends TrackingUserAccessDeleteArgs>(
+      args: SelectSubset<T, TrackingUserAccessDeleteArgs>
+    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
 
     /**
-     * Update one Domain.
-     * @param {DomainUpdateArgs} args - Arguments to update one Domain.
+     * Update one TrackingUserAccess.
+     * @param {TrackingUserAccessUpdateArgs} args - Arguments to update one TrackingUserAccess.
      * @example
-     * // Update one Domain
-     * const domain = await prisma.domain.update({
+     * // Update one TrackingUserAccess
+     * const trackingUserAccess = await prisma.trackingUserAccess.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -4603,34 +4748,34 @@ export namespace Prisma {
      * })
      * 
     **/
-    update<T extends DomainUpdateArgs>(
-      args: SelectSubset<T, DomainUpdateArgs>
-    ): Prisma__DomainClient<DomainGetPayload<T>>
+    update<T extends TrackingUserAccessUpdateArgs>(
+      args: SelectSubset<T, TrackingUserAccessUpdateArgs>
+    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
 
     /**
-     * Delete zero or more Domains.
-     * @param {DomainDeleteManyArgs} args - Arguments to filter Domains to delete.
+     * Delete zero or more TrackingUserAccesses.
+     * @param {TrackingUserAccessDeleteManyArgs} args - Arguments to filter TrackingUserAccesses to delete.
      * @example
-     * // Delete a few Domains
-     * const { count } = await prisma.domain.deleteMany({
+     * // Delete a few TrackingUserAccesses
+     * const { count } = await prisma.trackingUserAccess.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
     **/
-    deleteMany<T extends DomainDeleteManyArgs>(
-      args?: SelectSubset<T, DomainDeleteManyArgs>
+    deleteMany<T extends TrackingUserAccessDeleteManyArgs>(
+      args?: SelectSubset<T, TrackingUserAccessDeleteManyArgs>
     ): PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more Domains.
+     * Update zero or more TrackingUserAccesses.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {DomainUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {TrackingUserAccessUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many Domains
-     * const domain = await prisma.domain.updateMany({
+     * // Update many TrackingUserAccesses
+     * const trackingUserAccess = await prisma.trackingUserAccess.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -4640,59 +4785,59 @@ export namespace Prisma {
      * })
      * 
     **/
-    updateMany<T extends DomainUpdateManyArgs>(
-      args: SelectSubset<T, DomainUpdateManyArgs>
+    updateMany<T extends TrackingUserAccessUpdateManyArgs>(
+      args: SelectSubset<T, TrackingUserAccessUpdateManyArgs>
     ): PrismaPromise<BatchPayload>
 
     /**
-     * Create or update one Domain.
-     * @param {DomainUpsertArgs} args - Arguments to update or create a Domain.
+     * Create or update one TrackingUserAccess.
+     * @param {TrackingUserAccessUpsertArgs} args - Arguments to update or create a TrackingUserAccess.
      * @example
-     * // Update or create a Domain
-     * const domain = await prisma.domain.upsert({
+     * // Update or create a TrackingUserAccess
+     * const trackingUserAccess = await prisma.trackingUserAccess.upsert({
      *   create: {
-     *     // ... data to create a Domain
+     *     // ... data to create a TrackingUserAccess
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the Domain we want to update
+     *     // ... the filter for the TrackingUserAccess we want to update
      *   }
      * })
     **/
-    upsert<T extends DomainUpsertArgs>(
-      args: SelectSubset<T, DomainUpsertArgs>
-    ): Prisma__DomainClient<DomainGetPayload<T>>
+    upsert<T extends TrackingUserAccessUpsertArgs>(
+      args: SelectSubset<T, TrackingUserAccessUpsertArgs>
+    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
 
     /**
-     * Count the number of Domains.
+     * Count the number of TrackingUserAccesses.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {DomainCountArgs} args - Arguments to filter Domains to count.
+     * @param {TrackingUserAccessCountArgs} args - Arguments to filter TrackingUserAccesses to count.
      * @example
-     * // Count the number of Domains
-     * const count = await prisma.domain.count({
+     * // Count the number of TrackingUserAccesses
+     * const count = await prisma.trackingUserAccess.count({
      *   where: {
-     *     // ... the filter for the Domains we want to count
+     *     // ... the filter for the TrackingUserAccesses we want to count
      *   }
      * })
     **/
-    count<T extends DomainCountArgs>(
-      args?: Subset<T, DomainCountArgs>,
+    count<T extends TrackingUserAccessCountArgs>(
+      args?: Subset<T, TrackingUserAccessCountArgs>,
     ): PrismaPromise<
       T extends _Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], DomainCountAggregateOutputType>
+          : GetScalarType<T['select'], TrackingUserAccessCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a Domain.
+     * Allows you to perform aggregations operations on a TrackingUserAccess.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {DomainAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {TrackingUserAccessAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -4712,13 +4857,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends DomainAggregateArgs>(args: Subset<T, DomainAggregateArgs>): PrismaPromise<GetDomainAggregateType<T>>
+    aggregate<T extends TrackingUserAccessAggregateArgs>(args: Subset<T, TrackingUserAccessAggregateArgs>): PrismaPromise<GetTrackingUserAccessAggregateType<T>>
 
     /**
-     * Group by Domain.
+     * Group by TrackingUserAccess.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {DomainGroupByArgs} args - Group by arguments.
+     * @param {TrackingUserAccessGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -4733,14 +4878,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends DomainGroupByArgs,
+      T extends TrackingUserAccessGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: DomainGroupByArgs['orderBy'] }
-        : { orderBy?: DomainGroupByArgs['orderBy'] },
+        ? { orderBy: TrackingUserAccessGroupByArgs['orderBy'] }
+        : { orderBy?: TrackingUserAccessGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends TupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -4789,17 +4934,17 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, DomainGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDomainGroupByPayload<T> : PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, TrackingUserAccessGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTrackingUserAccessGroupByPayload<T> : PrismaPromise<InputErrors>
 
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for Domain.
+   * The delegate class that acts as a "Promise-like" for TrackingUserAccess.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__DomainClient<T, Null = never> implements PrismaPromise<T> {
+  export class Prisma__TrackingUserAccessClient<T, Null = never> implements PrismaPromise<T> {
     [prisma]: true;
     private readonly _dmmf;
     private readonly _fetcher;
@@ -4816,7 +4961,9 @@ export namespace Prisma {
     constructor(_dmmf: runtime.DMMFClass, _fetcher: PrismaClientFetcher, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
     readonly [Symbol.toStringTag]: 'PrismaClientPromise';
 
-    owner<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+    user<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+
+    workspace<T extends WorkspaceArgs= {}>(args?: Subset<T, WorkspaceArgs>): Prisma__WorkspaceClient<WorkspaceGetPayload<T> | Null>;
 
     private get _document();
     /**
@@ -4846,30 +4993,30 @@ export namespace Prisma {
   // Custom InputTypes
 
   /**
-   * Domain base type for findUnique actions
+   * TrackingUserAccess base type for findUnique actions
    */
-  export type DomainFindUniqueArgsBase = {
+  export type TrackingUserAccessFindUniqueArgsBase = {
     /**
-     * Select specific fields to fetch from the Domain
+     * Select specific fields to fetch from the TrackingUserAccess
      * 
     **/
-    select?: DomainSelect | null
+    select?: TrackingUserAccessSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: DomainInclude | null
+    include?: TrackingUserAccessInclude | null
     /**
-     * Filter, which Domain to fetch.
+     * Filter, which TrackingUserAccess to fetch.
      * 
     **/
-    where: DomainWhereUniqueInput
+    where: TrackingUserAccessWhereUniqueInput
   }
 
   /**
-   * Domain findUnique
+   * TrackingUserAccess findUnique
    */
-  export interface DomainFindUniqueArgs extends DomainFindUniqueArgsBase {
+  export interface TrackingUserAccessFindUniqueArgs extends TrackingUserAccessFindUniqueArgsBase {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
@@ -4879,87 +5026,87 @@ export namespace Prisma {
       
 
   /**
-   * Domain findUniqueOrThrow
+   * TrackingUserAccess findUniqueOrThrow
    */
-  export type DomainFindUniqueOrThrowArgs = {
+  export type TrackingUserAccessFindUniqueOrThrowArgs = {
     /**
-     * Select specific fields to fetch from the Domain
+     * Select specific fields to fetch from the TrackingUserAccess
      * 
     **/
-    select?: DomainSelect | null
+    select?: TrackingUserAccessSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: DomainInclude | null
+    include?: TrackingUserAccessInclude | null
     /**
-     * Filter, which Domain to fetch.
+     * Filter, which TrackingUserAccess to fetch.
      * 
     **/
-    where: DomainWhereUniqueInput
+    where: TrackingUserAccessWhereUniqueInput
   }
 
 
   /**
-   * Domain base type for findFirst actions
+   * TrackingUserAccess base type for findFirst actions
    */
-  export type DomainFindFirstArgsBase = {
+  export type TrackingUserAccessFindFirstArgsBase = {
     /**
-     * Select specific fields to fetch from the Domain
+     * Select specific fields to fetch from the TrackingUserAccess
      * 
     **/
-    select?: DomainSelect | null
+    select?: TrackingUserAccessSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: DomainInclude | null
+    include?: TrackingUserAccessInclude | null
     /**
-     * Filter, which Domain to fetch.
+     * Filter, which TrackingUserAccess to fetch.
      * 
     **/
-    where?: DomainWhereInput
+    where?: TrackingUserAccessWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Domains to fetch.
+     * Determine the order of TrackingUserAccesses to fetch.
      * 
     **/
-    orderBy?: Enumerable<DomainOrderByWithRelationInput>
+    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for Domains.
+     * Sets the position for searching for TrackingUserAccesses.
      * 
     **/
-    cursor?: DomainWhereUniqueInput
+    cursor?: TrackingUserAccessWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Domains from the position of the cursor.
+     * Take `±n` TrackingUserAccesses from the position of the cursor.
      * 
     **/
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Domains.
+     * Skip the first `n` TrackingUserAccesses.
      * 
     **/
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of Domains.
+     * Filter by unique combinations of TrackingUserAccesses.
      * 
     **/
-    distinct?: Enumerable<DomainScalarFieldEnum>
+    distinct?: Enumerable<TrackingUserAccessScalarFieldEnum>
   }
 
   /**
-   * Domain findFirst
+   * TrackingUserAccess findFirst
    */
-  export interface DomainFindFirstArgs extends DomainFindFirstArgsBase {
+  export interface TrackingUserAccessFindFirstArgs extends TrackingUserAccessFindFirstArgsBase {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
@@ -4969,272 +5116,1399 @@ export namespace Prisma {
       
 
   /**
-   * Domain findFirstOrThrow
+   * TrackingUserAccess findFirstOrThrow
    */
-  export type DomainFindFirstOrThrowArgs = {
+  export type TrackingUserAccessFindFirstOrThrowArgs = {
     /**
-     * Select specific fields to fetch from the Domain
+     * Select specific fields to fetch from the TrackingUserAccess
      * 
     **/
-    select?: DomainSelect | null
+    select?: TrackingUserAccessSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: DomainInclude | null
+    include?: TrackingUserAccessInclude | null
     /**
-     * Filter, which Domain to fetch.
+     * Filter, which TrackingUserAccess to fetch.
      * 
     **/
-    where?: DomainWhereInput
+    where?: TrackingUserAccessWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Domains to fetch.
+     * Determine the order of TrackingUserAccesses to fetch.
      * 
     **/
-    orderBy?: Enumerable<DomainOrderByWithRelationInput>
+    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for Domains.
+     * Sets the position for searching for TrackingUserAccesses.
      * 
     **/
-    cursor?: DomainWhereUniqueInput
+    cursor?: TrackingUserAccessWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Domains from the position of the cursor.
+     * Take `±n` TrackingUserAccesses from the position of the cursor.
      * 
     **/
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Domains.
+     * Skip the first `n` TrackingUserAccesses.
      * 
     **/
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of Domains.
+     * Filter by unique combinations of TrackingUserAccesses.
      * 
     **/
-    distinct?: Enumerable<DomainScalarFieldEnum>
+    distinct?: Enumerable<TrackingUserAccessScalarFieldEnum>
   }
 
 
   /**
-   * Domain findMany
+   * TrackingUserAccess findMany
    */
-  export type DomainFindManyArgs = {
+  export type TrackingUserAccessFindManyArgs = {
     /**
-     * Select specific fields to fetch from the Domain
+     * Select specific fields to fetch from the TrackingUserAccess
      * 
     **/
-    select?: DomainSelect | null
+    select?: TrackingUserAccessSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: DomainInclude | null
+    include?: TrackingUserAccessInclude | null
     /**
-     * Filter, which Domains to fetch.
+     * Filter, which TrackingUserAccesses to fetch.
      * 
     **/
-    where?: DomainWhereInput
+    where?: TrackingUserAccessWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Domains to fetch.
+     * Determine the order of TrackingUserAccesses to fetch.
      * 
     **/
-    orderBy?: Enumerable<DomainOrderByWithRelationInput>
+    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing Domains.
+     * Sets the position for listing TrackingUserAccesses.
      * 
     **/
-    cursor?: DomainWhereUniqueInput
+    cursor?: TrackingUserAccessWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Domains from the position of the cursor.
+     * Take `±n` TrackingUserAccesses from the position of the cursor.
      * 
     **/
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Domains.
+     * Skip the first `n` TrackingUserAccesses.
      * 
     **/
     skip?: number
-    distinct?: Enumerable<DomainScalarFieldEnum>
+    distinct?: Enumerable<TrackingUserAccessScalarFieldEnum>
   }
 
 
   /**
-   * Domain create
+   * TrackingUserAccess create
    */
-  export type DomainCreateArgs = {
+  export type TrackingUserAccessCreateArgs = {
     /**
-     * Select specific fields to fetch from the Domain
+     * Select specific fields to fetch from the TrackingUserAccess
      * 
     **/
-    select?: DomainSelect | null
+    select?: TrackingUserAccessSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: DomainInclude | null
+    include?: TrackingUserAccessInclude | null
     /**
-     * The data needed to create a Domain.
+     * The data needed to create a TrackingUserAccess.
      * 
     **/
-    data: XOR<DomainCreateInput, DomainUncheckedCreateInput>
+    data: XOR<TrackingUserAccessCreateInput, TrackingUserAccessUncheckedCreateInput>
   }
 
 
   /**
-   * Domain createMany
+   * TrackingUserAccess createMany
    */
-  export type DomainCreateManyArgs = {
+  export type TrackingUserAccessCreateManyArgs = {
     /**
-     * The data used to create many Domains.
+     * The data used to create many TrackingUserAccesses.
      * 
     **/
-    data: Enumerable<DomainCreateManyInput>
+    data: Enumerable<TrackingUserAccessCreateManyInput>
     skipDuplicates?: boolean
   }
 
 
   /**
-   * Domain update
+   * TrackingUserAccess update
    */
-  export type DomainUpdateArgs = {
+  export type TrackingUserAccessUpdateArgs = {
     /**
-     * Select specific fields to fetch from the Domain
+     * Select specific fields to fetch from the TrackingUserAccess
      * 
     **/
-    select?: DomainSelect | null
+    select?: TrackingUserAccessSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: DomainInclude | null
+    include?: TrackingUserAccessInclude | null
     /**
-     * The data needed to update a Domain.
+     * The data needed to update a TrackingUserAccess.
      * 
     **/
-    data: XOR<DomainUpdateInput, DomainUncheckedUpdateInput>
+    data: XOR<TrackingUserAccessUpdateInput, TrackingUserAccessUncheckedUpdateInput>
     /**
-     * Choose, which Domain to update.
+     * Choose, which TrackingUserAccess to update.
      * 
     **/
-    where: DomainWhereUniqueInput
+    where: TrackingUserAccessWhereUniqueInput
   }
 
 
   /**
-   * Domain updateMany
+   * TrackingUserAccess updateMany
    */
-  export type DomainUpdateManyArgs = {
+  export type TrackingUserAccessUpdateManyArgs = {
     /**
-     * The data used to update Domains.
+     * The data used to update TrackingUserAccesses.
      * 
     **/
-    data: XOR<DomainUpdateManyMutationInput, DomainUncheckedUpdateManyInput>
+    data: XOR<TrackingUserAccessUpdateManyMutationInput, TrackingUserAccessUncheckedUpdateManyInput>
     /**
-     * Filter which Domains to update
+     * Filter which TrackingUserAccesses to update
      * 
     **/
-    where?: DomainWhereInput
+    where?: TrackingUserAccessWhereInput
   }
 
 
   /**
-   * Domain upsert
+   * TrackingUserAccess upsert
    */
-  export type DomainUpsertArgs = {
+  export type TrackingUserAccessUpsertArgs = {
     /**
-     * Select specific fields to fetch from the Domain
+     * Select specific fields to fetch from the TrackingUserAccess
      * 
     **/
-    select?: DomainSelect | null
+    select?: TrackingUserAccessSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: DomainInclude | null
+    include?: TrackingUserAccessInclude | null
     /**
-     * The filter to search for the Domain to update in case it exists.
+     * The filter to search for the TrackingUserAccess to update in case it exists.
      * 
     **/
-    where: DomainWhereUniqueInput
+    where: TrackingUserAccessWhereUniqueInput
     /**
-     * In case the Domain found by the `where` argument doesn't exist, create a new Domain with this data.
+     * In case the TrackingUserAccess found by the `where` argument doesn't exist, create a new TrackingUserAccess with this data.
      * 
     **/
-    create: XOR<DomainCreateInput, DomainUncheckedCreateInput>
+    create: XOR<TrackingUserAccessCreateInput, TrackingUserAccessUncheckedCreateInput>
     /**
-     * In case the Domain was found with the provided `where` argument, update it with this data.
+     * In case the TrackingUserAccess was found with the provided `where` argument, update it with this data.
      * 
     **/
-    update: XOR<DomainUpdateInput, DomainUncheckedUpdateInput>
+    update: XOR<TrackingUserAccessUpdateInput, TrackingUserAccessUncheckedUpdateInput>
   }
 
 
   /**
-   * Domain delete
+   * TrackingUserAccess delete
    */
-  export type DomainDeleteArgs = {
+  export type TrackingUserAccessDeleteArgs = {
     /**
-     * Select specific fields to fetch from the Domain
+     * Select specific fields to fetch from the TrackingUserAccess
      * 
     **/
-    select?: DomainSelect | null
+    select?: TrackingUserAccessSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: DomainInclude | null
+    include?: TrackingUserAccessInclude | null
     /**
-     * Filter which Domain to delete.
+     * Filter which TrackingUserAccess to delete.
      * 
     **/
-    where: DomainWhereUniqueInput
+    where: TrackingUserAccessWhereUniqueInput
   }
 
 
   /**
-   * Domain deleteMany
+   * TrackingUserAccess deleteMany
    */
-  export type DomainDeleteManyArgs = {
+  export type TrackingUserAccessDeleteManyArgs = {
     /**
-     * Filter which Domains to delete
+     * Filter which TrackingUserAccesses to delete
      * 
     **/
-    where?: DomainWhereInput
+    where?: TrackingUserAccessWhereInput
   }
 
 
   /**
-   * Domain without action
+   * TrackingUserAccess without action
    */
-  export type DomainArgs = {
+  export type TrackingUserAccessArgs = {
     /**
-     * Select specific fields to fetch from the Domain
+     * Select specific fields to fetch from the TrackingUserAccess
      * 
     **/
-    select?: DomainSelect | null
+    select?: TrackingUserAccessSelect | null
     /**
      * Choose, which related nodes to fetch as well.
      * 
     **/
-    include?: DomainInclude | null
+    include?: TrackingUserAccessInclude | null
+  }
+
+
+
+  /**
+   * Model Workspace
+   */
+
+
+  export type AggregateWorkspace = {
+    _count: WorkspaceCountAggregateOutputType | null
+    _min: WorkspaceMinAggregateOutputType | null
+    _max: WorkspaceMaxAggregateOutputType | null
+  }
+
+  export type WorkspaceMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    domain: string | null
+    stripeCustomerId: string | null
+    stripeWorkspaceId: string | null
+    stripeSubscriptionId: string | null
+    stripePriceId: string | null
+    stripeCurrentPeriodEnd: Date | null
+    createdBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type WorkspaceMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    domain: string | null
+    stripeCustomerId: string | null
+    stripeWorkspaceId: string | null
+    stripeSubscriptionId: string | null
+    stripePriceId: string | null
+    stripeCurrentPeriodEnd: Date | null
+    createdBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type WorkspaceCountAggregateOutputType = {
+    id: number
+    name: number
+    domain: number
+    stripeCustomerId: number
+    stripeWorkspaceId: number
+    stripeSubscriptionId: number
+    stripePriceId: number
+    stripeCurrentPeriodEnd: number
+    createdBy: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type WorkspaceMinAggregateInputType = {
+    id?: true
+    name?: true
+    domain?: true
+    stripeCustomerId?: true
+    stripeWorkspaceId?: true
+    stripeSubscriptionId?: true
+    stripePriceId?: true
+    stripeCurrentPeriodEnd?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type WorkspaceMaxAggregateInputType = {
+    id?: true
+    name?: true
+    domain?: true
+    stripeCustomerId?: true
+    stripeWorkspaceId?: true
+    stripeSubscriptionId?: true
+    stripePriceId?: true
+    stripeCurrentPeriodEnd?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type WorkspaceCountAggregateInputType = {
+    id?: true
+    name?: true
+    domain?: true
+    stripeCustomerId?: true
+    stripeWorkspaceId?: true
+    stripeSubscriptionId?: true
+    stripePriceId?: true
+    stripeCurrentPeriodEnd?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type WorkspaceAggregateArgs = {
+    /**
+     * Filter which Workspace to aggregate.
+     * 
+    **/
+    where?: WorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Workspaces to fetch.
+     * 
+    **/
+    orderBy?: Enumerable<WorkspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     * 
+    **/
+    cursor?: WorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Workspaces from the position of the cursor.
+     * 
+    **/
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Workspaces.
+     * 
+    **/
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Workspaces
+    **/
+    _count?: true | WorkspaceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: WorkspaceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: WorkspaceMaxAggregateInputType
+  }
+
+  export type GetWorkspaceAggregateType<T extends WorkspaceAggregateArgs> = {
+        [P in keyof T & keyof AggregateWorkspace]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateWorkspace[P]>
+      : GetScalarType<T[P], AggregateWorkspace[P]>
+  }
+
+
+
+
+  export type WorkspaceGroupByArgs = {
+    where?: WorkspaceWhereInput
+    orderBy?: Enumerable<WorkspaceOrderByWithAggregationInput>
+    by: Array<WorkspaceScalarFieldEnum>
+    having?: WorkspaceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: WorkspaceCountAggregateInputType | true
+    _min?: WorkspaceMinAggregateInputType
+    _max?: WorkspaceMaxAggregateInputType
+  }
+
+
+  export type WorkspaceGroupByOutputType = {
+    id: string
+    name: string
+    domain: string
+    stripeCustomerId: string | null
+    stripeWorkspaceId: string | null
+    stripeSubscriptionId: string | null
+    stripePriceId: string | null
+    stripeCurrentPeriodEnd: Date | null
+    createdBy: string
+    createdAt: Date
+    updatedAt: Date
+    _count: WorkspaceCountAggregateOutputType | null
+    _min: WorkspaceMinAggregateOutputType | null
+    _max: WorkspaceMaxAggregateOutputType | null
+  }
+
+  type GetWorkspaceGroupByPayload<T extends WorkspaceGroupByArgs> = PrismaPromise<
+    Array<
+      PickArray<WorkspaceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof WorkspaceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], WorkspaceGroupByOutputType[P]>
+            : GetScalarType<T[P], WorkspaceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type WorkspaceSelect = {
+    id?: boolean
+    name?: boolean
+    domain?: boolean
+    stripeCustomerId?: boolean
+    stripeWorkspaceId?: boolean
+    stripeSubscriptionId?: boolean
+    stripePriceId?: boolean
+    stripeCurrentPeriodEnd?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    trackUserAccessWorkspace?: boolean | UserArgs
+    users?: boolean | WorkspaceUsersArgs
+    notebooks?: boolean | WorkspaceNotebooksArgs
+    trackingUserAccess?: boolean | WorkspaceTrackingUserAccessArgs
+    _count?: boolean | WorkspaceCountOutputTypeArgs
+  }
+
+
+  export type WorkspaceInclude = {
+    trackUserAccessWorkspace?: boolean | UserArgs
+    users?: boolean | WorkspaceUsersArgs
+    notebooks?: boolean | WorkspaceNotebooksArgs
+    trackingUserAccess?: boolean | WorkspaceTrackingUserAccessArgs
+    _count?: boolean | WorkspaceCountOutputTypeArgs
+  } 
+
+  export type WorkspaceGetPayload<S extends boolean | null | undefined | WorkspaceArgs> =
+    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
+    S extends true ? Workspace :
+    S extends undefined ? never :
+    S extends { include: any } & (WorkspaceArgs | WorkspaceFindManyArgs)
+    ? Workspace  & {
+    [P in TruthyKeys<S['include']>]:
+        P extends 'trackUserAccessWorkspace' ? UserGetPayload<S['include'][P]> | null :
+        P extends 'users' ? Array < UserGetPayload<S['include'][P]>>  :
+        P extends 'notebooks' ? Array < NotebookGetPayload<S['include'][P]>>  :
+        P extends 'trackingUserAccess' ? Array < TrackingUserAccessGetPayload<S['include'][P]>>  :
+        P extends '_count' ? WorkspaceCountOutputTypeGetPayload<S['include'][P]> :  never
+  } 
+    : S extends { select: any } & (WorkspaceArgs | WorkspaceFindManyArgs)
+      ? {
+    [P in TruthyKeys<S['select']>]:
+        P extends 'trackUserAccessWorkspace' ? UserGetPayload<S['select'][P]> | null :
+        P extends 'users' ? Array < UserGetPayload<S['select'][P]>>  :
+        P extends 'notebooks' ? Array < NotebookGetPayload<S['select'][P]>>  :
+        P extends 'trackingUserAccess' ? Array < TrackingUserAccessGetPayload<S['select'][P]>>  :
+        P extends '_count' ? WorkspaceCountOutputTypeGetPayload<S['select'][P]> :  P extends keyof Workspace ? Workspace[P] : never
+  } 
+      : Workspace
+
+
+  type WorkspaceCountArgs = Merge<
+    Omit<WorkspaceFindManyArgs, 'select' | 'include'> & {
+      select?: WorkspaceCountAggregateInputType | true
+    }
+  >
+
+  export interface WorkspaceDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
+    /**
+     * Find zero or one Workspace that matches the filter.
+     * @param {WorkspaceFindUniqueArgs} args - Arguments to find a Workspace
+     * @example
+     * // Get one Workspace
+     * const workspace = await prisma.workspace.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUnique<T extends WorkspaceFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, WorkspaceFindUniqueArgs>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Workspace'> extends True ? Prisma__WorkspaceClient<WorkspaceGetPayload<T>> : Prisma__WorkspaceClient<WorkspaceGetPayload<T> | null, null>
+
+    /**
+     * Find one Workspace that matches the filter or throw an error  with `error.code='P2025'` 
+     *     if no matches were found.
+     * @param {WorkspaceFindUniqueOrThrowArgs} args - Arguments to find a Workspace
+     * @example
+     * // Get one Workspace
+     * const workspace = await prisma.workspace.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUniqueOrThrow<T extends WorkspaceFindUniqueOrThrowArgs>(
+      args?: SelectSubset<T, WorkspaceFindUniqueOrThrowArgs>
+    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+
+    /**
+     * Find the first Workspace that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceFindFirstArgs} args - Arguments to find a Workspace
+     * @example
+     * // Get one Workspace
+     * const workspace = await prisma.workspace.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirst<T extends WorkspaceFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, WorkspaceFindFirstArgs>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Workspace'> extends True ? Prisma__WorkspaceClient<WorkspaceGetPayload<T>> : Prisma__WorkspaceClient<WorkspaceGetPayload<T> | null, null>
+
+    /**
+     * Find the first Workspace that matches the filter or
+     * throw `NotFoundError` if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceFindFirstOrThrowArgs} args - Arguments to find a Workspace
+     * @example
+     * // Get one Workspace
+     * const workspace = await prisma.workspace.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirstOrThrow<T extends WorkspaceFindFirstOrThrowArgs>(
+      args?: SelectSubset<T, WorkspaceFindFirstOrThrowArgs>
+    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+
+    /**
+     * Find zero or more Workspaces that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Workspaces
+     * const workspaces = await prisma.workspace.findMany()
+     * 
+     * // Get first 10 Workspaces
+     * const workspaces = await prisma.workspace.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const workspaceWithIdOnly = await prisma.workspace.findMany({ select: { id: true } })
+     * 
+    **/
+    findMany<T extends WorkspaceFindManyArgs>(
+      args?: SelectSubset<T, WorkspaceFindManyArgs>
+    ): PrismaPromise<Array<WorkspaceGetPayload<T>>>
+
+    /**
+     * Create a Workspace.
+     * @param {WorkspaceCreateArgs} args - Arguments to create a Workspace.
+     * @example
+     * // Create one Workspace
+     * const Workspace = await prisma.workspace.create({
+     *   data: {
+     *     // ... data to create a Workspace
+     *   }
+     * })
+     * 
+    **/
+    create<T extends WorkspaceCreateArgs>(
+      args: SelectSubset<T, WorkspaceCreateArgs>
+    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+
+    /**
+     * Create many Workspaces.
+     *     @param {WorkspaceCreateManyArgs} args - Arguments to create many Workspaces.
+     *     @example
+     *     // Create many Workspaces
+     *     const workspace = await prisma.workspace.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends WorkspaceCreateManyArgs>(
+      args?: SelectSubset<T, WorkspaceCreateManyArgs>
+    ): PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Workspace.
+     * @param {WorkspaceDeleteArgs} args - Arguments to delete one Workspace.
+     * @example
+     * // Delete one Workspace
+     * const Workspace = await prisma.workspace.delete({
+     *   where: {
+     *     // ... filter to delete one Workspace
+     *   }
+     * })
+     * 
+    **/
+    delete<T extends WorkspaceDeleteArgs>(
+      args: SelectSubset<T, WorkspaceDeleteArgs>
+    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+
+    /**
+     * Update one Workspace.
+     * @param {WorkspaceUpdateArgs} args - Arguments to update one Workspace.
+     * @example
+     * // Update one Workspace
+     * const workspace = await prisma.workspace.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    update<T extends WorkspaceUpdateArgs>(
+      args: SelectSubset<T, WorkspaceUpdateArgs>
+    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+
+    /**
+     * Delete zero or more Workspaces.
+     * @param {WorkspaceDeleteManyArgs} args - Arguments to filter Workspaces to delete.
+     * @example
+     * // Delete a few Workspaces
+     * const { count } = await prisma.workspace.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+    **/
+    deleteMany<T extends WorkspaceDeleteManyArgs>(
+      args?: SelectSubset<T, WorkspaceDeleteManyArgs>
+    ): PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Workspaces.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Workspaces
+     * const workspace = await prisma.workspace.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    updateMany<T extends WorkspaceUpdateManyArgs>(
+      args: SelectSubset<T, WorkspaceUpdateManyArgs>
+    ): PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Workspace.
+     * @param {WorkspaceUpsertArgs} args - Arguments to update or create a Workspace.
+     * @example
+     * // Update or create a Workspace
+     * const workspace = await prisma.workspace.upsert({
+     *   create: {
+     *     // ... data to create a Workspace
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Workspace we want to update
+     *   }
+     * })
+    **/
+    upsert<T extends WorkspaceUpsertArgs>(
+      args: SelectSubset<T, WorkspaceUpsertArgs>
+    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+
+    /**
+     * Count the number of Workspaces.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceCountArgs} args - Arguments to filter Workspaces to count.
+     * @example
+     * // Count the number of Workspaces
+     * const count = await prisma.workspace.count({
+     *   where: {
+     *     // ... the filter for the Workspaces we want to count
+     *   }
+     * })
+    **/
+    count<T extends WorkspaceCountArgs>(
+      args?: Subset<T, WorkspaceCountArgs>,
+    ): PrismaPromise<
+      T extends _Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], WorkspaceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Workspace.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends WorkspaceAggregateArgs>(args: Subset<T, WorkspaceAggregateArgs>): PrismaPromise<GetWorkspaceAggregateType<T>>
+
+    /**
+     * Group by Workspace.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends WorkspaceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: WorkspaceGroupByArgs['orderBy'] }
+        : { orderBy?: WorkspaceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, WorkspaceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetWorkspaceGroupByPayload<T> : PrismaPromise<InputErrors>
+
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Workspace.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export class Prisma__WorkspaceClient<T, Null = never> implements PrismaPromise<T> {
+    [prisma]: true;
+    private readonly _dmmf;
+    private readonly _fetcher;
+    private readonly _queryType;
+    private readonly _rootField;
+    private readonly _clientMethod;
+    private readonly _args;
+    private readonly _dataPath;
+    private readonly _errorFormat;
+    private readonly _measurePerformance?;
+    private _isList;
+    private _callsite;
+    private _requestPromise?;
+    constructor(_dmmf: runtime.DMMFClass, _fetcher: PrismaClientFetcher, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
+    readonly [Symbol.toStringTag]: 'PrismaClientPromise';
+
+    trackUserAccessWorkspace<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+
+    users<T extends WorkspaceUsersArgs= {}>(args?: Subset<T, WorkspaceUsersArgs>): PrismaPromise<Array<UserGetPayload<T>>| Null>;
+
+    notebooks<T extends WorkspaceNotebooksArgs= {}>(args?: Subset<T, WorkspaceNotebooksArgs>): PrismaPromise<Array<NotebookGetPayload<T>>| Null>;
+
+    trackingUserAccess<T extends WorkspaceTrackingUserAccessArgs= {}>(args?: Subset<T, WorkspaceTrackingUserAccessArgs>): PrismaPromise<Array<TrackingUserAccessGetPayload<T>>| Null>;
+
+    private get _document();
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): Promise<T>;
+  }
+
+
+
+  // Custom InputTypes
+
+  /**
+   * Workspace base type for findUnique actions
+   */
+  export type WorkspaceFindUniqueArgsBase = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     * 
+    **/
+    select?: WorkspaceSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: WorkspaceInclude | null
+    /**
+     * Filter, which Workspace to fetch.
+     * 
+    **/
+    where: WorkspaceWhereUniqueInput
+  }
+
+  /**
+   * Workspace findUnique
+   */
+  export interface WorkspaceFindUniqueArgs extends WorkspaceFindUniqueArgsBase {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * Workspace findUniqueOrThrow
+   */
+  export type WorkspaceFindUniqueOrThrowArgs = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     * 
+    **/
+    select?: WorkspaceSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: WorkspaceInclude | null
+    /**
+     * Filter, which Workspace to fetch.
+     * 
+    **/
+    where: WorkspaceWhereUniqueInput
+  }
+
+
+  /**
+   * Workspace base type for findFirst actions
+   */
+  export type WorkspaceFindFirstArgsBase = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     * 
+    **/
+    select?: WorkspaceSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: WorkspaceInclude | null
+    /**
+     * Filter, which Workspace to fetch.
+     * 
+    **/
+    where?: WorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Workspaces to fetch.
+     * 
+    **/
+    orderBy?: Enumerable<WorkspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Workspaces.
+     * 
+    **/
+    cursor?: WorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Workspaces from the position of the cursor.
+     * 
+    **/
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Workspaces.
+     * 
+    **/
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Workspaces.
+     * 
+    **/
+    distinct?: Enumerable<WorkspaceScalarFieldEnum>
+  }
+
+  /**
+   * Workspace findFirst
+   */
+  export interface WorkspaceFindFirstArgs extends WorkspaceFindFirstArgsBase {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * Workspace findFirstOrThrow
+   */
+  export type WorkspaceFindFirstOrThrowArgs = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     * 
+    **/
+    select?: WorkspaceSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: WorkspaceInclude | null
+    /**
+     * Filter, which Workspace to fetch.
+     * 
+    **/
+    where?: WorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Workspaces to fetch.
+     * 
+    **/
+    orderBy?: Enumerable<WorkspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Workspaces.
+     * 
+    **/
+    cursor?: WorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Workspaces from the position of the cursor.
+     * 
+    **/
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Workspaces.
+     * 
+    **/
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Workspaces.
+     * 
+    **/
+    distinct?: Enumerable<WorkspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * Workspace findMany
+   */
+  export type WorkspaceFindManyArgs = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     * 
+    **/
+    select?: WorkspaceSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: WorkspaceInclude | null
+    /**
+     * Filter, which Workspaces to fetch.
+     * 
+    **/
+    where?: WorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Workspaces to fetch.
+     * 
+    **/
+    orderBy?: Enumerable<WorkspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Workspaces.
+     * 
+    **/
+    cursor?: WorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Workspaces from the position of the cursor.
+     * 
+    **/
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Workspaces.
+     * 
+    **/
+    skip?: number
+    distinct?: Enumerable<WorkspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * Workspace create
+   */
+  export type WorkspaceCreateArgs = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     * 
+    **/
+    select?: WorkspaceSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: WorkspaceInclude | null
+    /**
+     * The data needed to create a Workspace.
+     * 
+    **/
+    data: XOR<WorkspaceCreateInput, WorkspaceUncheckedCreateInput>
+  }
+
+
+  /**
+   * Workspace createMany
+   */
+  export type WorkspaceCreateManyArgs = {
+    /**
+     * The data used to create many Workspaces.
+     * 
+    **/
+    data: Enumerable<WorkspaceCreateManyInput>
+    skipDuplicates?: boolean
+  }
+
+
+  /**
+   * Workspace update
+   */
+  export type WorkspaceUpdateArgs = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     * 
+    **/
+    select?: WorkspaceSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: WorkspaceInclude | null
+    /**
+     * The data needed to update a Workspace.
+     * 
+    **/
+    data: XOR<WorkspaceUpdateInput, WorkspaceUncheckedUpdateInput>
+    /**
+     * Choose, which Workspace to update.
+     * 
+    **/
+    where: WorkspaceWhereUniqueInput
+  }
+
+
+  /**
+   * Workspace updateMany
+   */
+  export type WorkspaceUpdateManyArgs = {
+    /**
+     * The data used to update Workspaces.
+     * 
+    **/
+    data: XOR<WorkspaceUpdateManyMutationInput, WorkspaceUncheckedUpdateManyInput>
+    /**
+     * Filter which Workspaces to update
+     * 
+    **/
+    where?: WorkspaceWhereInput
+  }
+
+
+  /**
+   * Workspace upsert
+   */
+  export type WorkspaceUpsertArgs = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     * 
+    **/
+    select?: WorkspaceSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: WorkspaceInclude | null
+    /**
+     * The filter to search for the Workspace to update in case it exists.
+     * 
+    **/
+    where: WorkspaceWhereUniqueInput
+    /**
+     * In case the Workspace found by the `where` argument doesn't exist, create a new Workspace with this data.
+     * 
+    **/
+    create: XOR<WorkspaceCreateInput, WorkspaceUncheckedCreateInput>
+    /**
+     * In case the Workspace was found with the provided `where` argument, update it with this data.
+     * 
+    **/
+    update: XOR<WorkspaceUpdateInput, WorkspaceUncheckedUpdateInput>
+  }
+
+
+  /**
+   * Workspace delete
+   */
+  export type WorkspaceDeleteArgs = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     * 
+    **/
+    select?: WorkspaceSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: WorkspaceInclude | null
+    /**
+     * Filter which Workspace to delete.
+     * 
+    **/
+    where: WorkspaceWhereUniqueInput
+  }
+
+
+  /**
+   * Workspace deleteMany
+   */
+  export type WorkspaceDeleteManyArgs = {
+    /**
+     * Filter which Workspaces to delete
+     * 
+    **/
+    where?: WorkspaceWhereInput
+  }
+
+
+  /**
+   * Workspace.users
+   */
+  export type WorkspaceUsersArgs = {
+    /**
+     * Select specific fields to fetch from the User
+     * 
+    **/
+    select?: UserSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: UserInclude | null
+    where?: UserWhereInput
+    orderBy?: Enumerable<UserOrderByWithRelationInput>
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<UserScalarFieldEnum>
+  }
+
+
+  /**
+   * Workspace.notebooks
+   */
+  export type WorkspaceNotebooksArgs = {
+    /**
+     * Select specific fields to fetch from the Notebook
+     * 
+    **/
+    select?: NotebookSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: NotebookInclude | null
+    where?: NotebookWhereInput
+    orderBy?: Enumerable<NotebookOrderByWithRelationInput>
+    cursor?: NotebookWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<NotebookScalarFieldEnum>
+  }
+
+
+  /**
+   * Workspace.trackingUserAccess
+   */
+  export type WorkspaceTrackingUserAccessArgs = {
+    /**
+     * Select specific fields to fetch from the TrackingUserAccess
+     * 
+    **/
+    select?: TrackingUserAccessSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: TrackingUserAccessInclude | null
+    where?: TrackingUserAccessWhereInput
+    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
+    cursor?: TrackingUserAccessWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<TrackingUserAccessScalarFieldEnum>
+  }
+
+
+  /**
+   * Workspace without action
+   */
+  export type WorkspaceArgs = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     * 
+    **/
+    select?: WorkspaceSelect | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     * 
+    **/
+    include?: WorkspaceInclude | null
   }
 
 
@@ -6170,7 +7444,7 @@ export namespace Prisma {
     published: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
-    authorId: string | null
+    workspaceId: string | null
   }
 
   export type NotebookMaxAggregateOutputType = {
@@ -6180,7 +7454,7 @@ export namespace Prisma {
     published: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
-    authorId: string | null
+    workspaceId: string | null
   }
 
   export type NotebookCountAggregateOutputType = {
@@ -6190,7 +7464,7 @@ export namespace Prisma {
     published: number
     createdAt: number
     updatedAt: number
-    authorId: number
+    workspaceId: number
     _all: number
   }
 
@@ -6202,7 +7476,7 @@ export namespace Prisma {
     published?: true
     createdAt?: true
     updatedAt?: true
-    authorId?: true
+    workspaceId?: true
   }
 
   export type NotebookMaxAggregateInputType = {
@@ -6212,7 +7486,7 @@ export namespace Prisma {
     published?: true
     createdAt?: true
     updatedAt?: true
-    authorId?: true
+    workspaceId?: true
   }
 
   export type NotebookCountAggregateInputType = {
@@ -6222,7 +7496,7 @@ export namespace Prisma {
     published?: true
     createdAt?: true
     updatedAt?: true
-    authorId?: true
+    workspaceId?: true
     _all?: true
   }
 
@@ -6311,7 +7585,7 @@ export namespace Prisma {
     published: boolean
     createdAt: Date
     updatedAt: Date
-    authorId: string
+    workspaceId: string
     _count: NotebookCountAggregateOutputType | null
     _min: NotebookMinAggregateOutputType | null
     _max: NotebookMaxAggregateOutputType | null
@@ -6338,16 +7612,16 @@ export namespace Prisma {
     published?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    authorId?: boolean
+    workspaceId?: boolean
     pages?: boolean | NotebookPagesArgs
-    author?: boolean | UserArgs
+    workspace?: boolean | WorkspaceArgs
     _count?: boolean | NotebookCountOutputTypeArgs
   }
 
 
   export type NotebookInclude = {
     pages?: boolean | NotebookPagesArgs
-    author?: boolean | UserArgs
+    workspace?: boolean | WorkspaceArgs
     _count?: boolean | NotebookCountOutputTypeArgs
   } 
 
@@ -6359,14 +7633,14 @@ export namespace Prisma {
     ? Notebook  & {
     [P in TruthyKeys<S['include']>]:
         P extends 'pages' ? Array < PageGetPayload<S['include'][P]>>  :
-        P extends 'author' ? UserGetPayload<S['include'][P]> :
+        P extends 'workspace' ? WorkspaceGetPayload<S['include'][P]> :
         P extends '_count' ? NotebookCountOutputTypeGetPayload<S['include'][P]> :  never
   } 
     : S extends { select: any } & (NotebookArgs | NotebookFindManyArgs)
       ? {
     [P in TruthyKeys<S['select']>]:
         P extends 'pages' ? Array < PageGetPayload<S['select'][P]>>  :
-        P extends 'author' ? UserGetPayload<S['select'][P]> :
+        P extends 'workspace' ? WorkspaceGetPayload<S['select'][P]> :
         P extends '_count' ? NotebookCountOutputTypeGetPayload<S['select'][P]> :  P extends keyof Notebook ? Notebook[P] : never
   } 
       : Notebook
@@ -6743,7 +8017,7 @@ export namespace Prisma {
 
     pages<T extends NotebookPagesArgs= {}>(args?: Subset<T, NotebookPagesArgs>): PrismaPromise<Array<PageGetPayload<T>>| Null>;
 
-    author<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+    workspace<T extends WorkspaceArgs= {}>(args?: Subset<T, WorkspaceArgs>): Prisma__WorkspaceClient<WorkspaceGetPayload<T> | Null>;
 
     private get _document();
     /**
@@ -7205,7 +8479,10 @@ export namespace Prisma {
     title: string | null
     published: boolean | null
     createdAt: Date | null
+    updatedBy: string | null
     updatedAt: Date | null
+    deletedBy: string | null
+    deletedAt: Date | null
     notebookId: string | null
   }
 
@@ -7214,7 +8491,10 @@ export namespace Prisma {
     title: string | null
     published: boolean | null
     createdAt: Date | null
+    updatedBy: string | null
     updatedAt: Date | null
+    deletedBy: string | null
+    deletedAt: Date | null
     notebookId: string | null
   }
 
@@ -7224,7 +8504,10 @@ export namespace Prisma {
     content: number
     published: number
     createdAt: number
+    updatedBy: number
     updatedAt: number
+    deletedBy: number
+    deletedAt: number
     notebookId: number
     _all: number
   }
@@ -7235,7 +8518,10 @@ export namespace Prisma {
     title?: true
     published?: true
     createdAt?: true
+    updatedBy?: true
     updatedAt?: true
+    deletedBy?: true
+    deletedAt?: true
     notebookId?: true
   }
 
@@ -7244,7 +8530,10 @@ export namespace Prisma {
     title?: true
     published?: true
     createdAt?: true
+    updatedBy?: true
     updatedAt?: true
+    deletedBy?: true
+    deletedAt?: true
     notebookId?: true
   }
 
@@ -7254,7 +8543,10 @@ export namespace Prisma {
     content?: true
     published?: true
     createdAt?: true
+    updatedBy?: true
     updatedAt?: true
+    deletedBy?: true
+    deletedAt?: true
     notebookId?: true
     _all?: true
   }
@@ -7343,7 +8635,10 @@ export namespace Prisma {
     content: JsonValue | null
     published: boolean
     createdAt: Date
+    updatedBy: string | null
     updatedAt: Date
+    deletedBy: string | null
+    deletedAt: Date | null
     notebookId: string
     _count: PageCountAggregateOutputType | null
     _min: PageMinAggregateOutputType | null
@@ -7370,13 +8665,20 @@ export namespace Prisma {
     content?: boolean
     published?: boolean
     createdAt?: boolean
+    updatedBy?: boolean
     updatedAt?: boolean
+    deletedBy?: boolean
+    deletedAt?: boolean
     notebookId?: boolean
+    updatedByUser?: boolean | UserArgs
+    deletedByUser?: boolean | UserArgs
     notebook?: boolean | NotebookArgs
   }
 
 
   export type PageInclude = {
+    updatedByUser?: boolean | UserArgs
+    deletedByUser?: boolean | UserArgs
     notebook?: boolean | NotebookArgs
   } 
 
@@ -7387,11 +8689,15 @@ export namespace Prisma {
     S extends { include: any } & (PageArgs | PageFindManyArgs)
     ? Page  & {
     [P in TruthyKeys<S['include']>]:
+        P extends 'updatedByUser' ? UserGetPayload<S['include'][P]> | null :
+        P extends 'deletedByUser' ? UserGetPayload<S['include'][P]> | null :
         P extends 'notebook' ? NotebookGetPayload<S['include'][P]> :  never
   } 
     : S extends { select: any } & (PageArgs | PageFindManyArgs)
       ? {
     [P in TruthyKeys<S['select']>]:
+        P extends 'updatedByUser' ? UserGetPayload<S['select'][P]> | null :
+        P extends 'deletedByUser' ? UserGetPayload<S['select'][P]> | null :
         P extends 'notebook' ? NotebookGetPayload<S['select'][P]> :  P extends keyof Page ? Page[P] : never
   } 
       : Page
@@ -7765,6 +9071,10 @@ export namespace Prisma {
     private _requestPromise?;
     constructor(_dmmf: runtime.DMMFClass, _fetcher: PrismaClientFetcher, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
     readonly [Symbol.toStringTag]: 'PrismaClientPromise';
+
+    updatedByUser<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+
+    deletedByUser<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
 
     notebook<T extends NotebookArgs= {}>(args?: Subset<T, NotebookArgs>): Prisma__NotebookClient<NotebookGetPayload<T> | Null>;
 
@@ -8216,17 +9526,6 @@ export namespace Prisma {
   export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
 
 
-  export const DomainScalarFieldEnum: {
-    id: 'id',
-    name: 'name',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    ownerId: 'ownerId'
-  };
-
-  export type DomainScalarFieldEnum = (typeof DomainScalarFieldEnum)[keyof typeof DomainScalarFieldEnum]
-
-
   export const JsonNullValueFilter: {
     DbNull: typeof DbNull,
     JsonNull: typeof JsonNull,
@@ -8243,7 +9542,7 @@ export namespace Prisma {
     published: 'published',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    authorId: 'authorId'
+    workspaceId: 'workspaceId'
   };
 
   export type NotebookScalarFieldEnum = (typeof NotebookScalarFieldEnum)[keyof typeof NotebookScalarFieldEnum]
@@ -8263,7 +9562,10 @@ export namespace Prisma {
     content: 'content',
     published: 'published',
     createdAt: 'createdAt',
+    updatedBy: 'updatedBy',
     updatedAt: 'updatedAt',
+    deletedBy: 'deletedBy',
+    deletedAt: 'deletedAt',
     notebookId: 'notebookId'
   };
 
@@ -8288,6 +9590,18 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const TrackingUserAccessScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    lastAccessWorkspaceId: 'lastAccessWorkspaceId',
+    lastAccessNotebookId: 'lastAccessNotebookId',
+    lastAccessPageId: 'lastAccessPageId',
+    createdAt: 'createdAt'
+  };
+
+  export type TrackingUserAccessScalarFieldEnum = (typeof TrackingUserAccessScalarFieldEnum)[keyof typeof TrackingUserAccessScalarFieldEnum]
+
+
   export const TransactionIsolationLevel: {
     ReadUncommitted: 'ReadUncommitted',
     ReadCommitted: 'ReadCommitted',
@@ -8309,7 +9623,8 @@ export namespace Prisma {
     stripeCustomerId: 'stripeCustomerId',
     stripeSubscriptionId: 'stripeSubscriptionId',
     stripePriceId: 'stripePriceId',
-    stripeCurrentPeriodEnd: 'stripeCurrentPeriodEnd'
+    stripeCurrentPeriodEnd: 'stripeCurrentPeriodEnd',
+    lastAccessWorkspaceId: 'lastAccessWorkspaceId'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -8322,6 +9637,23 @@ export namespace Prisma {
   };
 
   export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
+
+
+  export const WorkspaceScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    domain: 'domain',
+    stripeCustomerId: 'stripeCustomerId',
+    stripeWorkspaceId: 'stripeWorkspaceId',
+    stripeSubscriptionId: 'stripeSubscriptionId',
+    stripePriceId: 'stripePriceId',
+    stripeCurrentPeriodEnd: 'stripeCurrentPeriodEnd',
+    createdBy: 'createdBy',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
 
 
   /**
@@ -8474,10 +9806,14 @@ export namespace Prisma {
     stripeSubscriptionId?: StringNullableFilter | string | null
     stripePriceId?: StringNullableFilter | string | null
     stripeCurrentPeriodEnd?: DateTimeNullableFilter | Date | string | null
+    lastAccessWorkspaceId?: StringNullableFilter | string | null
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
-    Notebook?: NotebookListRelationFilter
-    CustomDomain?: XOR<DomainRelationFilter, DomainWhereInput> | null
+    workspaces?: WorkspaceListRelationFilter
+    trackingUserAccess?: TrackingUserAccessListRelationFilter
+    lastAccessWorkspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput> | null
+    pagesUserUpdated?: XOR<PageRelationFilter, PageWhereInput> | null
+    pagesUserDeleted?: XOR<PageRelationFilter, PageWhereInput> | null
   }
 
   export type UserOrderByWithRelationInput = {
@@ -8492,10 +9828,14 @@ export namespace Prisma {
     stripeSubscriptionId?: SortOrder
     stripePriceId?: SortOrder
     stripeCurrentPeriodEnd?: SortOrder
+    lastAccessWorkspaceId?: SortOrder
     accounts?: AccountOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
-    Notebook?: NotebookOrderByRelationAggregateInput
-    CustomDomain?: DomainOrderByWithRelationInput
+    workspaces?: WorkspaceOrderByRelationAggregateInput
+    trackingUserAccess?: TrackingUserAccessOrderByRelationAggregateInput
+    lastAccessWorkspace?: WorkspaceOrderByWithRelationInput
+    pagesUserUpdated?: PageOrderByWithRelationInput
+    pagesUserDeleted?: PageOrderByWithRelationInput
   }
 
   export type UserWhereUniqueInput = {
@@ -8503,6 +9843,7 @@ export namespace Prisma {
     email?: string
     stripeCustomerId?: string
     stripeSubscriptionId?: string
+    lastAccessWorkspaceId?: string
   }
 
   export type UserOrderByWithAggregationInput = {
@@ -8517,6 +9858,7 @@ export namespace Prisma {
     stripeSubscriptionId?: SortOrder
     stripePriceId?: SortOrder
     stripeCurrentPeriodEnd?: SortOrder
+    lastAccessWorkspaceId?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -8537,55 +9879,141 @@ export namespace Prisma {
     stripeSubscriptionId?: StringNullableWithAggregatesFilter | string | null
     stripePriceId?: StringNullableWithAggregatesFilter | string | null
     stripeCurrentPeriodEnd?: DateTimeNullableWithAggregatesFilter | Date | string | null
+    lastAccessWorkspaceId?: StringNullableWithAggregatesFilter | string | null
   }
 
-  export type DomainWhereInput = {
-    AND?: Enumerable<DomainWhereInput>
-    OR?: Enumerable<DomainWhereInput>
-    NOT?: Enumerable<DomainWhereInput>
+  export type TrackingUserAccessWhereInput = {
+    AND?: Enumerable<TrackingUserAccessWhereInput>
+    OR?: Enumerable<TrackingUserAccessWhereInput>
+    NOT?: Enumerable<TrackingUserAccessWhereInput>
+    id?: StringFilter | string
+    userId?: StringFilter | string
+    lastAccessWorkspaceId?: StringNullableFilter | string | null
+    lastAccessNotebookId?: StringNullableFilter | string | null
+    lastAccessPageId?: StringNullableFilter | string | null
+    createdAt?: DateTimeFilter | Date | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    workspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput> | null
+  }
+
+  export type TrackingUserAccessOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    lastAccessWorkspaceId?: SortOrder
+    lastAccessNotebookId?: SortOrder
+    lastAccessPageId?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    workspace?: WorkspaceOrderByWithRelationInput
+  }
+
+  export type TrackingUserAccessWhereUniqueInput = {
+    id?: string
+  }
+
+  export type TrackingUserAccessOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    lastAccessWorkspaceId?: SortOrder
+    lastAccessNotebookId?: SortOrder
+    lastAccessPageId?: SortOrder
+    createdAt?: SortOrder
+    _count?: TrackingUserAccessCountOrderByAggregateInput
+    _max?: TrackingUserAccessMaxOrderByAggregateInput
+    _min?: TrackingUserAccessMinOrderByAggregateInput
+  }
+
+  export type TrackingUserAccessScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<TrackingUserAccessScalarWhereWithAggregatesInput>
+    OR?: Enumerable<TrackingUserAccessScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<TrackingUserAccessScalarWhereWithAggregatesInput>
+    id?: StringWithAggregatesFilter | string
+    userId?: StringWithAggregatesFilter | string
+    lastAccessWorkspaceId?: StringNullableWithAggregatesFilter | string | null
+    lastAccessNotebookId?: StringNullableWithAggregatesFilter | string | null
+    lastAccessPageId?: StringNullableWithAggregatesFilter | string | null
+    createdAt?: DateTimeWithAggregatesFilter | Date | string
+  }
+
+  export type WorkspaceWhereInput = {
+    AND?: Enumerable<WorkspaceWhereInput>
+    OR?: Enumerable<WorkspaceWhereInput>
+    NOT?: Enumerable<WorkspaceWhereInput>
     id?: StringFilter | string
     name?: StringFilter | string
+    domain?: StringFilter | string
+    stripeCustomerId?: StringNullableFilter | string | null
+    stripeWorkspaceId?: StringNullableFilter | string | null
+    stripeSubscriptionId?: StringNullableFilter | string | null
+    stripePriceId?: StringNullableFilter | string | null
+    stripeCurrentPeriodEnd?: DateTimeNullableFilter | Date | string | null
+    createdBy?: StringFilter | string
     createdAt?: DateTimeFilter | Date | string
     updatedAt?: DateTimeFilter | Date | string
-    ownerId?: StringFilter | string
-    owner?: XOR<UserRelationFilter, UserWhereInput>
+    trackUserAccessWorkspace?: XOR<UserRelationFilter, UserWhereInput> | null
+    users?: UserListRelationFilter
+    notebooks?: NotebookListRelationFilter
+    trackingUserAccess?: TrackingUserAccessListRelationFilter
   }
 
-  export type DomainOrderByWithRelationInput = {
+  export type WorkspaceOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
+    domain?: SortOrder
+    stripeCustomerId?: SortOrder
+    stripeWorkspaceId?: SortOrder
+    stripeSubscriptionId?: SortOrder
+    stripePriceId?: SortOrder
+    stripeCurrentPeriodEnd?: SortOrder
+    createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    ownerId?: SortOrder
-    owner?: UserOrderByWithRelationInput
+    trackUserAccessWorkspace?: UserOrderByWithRelationInput
+    users?: UserOrderByRelationAggregateInput
+    notebooks?: NotebookOrderByRelationAggregateInput
+    trackingUserAccess?: TrackingUserAccessOrderByRelationAggregateInput
   }
 
-  export type DomainWhereUniqueInput = {
+  export type WorkspaceWhereUniqueInput = {
     id?: string
-    name?: string
-    ownerId?: string
+    domain?: string
+    stripeCustomerId?: string
+    stripeWorkspaceId?: string
+    stripeSubscriptionId?: string
   }
 
-  export type DomainOrderByWithAggregationInput = {
+  export type WorkspaceOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
+    domain?: SortOrder
+    stripeCustomerId?: SortOrder
+    stripeWorkspaceId?: SortOrder
+    stripeSubscriptionId?: SortOrder
+    stripePriceId?: SortOrder
+    stripeCurrentPeriodEnd?: SortOrder
+    createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    ownerId?: SortOrder
-    _count?: DomainCountOrderByAggregateInput
-    _max?: DomainMaxOrderByAggregateInput
-    _min?: DomainMinOrderByAggregateInput
+    _count?: WorkspaceCountOrderByAggregateInput
+    _max?: WorkspaceMaxOrderByAggregateInput
+    _min?: WorkspaceMinOrderByAggregateInput
   }
 
-  export type DomainScalarWhereWithAggregatesInput = {
-    AND?: Enumerable<DomainScalarWhereWithAggregatesInput>
-    OR?: Enumerable<DomainScalarWhereWithAggregatesInput>
-    NOT?: Enumerable<DomainScalarWhereWithAggregatesInput>
+  export type WorkspaceScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<WorkspaceScalarWhereWithAggregatesInput>
+    OR?: Enumerable<WorkspaceScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<WorkspaceScalarWhereWithAggregatesInput>
     id?: StringWithAggregatesFilter | string
     name?: StringWithAggregatesFilter | string
+    domain?: StringWithAggregatesFilter | string
+    stripeCustomerId?: StringNullableWithAggregatesFilter | string | null
+    stripeWorkspaceId?: StringNullableWithAggregatesFilter | string | null
+    stripeSubscriptionId?: StringNullableWithAggregatesFilter | string | null
+    stripePriceId?: StringNullableWithAggregatesFilter | string | null
+    stripeCurrentPeriodEnd?: DateTimeNullableWithAggregatesFilter | Date | string | null
+    createdBy?: StringWithAggregatesFilter | string
     createdAt?: DateTimeWithAggregatesFilter | Date | string
     updatedAt?: DateTimeWithAggregatesFilter | Date | string
-    ownerId?: StringWithAggregatesFilter | string
   }
 
   export type VerificationTokenWhereInput = {
@@ -8636,9 +10064,9 @@ export namespace Prisma {
     published?: BoolFilter | boolean
     createdAt?: DateTimeFilter | Date | string
     updatedAt?: DateTimeFilter | Date | string
-    authorId?: StringFilter | string
+    workspaceId?: StringFilter | string
     pages?: PageListRelationFilter
-    author?: XOR<UserRelationFilter, UserWhereInput>
+    workspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput>
   }
 
   export type NotebookOrderByWithRelationInput = {
@@ -8648,9 +10076,9 @@ export namespace Prisma {
     published?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    authorId?: SortOrder
+    workspaceId?: SortOrder
     pages?: PageOrderByRelationAggregateInput
-    author?: UserOrderByWithRelationInput
+    workspace?: WorkspaceOrderByWithRelationInput
   }
 
   export type NotebookWhereUniqueInput = {
@@ -8664,7 +10092,7 @@ export namespace Prisma {
     published?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    authorId?: SortOrder
+    workspaceId?: SortOrder
     _count?: NotebookCountOrderByAggregateInput
     _max?: NotebookMaxOrderByAggregateInput
     _min?: NotebookMinOrderByAggregateInput
@@ -8680,7 +10108,7 @@ export namespace Prisma {
     published?: BoolWithAggregatesFilter | boolean
     createdAt?: DateTimeWithAggregatesFilter | Date | string
     updatedAt?: DateTimeWithAggregatesFilter | Date | string
-    authorId?: StringWithAggregatesFilter | string
+    workspaceId?: StringWithAggregatesFilter | string
   }
 
   export type PageWhereInput = {
@@ -8692,8 +10120,13 @@ export namespace Prisma {
     content?: JsonNullableFilter
     published?: BoolFilter | boolean
     createdAt?: DateTimeFilter | Date | string
+    updatedBy?: StringNullableFilter | string | null
     updatedAt?: DateTimeFilter | Date | string
+    deletedBy?: StringNullableFilter | string | null
+    deletedAt?: DateTimeNullableFilter | Date | string | null
     notebookId?: StringFilter | string
+    updatedByUser?: XOR<UserRelationFilter, UserWhereInput> | null
+    deletedByUser?: XOR<UserRelationFilter, UserWhereInput> | null
     notebook?: XOR<NotebookRelationFilter, NotebookWhereInput>
   }
 
@@ -8703,13 +10136,20 @@ export namespace Prisma {
     content?: SortOrder
     published?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
     updatedAt?: SortOrder
+    deletedBy?: SortOrder
+    deletedAt?: SortOrder
     notebookId?: SortOrder
+    updatedByUser?: UserOrderByWithRelationInput
+    deletedByUser?: UserOrderByWithRelationInput
     notebook?: NotebookOrderByWithRelationInput
   }
 
   export type PageWhereUniqueInput = {
     id?: string
+    updatedBy?: string
+    deletedBy?: string
   }
 
   export type PageOrderByWithAggregationInput = {
@@ -8718,7 +10158,10 @@ export namespace Prisma {
     content?: SortOrder
     published?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
     updatedAt?: SortOrder
+    deletedBy?: SortOrder
+    deletedAt?: SortOrder
     notebookId?: SortOrder
     _count?: PageCountOrderByAggregateInput
     _max?: PageMaxOrderByAggregateInput
@@ -8734,7 +10177,10 @@ export namespace Prisma {
     content?: JsonNullableWithAggregatesFilter
     published?: BoolWithAggregatesFilter | boolean
     createdAt?: DateTimeWithAggregatesFilter | Date | string
+    updatedBy?: StringNullableWithAggregatesFilter | string | null
     updatedAt?: DateTimeWithAggregatesFilter | Date | string
+    deletedBy?: StringNullableWithAggregatesFilter | string | null
+    deletedAt?: DateTimeNullableWithAggregatesFilter | Date | string | null
     notebookId?: StringWithAggregatesFilter | string
   }
 
@@ -8918,8 +10364,11 @@ export namespace Prisma {
     stripeCurrentPeriodEnd?: Date | string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    Notebook?: NotebookCreateNestedManyWithoutAuthorInput
-    CustomDomain?: DomainCreateNestedOneWithoutOwnerInput
+    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
+    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
+    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -8934,10 +10383,13 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
+    lastAccessWorkspaceId?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    Notebook?: NotebookUncheckedCreateNestedManyWithoutAuthorInput
-    CustomDomain?: DomainUncheckedCreateNestedOneWithoutOwnerInput
+    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
+    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
   }
 
   export type UserUpdateInput = {
@@ -8954,8 +10406,11 @@ export namespace Prisma {
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    Notebook?: NotebookUpdateManyWithoutAuthorNestedInput
-    CustomDomain?: DomainUpdateOneWithoutOwnerNestedInput
+    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
+    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
+    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -8970,10 +10425,13 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    Notebook?: NotebookUncheckedUpdateManyWithoutAuthorNestedInput
-    CustomDomain?: DomainUncheckedUpdateOneWithoutOwnerNestedInput
+    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
+    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -8988,6 +10446,7 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
+    lastAccessWorkspaceId?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -9016,61 +10475,182 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type DomainCreateInput = {
+  export type TrackingUserAccessCreateInput = {
+    id?: string
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutTrackingUserAccessInput
+    workspace?: WorkspaceCreateNestedOneWithoutTrackingUserAccessInput
+  }
+
+  export type TrackingUserAccessUncheckedCreateInput = {
+    id?: string
+    userId: string
+    lastAccessWorkspaceId?: string | null
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type TrackingUserAccessUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutTrackingUserAccessNestedInput
+    workspace?: WorkspaceUpdateOneWithoutTrackingUserAccessNestedInput
+  }
+
+  export type TrackingUserAccessUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackingUserAccessCreateManyInput = {
+    id?: string
+    userId: string
+    lastAccessWorkspaceId?: string | null
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type TrackingUserAccessUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackingUserAccessUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WorkspaceCreateInput = {
     id?: string
     name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    owner: UserCreateNestedOneWithoutCustomDomainInput
+    trackUserAccessWorkspace?: UserCreateNestedOneWithoutLastAccessWorkspaceInput
+    users?: UserCreateNestedManyWithoutWorkspacesInput
+    notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutWorkspaceInput
   }
 
-  export type DomainUncheckedCreateInput = {
+  export type WorkspaceUncheckedCreateInput = {
     id?: string
     name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownerId: string
+    trackUserAccessWorkspace?: UserUncheckedCreateNestedOneWithoutLastAccessWorkspaceInput
+    users?: UserUncheckedCreateNestedManyWithoutWorkspacesInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
-  export type DomainUpdateInput = {
+  export type WorkspaceUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    owner?: UserUpdateOneRequiredWithoutCustomDomainNestedInput
+    trackUserAccessWorkspace?: UserUpdateOneWithoutLastAccessWorkspaceNestedInput
+    users?: UserUpdateManyWithoutWorkspacesNestedInput
+    notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutWorkspaceNestedInput
   }
 
-  export type DomainUncheckedUpdateInput = {
+  export type WorkspaceUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
+    trackUserAccessWorkspace?: UserUncheckedUpdateOneWithoutLastAccessWorkspaceNestedInput
+    users?: UserUncheckedUpdateManyWithoutWorkspacesNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
-  export type DomainCreateManyInput = {
+  export type WorkspaceCreateManyInput = {
     id?: string
     name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    ownerId: string
   }
 
-  export type DomainUpdateManyMutationInput = {
+  export type WorkspaceUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DomainUncheckedUpdateManyInput = {
+  export type WorkspaceUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    ownerId?: StringFieldUpdateOperationsInput | string
   }
 
   export type VerificationTokenCreateInput = {
@@ -9123,7 +10703,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     pages?: PageCreateNestedManyWithoutNotebookInput
-    author: UserCreateNestedOneWithoutNotebookInput
+    workspace: WorkspaceCreateNestedOneWithoutNotebooksInput
   }
 
   export type NotebookUncheckedCreateInput = {
@@ -9133,7 +10713,7 @@ export namespace Prisma {
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    authorId: string
+    workspaceId: string
     pages?: PageUncheckedCreateNestedManyWithoutNotebookInput
   }
 
@@ -9145,7 +10725,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     pages?: PageUpdateManyWithoutNotebookNestedInput
-    author?: UserUpdateOneRequiredWithoutNotebookNestedInput
+    workspace?: WorkspaceUpdateOneRequiredWithoutNotebooksNestedInput
   }
 
   export type NotebookUncheckedUpdateInput = {
@@ -9155,7 +10735,7 @@ export namespace Prisma {
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    authorId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
     pages?: PageUncheckedUpdateManyWithoutNotebookNestedInput
   }
 
@@ -9166,7 +10746,7 @@ export namespace Prisma {
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    authorId: string
+    workspaceId: string
   }
 
   export type NotebookUpdateManyMutationInput = {
@@ -9185,7 +10765,7 @@ export namespace Prisma {
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    authorId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
   }
 
   export type PageCreateInput = {
@@ -9195,6 +10775,9 @@ export namespace Prisma {
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    updatedByUser?: UserCreateNestedOneWithoutPagesUserUpdatedInput
+    deletedByUser?: UserCreateNestedOneWithoutPagesUserDeletedInput
     notebook: NotebookCreateNestedOneWithoutPagesInput
   }
 
@@ -9204,7 +10787,10 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: boolean
     createdAt?: Date | string
+    updatedBy?: string | null
     updatedAt?: Date | string
+    deletedBy?: string | null
+    deletedAt?: Date | string | null
     notebookId: string
   }
 
@@ -9215,6 +10801,9 @@ export namespace Prisma {
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedByUser?: UserUpdateOneWithoutPagesUserUpdatedNestedInput
+    deletedByUser?: UserUpdateOneWithoutPagesUserDeletedNestedInput
     notebook?: NotebookUpdateOneRequiredWithoutPagesNestedInput
   }
 
@@ -9224,7 +10813,10 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notebookId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -9234,7 +10826,10 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: boolean
     createdAt?: Date | string
+    updatedBy?: string | null
     updatedAt?: Date | string
+    deletedBy?: string | null
+    deletedAt?: Date | string | null
     notebookId: string
   }
 
@@ -9245,6 +10840,7 @@ export namespace Prisma {
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PageUncheckedUpdateManyInput = {
@@ -9253,7 +10849,10 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notebookId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -9484,15 +11083,26 @@ export namespace Prisma {
     none?: SessionWhereInput
   }
 
-  export type NotebookListRelationFilter = {
-    every?: NotebookWhereInput
-    some?: NotebookWhereInput
-    none?: NotebookWhereInput
+  export type WorkspaceListRelationFilter = {
+    every?: WorkspaceWhereInput
+    some?: WorkspaceWhereInput
+    none?: WorkspaceWhereInput
   }
 
-  export type DomainRelationFilter = {
-    is?: DomainWhereInput | null
-    isNot?: DomainWhereInput | null
+  export type TrackingUserAccessListRelationFilter = {
+    every?: TrackingUserAccessWhereInput
+    some?: TrackingUserAccessWhereInput
+    none?: TrackingUserAccessWhereInput
+  }
+
+  export type WorkspaceRelationFilter = {
+    is?: WorkspaceWhereInput
+    isNot?: WorkspaceWhereInput
+  }
+
+  export type PageRelationFilter = {
+    is?: PageWhereInput | null
+    isNot?: PageWhereInput | null
   }
 
   export type AccountOrderByRelationAggregateInput = {
@@ -9503,7 +11113,11 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type NotebookOrderByRelationAggregateInput = {
+  export type WorkspaceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TrackingUserAccessOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -9519,6 +11133,7 @@ export namespace Prisma {
     stripeSubscriptionId?: SortOrder
     stripePriceId?: SortOrder
     stripeCurrentPeriodEnd?: SortOrder
+    lastAccessWorkspaceId?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -9533,6 +11148,7 @@ export namespace Prisma {
     stripeSubscriptionId?: SortOrder
     stripePriceId?: SortOrder
     stripeCurrentPeriodEnd?: SortOrder
+    lastAccessWorkspaceId?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -9547,6 +11163,7 @@ export namespace Prisma {
     stripeSubscriptionId?: SortOrder
     stripePriceId?: SortOrder
     stripeCurrentPeriodEnd?: SortOrder
+    lastAccessWorkspaceId?: SortOrder
   }
 
   export type DateTimeNullableWithAggregatesFilter = {
@@ -9563,28 +11180,93 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter
   }
 
-  export type DomainCountOrderByAggregateInput = {
+  export type TrackingUserAccessCountOrderByAggregateInput = {
     id?: SortOrder
-    name?: SortOrder
+    userId?: SortOrder
+    lastAccessWorkspaceId?: SortOrder
+    lastAccessNotebookId?: SortOrder
+    lastAccessPageId?: SortOrder
     createdAt?: SortOrder
-    updatedAt?: SortOrder
-    ownerId?: SortOrder
   }
 
-  export type DomainMaxOrderByAggregateInput = {
+  export type TrackingUserAccessMaxOrderByAggregateInput = {
     id?: SortOrder
-    name?: SortOrder
+    userId?: SortOrder
+    lastAccessWorkspaceId?: SortOrder
+    lastAccessNotebookId?: SortOrder
+    lastAccessPageId?: SortOrder
     createdAt?: SortOrder
-    updatedAt?: SortOrder
-    ownerId?: SortOrder
   }
 
-  export type DomainMinOrderByAggregateInput = {
+  export type TrackingUserAccessMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    lastAccessWorkspaceId?: SortOrder
+    lastAccessNotebookId?: SortOrder
+    lastAccessPageId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type UserListRelationFilter = {
+    every?: UserWhereInput
+    some?: UserWhereInput
+    none?: UserWhereInput
+  }
+
+  export type NotebookListRelationFilter = {
+    every?: NotebookWhereInput
+    some?: NotebookWhereInput
+    none?: NotebookWhereInput
+  }
+
+  export type UserOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type NotebookOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type WorkspaceCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    domain?: SortOrder
+    stripeCustomerId?: SortOrder
+    stripeWorkspaceId?: SortOrder
+    stripeSubscriptionId?: SortOrder
+    stripePriceId?: SortOrder
+    stripeCurrentPeriodEnd?: SortOrder
+    createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    ownerId?: SortOrder
+  }
+
+  export type WorkspaceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    domain?: SortOrder
+    stripeCustomerId?: SortOrder
+    stripeWorkspaceId?: SortOrder
+    stripeSubscriptionId?: SortOrder
+    stripePriceId?: SortOrder
+    stripeCurrentPeriodEnd?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WorkspaceMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    domain?: SortOrder
+    stripeCustomerId?: SortOrder
+    stripeWorkspaceId?: SortOrder
+    stripeSubscriptionId?: SortOrder
+    stripePriceId?: SortOrder
+    stripeCurrentPeriodEnd?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type VerificationTokenIdentifierTokenCompoundUniqueInput = {
@@ -9632,7 +11314,7 @@ export namespace Prisma {
     published?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    authorId?: SortOrder
+    workspaceId?: SortOrder
   }
 
   export type NotebookMaxOrderByAggregateInput = {
@@ -9642,7 +11324,7 @@ export namespace Prisma {
     published?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    authorId?: SortOrder
+    workspaceId?: SortOrder
   }
 
   export type NotebookMinOrderByAggregateInput = {
@@ -9652,7 +11334,7 @@ export namespace Prisma {
     published?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    authorId?: SortOrder
+    workspaceId?: SortOrder
   }
 
   export type BoolWithAggregatesFilter = {
@@ -9696,7 +11378,10 @@ export namespace Prisma {
     content?: SortOrder
     published?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
     updatedAt?: SortOrder
+    deletedBy?: SortOrder
+    deletedAt?: SortOrder
     notebookId?: SortOrder
   }
 
@@ -9705,7 +11390,10 @@ export namespace Prisma {
     title?: SortOrder
     published?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
     updatedAt?: SortOrder
+    deletedBy?: SortOrder
+    deletedAt?: SortOrder
     notebookId?: SortOrder
   }
 
@@ -9714,7 +11402,10 @@ export namespace Prisma {
     title?: SortOrder
     published?: SortOrder
     createdAt?: SortOrder
+    updatedBy?: SortOrder
     updatedAt?: SortOrder
+    deletedBy?: SortOrder
+    deletedAt?: SortOrder
     notebookId?: SortOrder
   }
   export type JsonNullableWithAggregatesFilter = 
@@ -9805,17 +11496,35 @@ export namespace Prisma {
     connect?: Enumerable<SessionWhereUniqueInput>
   }
 
-  export type NotebookCreateNestedManyWithoutAuthorInput = {
-    create?: XOR<Enumerable<NotebookCreateWithoutAuthorInput>, Enumerable<NotebookUncheckedCreateWithoutAuthorInput>>
-    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutAuthorInput>
-    createMany?: NotebookCreateManyAuthorInputEnvelope
-    connect?: Enumerable<NotebookWhereUniqueInput>
+  export type WorkspaceCreateNestedManyWithoutUsersInput = {
+    create?: XOR<Enumerable<WorkspaceCreateWithoutUsersInput>, Enumerable<WorkspaceUncheckedCreateWithoutUsersInput>>
+    connectOrCreate?: Enumerable<WorkspaceCreateOrConnectWithoutUsersInput>
+    connect?: Enumerable<WorkspaceWhereUniqueInput>
   }
 
-  export type DomainCreateNestedOneWithoutOwnerInput = {
-    create?: XOR<DomainCreateWithoutOwnerInput, DomainUncheckedCreateWithoutOwnerInput>
-    connectOrCreate?: DomainCreateOrConnectWithoutOwnerInput
-    connect?: DomainWhereUniqueInput
+  export type TrackingUserAccessCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutUserInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutUserInput>
+    createMany?: TrackingUserAccessCreateManyUserInputEnvelope
+    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+  }
+
+  export type WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput = {
+    create?: XOR<WorkspaceCreateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackUserAccessWorkspaceInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutTrackUserAccessWorkspaceInput
+    connect?: WorkspaceWhereUniqueInput
+  }
+
+  export type PageCreateNestedOneWithoutUpdatedByUserInput = {
+    create?: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
+    connectOrCreate?: PageCreateOrConnectWithoutUpdatedByUserInput
+    connect?: PageWhereUniqueInput
+  }
+
+  export type PageCreateNestedOneWithoutDeletedByUserInput = {
+    create?: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
+    connectOrCreate?: PageCreateOrConnectWithoutDeletedByUserInput
+    connect?: PageWhereUniqueInput
   }
 
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
@@ -9832,17 +11541,29 @@ export namespace Prisma {
     connect?: Enumerable<SessionWhereUniqueInput>
   }
 
-  export type NotebookUncheckedCreateNestedManyWithoutAuthorInput = {
-    create?: XOR<Enumerable<NotebookCreateWithoutAuthorInput>, Enumerable<NotebookUncheckedCreateWithoutAuthorInput>>
-    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutAuthorInput>
-    createMany?: NotebookCreateManyAuthorInputEnvelope
-    connect?: Enumerable<NotebookWhereUniqueInput>
+  export type WorkspaceUncheckedCreateNestedManyWithoutUsersInput = {
+    create?: XOR<Enumerable<WorkspaceCreateWithoutUsersInput>, Enumerable<WorkspaceUncheckedCreateWithoutUsersInput>>
+    connectOrCreate?: Enumerable<WorkspaceCreateOrConnectWithoutUsersInput>
+    connect?: Enumerable<WorkspaceWhereUniqueInput>
   }
 
-  export type DomainUncheckedCreateNestedOneWithoutOwnerInput = {
-    create?: XOR<DomainCreateWithoutOwnerInput, DomainUncheckedCreateWithoutOwnerInput>
-    connectOrCreate?: DomainCreateOrConnectWithoutOwnerInput
-    connect?: DomainWhereUniqueInput
+  export type TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutUserInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutUserInput>
+    createMany?: TrackingUserAccessCreateManyUserInputEnvelope
+    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+  }
+
+  export type PageUncheckedCreateNestedOneWithoutUpdatedByUserInput = {
+    create?: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
+    connectOrCreate?: PageCreateOrConnectWithoutUpdatedByUserInput
+    connect?: PageWhereUniqueInput
+  }
+
+  export type PageUncheckedCreateNestedOneWithoutDeletedByUserInput = {
+    create?: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
+    connectOrCreate?: PageCreateOrConnectWithoutDeletedByUserInput
+    connect?: PageWhereUniqueInput
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -9877,28 +11598,61 @@ export namespace Prisma {
     deleteMany?: Enumerable<SessionScalarWhereInput>
   }
 
-  export type NotebookUpdateManyWithoutAuthorNestedInput = {
-    create?: XOR<Enumerable<NotebookCreateWithoutAuthorInput>, Enumerable<NotebookUncheckedCreateWithoutAuthorInput>>
-    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutAuthorInput>
-    upsert?: Enumerable<NotebookUpsertWithWhereUniqueWithoutAuthorInput>
-    createMany?: NotebookCreateManyAuthorInputEnvelope
-    set?: Enumerable<NotebookWhereUniqueInput>
-    disconnect?: Enumerable<NotebookWhereUniqueInput>
-    delete?: Enumerable<NotebookWhereUniqueInput>
-    connect?: Enumerable<NotebookWhereUniqueInput>
-    update?: Enumerable<NotebookUpdateWithWhereUniqueWithoutAuthorInput>
-    updateMany?: Enumerable<NotebookUpdateManyWithWhereWithoutAuthorInput>
-    deleteMany?: Enumerable<NotebookScalarWhereInput>
+  export type WorkspaceUpdateManyWithoutUsersNestedInput = {
+    create?: XOR<Enumerable<WorkspaceCreateWithoutUsersInput>, Enumerable<WorkspaceUncheckedCreateWithoutUsersInput>>
+    connectOrCreate?: Enumerable<WorkspaceCreateOrConnectWithoutUsersInput>
+    upsert?: Enumerable<WorkspaceUpsertWithWhereUniqueWithoutUsersInput>
+    set?: Enumerable<WorkspaceWhereUniqueInput>
+    disconnect?: Enumerable<WorkspaceWhereUniqueInput>
+    delete?: Enumerable<WorkspaceWhereUniqueInput>
+    connect?: Enumerable<WorkspaceWhereUniqueInput>
+    update?: Enumerable<WorkspaceUpdateWithWhereUniqueWithoutUsersInput>
+    updateMany?: Enumerable<WorkspaceUpdateManyWithWhereWithoutUsersInput>
+    deleteMany?: Enumerable<WorkspaceScalarWhereInput>
   }
 
-  export type DomainUpdateOneWithoutOwnerNestedInput = {
-    create?: XOR<DomainCreateWithoutOwnerInput, DomainUncheckedCreateWithoutOwnerInput>
-    connectOrCreate?: DomainCreateOrConnectWithoutOwnerInput
-    upsert?: DomainUpsertWithoutOwnerInput
+  export type TrackingUserAccessUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutUserInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<TrackingUserAccessUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: TrackingUserAccessCreateManyUserInputEnvelope
+    set?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    disconnect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    delete?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    update?: Enumerable<TrackingUserAccessUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<TrackingUserAccessUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<TrackingUserAccessScalarWhereInput>
+  }
+
+  export type WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackUserAccessWorkspaceInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutTrackUserAccessWorkspaceInput
+    upsert?: WorkspaceUpsertWithoutTrackUserAccessWorkspaceInput
     disconnect?: boolean
     delete?: boolean
-    connect?: DomainWhereUniqueInput
-    update?: XOR<DomainUpdateWithoutOwnerInput, DomainUncheckedUpdateWithoutOwnerInput>
+    connect?: WorkspaceWhereUniqueInput
+    update?: XOR<WorkspaceUpdateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedUpdateWithoutTrackUserAccessWorkspaceInput>
+  }
+
+  export type PageUpdateOneWithoutUpdatedByUserNestedInput = {
+    create?: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
+    connectOrCreate?: PageCreateOrConnectWithoutUpdatedByUserInput
+    upsert?: PageUpsertWithoutUpdatedByUserInput
+    disconnect?: boolean
+    delete?: boolean
+    connect?: PageWhereUniqueInput
+    update?: XOR<PageUpdateWithoutUpdatedByUserInput, PageUncheckedUpdateWithoutUpdatedByUserInput>
+  }
+
+  export type PageUpdateOneWithoutDeletedByUserNestedInput = {
+    create?: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
+    connectOrCreate?: PageCreateOrConnectWithoutDeletedByUserInput
+    upsert?: PageUpsertWithoutDeletedByUserInput
+    disconnect?: boolean
+    delete?: boolean
+    connect?: PageWhereUniqueInput
+    update?: XOR<PageUpdateWithoutDeletedByUserInput, PageUncheckedUpdateWithoutDeletedByUserInput>
   }
 
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
@@ -9929,42 +11683,235 @@ export namespace Prisma {
     deleteMany?: Enumerable<SessionScalarWhereInput>
   }
 
-  export type NotebookUncheckedUpdateManyWithoutAuthorNestedInput = {
-    create?: XOR<Enumerable<NotebookCreateWithoutAuthorInput>, Enumerable<NotebookUncheckedCreateWithoutAuthorInput>>
-    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutAuthorInput>
-    upsert?: Enumerable<NotebookUpsertWithWhereUniqueWithoutAuthorInput>
-    createMany?: NotebookCreateManyAuthorInputEnvelope
+  export type WorkspaceUncheckedUpdateManyWithoutUsersNestedInput = {
+    create?: XOR<Enumerable<WorkspaceCreateWithoutUsersInput>, Enumerable<WorkspaceUncheckedCreateWithoutUsersInput>>
+    connectOrCreate?: Enumerable<WorkspaceCreateOrConnectWithoutUsersInput>
+    upsert?: Enumerable<WorkspaceUpsertWithWhereUniqueWithoutUsersInput>
+    set?: Enumerable<WorkspaceWhereUniqueInput>
+    disconnect?: Enumerable<WorkspaceWhereUniqueInput>
+    delete?: Enumerable<WorkspaceWhereUniqueInput>
+    connect?: Enumerable<WorkspaceWhereUniqueInput>
+    update?: Enumerable<WorkspaceUpdateWithWhereUniqueWithoutUsersInput>
+    updateMany?: Enumerable<WorkspaceUpdateManyWithWhereWithoutUsersInput>
+    deleteMany?: Enumerable<WorkspaceScalarWhereInput>
+  }
+
+  export type TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutUserInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<TrackingUserAccessUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: TrackingUserAccessCreateManyUserInputEnvelope
+    set?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    disconnect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    delete?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    update?: Enumerable<TrackingUserAccessUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<TrackingUserAccessUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<TrackingUserAccessScalarWhereInput>
+  }
+
+  export type PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput = {
+    create?: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
+    connectOrCreate?: PageCreateOrConnectWithoutUpdatedByUserInput
+    upsert?: PageUpsertWithoutUpdatedByUserInput
+    disconnect?: boolean
+    delete?: boolean
+    connect?: PageWhereUniqueInput
+    update?: XOR<PageUpdateWithoutUpdatedByUserInput, PageUncheckedUpdateWithoutUpdatedByUserInput>
+  }
+
+  export type PageUncheckedUpdateOneWithoutDeletedByUserNestedInput = {
+    create?: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
+    connectOrCreate?: PageCreateOrConnectWithoutDeletedByUserInput
+    upsert?: PageUpsertWithoutDeletedByUserInput
+    disconnect?: boolean
+    delete?: boolean
+    connect?: PageWhereUniqueInput
+    update?: XOR<PageUpdateWithoutDeletedByUserInput, PageUncheckedUpdateWithoutDeletedByUserInput>
+  }
+
+  export type UserCreateNestedOneWithoutTrackingUserAccessInput = {
+    create?: XOR<UserCreateWithoutTrackingUserAccessInput, UserUncheckedCreateWithoutTrackingUserAccessInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTrackingUserAccessInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type WorkspaceCreateNestedOneWithoutTrackingUserAccessInput = {
+    create?: XOR<WorkspaceCreateWithoutTrackingUserAccessInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutTrackingUserAccessInput
+    connect?: WorkspaceWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutTrackingUserAccessNestedInput = {
+    create?: XOR<UserCreateWithoutTrackingUserAccessInput, UserUncheckedCreateWithoutTrackingUserAccessInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTrackingUserAccessInput
+    upsert?: UserUpsertWithoutTrackingUserAccessInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<UserUpdateWithoutTrackingUserAccessInput, UserUncheckedUpdateWithoutTrackingUserAccessInput>
+  }
+
+  export type WorkspaceUpdateOneWithoutTrackingUserAccessNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutTrackingUserAccessInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutTrackingUserAccessInput
+    upsert?: WorkspaceUpsertWithoutTrackingUserAccessInput
+    disconnect?: boolean
+    delete?: boolean
+    connect?: WorkspaceWhereUniqueInput
+    update?: XOR<WorkspaceUpdateWithoutTrackingUserAccessInput, WorkspaceUncheckedUpdateWithoutTrackingUserAccessInput>
+  }
+
+  export type UserCreateNestedOneWithoutLastAccessWorkspaceInput = {
+    create?: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
+    connectOrCreate?: UserCreateOrConnectWithoutLastAccessWorkspaceInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedManyWithoutWorkspacesInput = {
+    create?: XOR<Enumerable<UserCreateWithoutWorkspacesInput>, Enumerable<UserUncheckedCreateWithoutWorkspacesInput>>
+    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutWorkspacesInput>
+    connect?: Enumerable<UserWhereUniqueInput>
+  }
+
+  export type NotebookCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutWorkspaceInput>, Enumerable<NotebookUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutWorkspaceInput>
+    createMany?: NotebookCreateManyWorkspaceInputEnvelope
+    connect?: Enumerable<NotebookWhereUniqueInput>
+  }
+
+  export type TrackingUserAccessCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutWorkspaceInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutWorkspaceInput>
+    createMany?: TrackingUserAccessCreateManyWorkspaceInputEnvelope
+    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+  }
+
+  export type UserUncheckedCreateNestedOneWithoutLastAccessWorkspaceInput = {
+    create?: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
+    connectOrCreate?: UserCreateOrConnectWithoutLastAccessWorkspaceInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUncheckedCreateNestedManyWithoutWorkspacesInput = {
+    create?: XOR<Enumerable<UserCreateWithoutWorkspacesInput>, Enumerable<UserUncheckedCreateWithoutWorkspacesInput>>
+    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutWorkspacesInput>
+    connect?: Enumerable<UserWhereUniqueInput>
+  }
+
+  export type NotebookUncheckedCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutWorkspaceInput>, Enumerable<NotebookUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutWorkspaceInput>
+    createMany?: NotebookCreateManyWorkspaceInputEnvelope
+    connect?: Enumerable<NotebookWhereUniqueInput>
+  }
+
+  export type TrackingUserAccessUncheckedCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutWorkspaceInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutWorkspaceInput>
+    createMany?: TrackingUserAccessCreateManyWorkspaceInputEnvelope
+    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+  }
+
+  export type UserUpdateOneWithoutLastAccessWorkspaceNestedInput = {
+    create?: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
+    connectOrCreate?: UserCreateOrConnectWithoutLastAccessWorkspaceInput
+    upsert?: UserUpsertWithoutLastAccessWorkspaceInput
+    disconnect?: boolean
+    delete?: boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<UserUpdateWithoutLastAccessWorkspaceInput, UserUncheckedUpdateWithoutLastAccessWorkspaceInput>
+  }
+
+  export type UserUpdateManyWithoutWorkspacesNestedInput = {
+    create?: XOR<Enumerable<UserCreateWithoutWorkspacesInput>, Enumerable<UserUncheckedCreateWithoutWorkspacesInput>>
+    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutWorkspacesInput>
+    upsert?: Enumerable<UserUpsertWithWhereUniqueWithoutWorkspacesInput>
+    set?: Enumerable<UserWhereUniqueInput>
+    disconnect?: Enumerable<UserWhereUniqueInput>
+    delete?: Enumerable<UserWhereUniqueInput>
+    connect?: Enumerable<UserWhereUniqueInput>
+    update?: Enumerable<UserUpdateWithWhereUniqueWithoutWorkspacesInput>
+    updateMany?: Enumerable<UserUpdateManyWithWhereWithoutWorkspacesInput>
+    deleteMany?: Enumerable<UserScalarWhereInput>
+  }
+
+  export type NotebookUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutWorkspaceInput>, Enumerable<NotebookUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutWorkspaceInput>
+    upsert?: Enumerable<NotebookUpsertWithWhereUniqueWithoutWorkspaceInput>
+    createMany?: NotebookCreateManyWorkspaceInputEnvelope
     set?: Enumerable<NotebookWhereUniqueInput>
     disconnect?: Enumerable<NotebookWhereUniqueInput>
     delete?: Enumerable<NotebookWhereUniqueInput>
     connect?: Enumerable<NotebookWhereUniqueInput>
-    update?: Enumerable<NotebookUpdateWithWhereUniqueWithoutAuthorInput>
-    updateMany?: Enumerable<NotebookUpdateManyWithWhereWithoutAuthorInput>
+    update?: Enumerable<NotebookUpdateWithWhereUniqueWithoutWorkspaceInput>
+    updateMany?: Enumerable<NotebookUpdateManyWithWhereWithoutWorkspaceInput>
     deleteMany?: Enumerable<NotebookScalarWhereInput>
   }
 
-  export type DomainUncheckedUpdateOneWithoutOwnerNestedInput = {
-    create?: XOR<DomainCreateWithoutOwnerInput, DomainUncheckedCreateWithoutOwnerInput>
-    connectOrCreate?: DomainCreateOrConnectWithoutOwnerInput
-    upsert?: DomainUpsertWithoutOwnerInput
+  export type TrackingUserAccessUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutWorkspaceInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutWorkspaceInput>
+    upsert?: Enumerable<TrackingUserAccessUpsertWithWhereUniqueWithoutWorkspaceInput>
+    createMany?: TrackingUserAccessCreateManyWorkspaceInputEnvelope
+    set?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    disconnect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    delete?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    update?: Enumerable<TrackingUserAccessUpdateWithWhereUniqueWithoutWorkspaceInput>
+    updateMany?: Enumerable<TrackingUserAccessUpdateManyWithWhereWithoutWorkspaceInput>
+    deleteMany?: Enumerable<TrackingUserAccessScalarWhereInput>
+  }
+
+  export type UserUncheckedUpdateOneWithoutLastAccessWorkspaceNestedInput = {
+    create?: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
+    connectOrCreate?: UserCreateOrConnectWithoutLastAccessWorkspaceInput
+    upsert?: UserUpsertWithoutLastAccessWorkspaceInput
     disconnect?: boolean
     delete?: boolean
-    connect?: DomainWhereUniqueInput
-    update?: XOR<DomainUpdateWithoutOwnerInput, DomainUncheckedUpdateWithoutOwnerInput>
+    connect?: UserWhereUniqueInput
+    update?: XOR<UserUpdateWithoutLastAccessWorkspaceInput, UserUncheckedUpdateWithoutLastAccessWorkspaceInput>
   }
 
-  export type UserCreateNestedOneWithoutCustomDomainInput = {
-    create?: XOR<UserCreateWithoutCustomDomainInput, UserUncheckedCreateWithoutCustomDomainInput>
-    connectOrCreate?: UserCreateOrConnectWithoutCustomDomainInput
-    connect?: UserWhereUniqueInput
+  export type UserUncheckedUpdateManyWithoutWorkspacesNestedInput = {
+    create?: XOR<Enumerable<UserCreateWithoutWorkspacesInput>, Enumerable<UserUncheckedCreateWithoutWorkspacesInput>>
+    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutWorkspacesInput>
+    upsert?: Enumerable<UserUpsertWithWhereUniqueWithoutWorkspacesInput>
+    set?: Enumerable<UserWhereUniqueInput>
+    disconnect?: Enumerable<UserWhereUniqueInput>
+    delete?: Enumerable<UserWhereUniqueInput>
+    connect?: Enumerable<UserWhereUniqueInput>
+    update?: Enumerable<UserUpdateWithWhereUniqueWithoutWorkspacesInput>
+    updateMany?: Enumerable<UserUpdateManyWithWhereWithoutWorkspacesInput>
+    deleteMany?: Enumerable<UserScalarWhereInput>
   }
 
-  export type UserUpdateOneRequiredWithoutCustomDomainNestedInput = {
-    create?: XOR<UserCreateWithoutCustomDomainInput, UserUncheckedCreateWithoutCustomDomainInput>
-    connectOrCreate?: UserCreateOrConnectWithoutCustomDomainInput
-    upsert?: UserUpsertWithoutCustomDomainInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<UserUpdateWithoutCustomDomainInput, UserUncheckedUpdateWithoutCustomDomainInput>
+  export type NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutWorkspaceInput>, Enumerable<NotebookUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutWorkspaceInput>
+    upsert?: Enumerable<NotebookUpsertWithWhereUniqueWithoutWorkspaceInput>
+    createMany?: NotebookCreateManyWorkspaceInputEnvelope
+    set?: Enumerable<NotebookWhereUniqueInput>
+    disconnect?: Enumerable<NotebookWhereUniqueInput>
+    delete?: Enumerable<NotebookWhereUniqueInput>
+    connect?: Enumerable<NotebookWhereUniqueInput>
+    update?: Enumerable<NotebookUpdateWithWhereUniqueWithoutWorkspaceInput>
+    updateMany?: Enumerable<NotebookUpdateManyWithWhereWithoutWorkspaceInput>
+    deleteMany?: Enumerable<NotebookScalarWhereInput>
+  }
+
+  export type TrackingUserAccessUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutWorkspaceInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutWorkspaceInput>
+    upsert?: Enumerable<TrackingUserAccessUpsertWithWhereUniqueWithoutWorkspaceInput>
+    createMany?: TrackingUserAccessCreateManyWorkspaceInputEnvelope
+    set?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    disconnect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    delete?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+    update?: Enumerable<TrackingUserAccessUpdateWithWhereUniqueWithoutWorkspaceInput>
+    updateMany?: Enumerable<TrackingUserAccessUpdateManyWithWhereWithoutWorkspaceInput>
+    deleteMany?: Enumerable<TrackingUserAccessScalarWhereInput>
   }
 
   export type PageCreateNestedManyWithoutNotebookInput = {
@@ -9974,10 +11921,10 @@ export namespace Prisma {
     connect?: Enumerable<PageWhereUniqueInput>
   }
 
-  export type UserCreateNestedOneWithoutNotebookInput = {
-    create?: XOR<UserCreateWithoutNotebookInput, UserUncheckedCreateWithoutNotebookInput>
-    connectOrCreate?: UserCreateOrConnectWithoutNotebookInput
-    connect?: UserWhereUniqueInput
+  export type WorkspaceCreateNestedOneWithoutNotebooksInput = {
+    create?: XOR<WorkspaceCreateWithoutNotebooksInput, WorkspaceUncheckedCreateWithoutNotebooksInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutNotebooksInput
+    connect?: WorkspaceWhereUniqueInput
   }
 
   export type PageUncheckedCreateNestedManyWithoutNotebookInput = {
@@ -10005,12 +11952,12 @@ export namespace Prisma {
     deleteMany?: Enumerable<PageScalarWhereInput>
   }
 
-  export type UserUpdateOneRequiredWithoutNotebookNestedInput = {
-    create?: XOR<UserCreateWithoutNotebookInput, UserUncheckedCreateWithoutNotebookInput>
-    connectOrCreate?: UserCreateOrConnectWithoutNotebookInput
-    upsert?: UserUpsertWithoutNotebookInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<UserUpdateWithoutNotebookInput, UserUncheckedUpdateWithoutNotebookInput>
+  export type WorkspaceUpdateOneRequiredWithoutNotebooksNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutNotebooksInput, WorkspaceUncheckedCreateWithoutNotebooksInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutNotebooksInput
+    upsert?: WorkspaceUpsertWithoutNotebooksInput
+    connect?: WorkspaceWhereUniqueInput
+    update?: XOR<WorkspaceUpdateWithoutNotebooksInput, WorkspaceUncheckedUpdateWithoutNotebooksInput>
   }
 
   export type PageUncheckedUpdateManyWithoutNotebookNestedInput = {
@@ -10027,10 +11974,42 @@ export namespace Prisma {
     deleteMany?: Enumerable<PageScalarWhereInput>
   }
 
+  export type UserCreateNestedOneWithoutPagesUserUpdatedInput = {
+    create?: XOR<UserCreateWithoutPagesUserUpdatedInput, UserUncheckedCreateWithoutPagesUserUpdatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPagesUserUpdatedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutPagesUserDeletedInput = {
+    create?: XOR<UserCreateWithoutPagesUserDeletedInput, UserUncheckedCreateWithoutPagesUserDeletedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPagesUserDeletedInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type NotebookCreateNestedOneWithoutPagesInput = {
     create?: XOR<NotebookCreateWithoutPagesInput, NotebookUncheckedCreateWithoutPagesInput>
     connectOrCreate?: NotebookCreateOrConnectWithoutPagesInput
     connect?: NotebookWhereUniqueInput
+  }
+
+  export type UserUpdateOneWithoutPagesUserUpdatedNestedInput = {
+    create?: XOR<UserCreateWithoutPagesUserUpdatedInput, UserUncheckedCreateWithoutPagesUserUpdatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPagesUserUpdatedInput
+    upsert?: UserUpsertWithoutPagesUserUpdatedInput
+    disconnect?: boolean
+    delete?: boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<UserUpdateWithoutPagesUserUpdatedInput, UserUncheckedUpdateWithoutPagesUserUpdatedInput>
+  }
+
+  export type UserUpdateOneWithoutPagesUserDeletedNestedInput = {
+    create?: XOR<UserCreateWithoutPagesUserDeletedInput, UserUncheckedCreateWithoutPagesUserDeletedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPagesUserDeletedInput
+    upsert?: UserUpsertWithoutPagesUserDeletedInput
+    disconnect?: boolean
+    delete?: boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<UserUpdateWithoutPagesUserDeletedInput, UserUncheckedUpdateWithoutPagesUserDeletedInput>
   }
 
   export type NotebookUpdateOneRequiredWithoutPagesNestedInput = {
@@ -10250,8 +12229,11 @@ export namespace Prisma {
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
-    Notebook?: NotebookCreateNestedManyWithoutAuthorInput
-    CustomDomain?: DomainCreateNestedOneWithoutOwnerInput
+    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
+    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
+    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -10266,9 +12248,12 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
+    lastAccessWorkspaceId?: string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    Notebook?: NotebookUncheckedCreateNestedManyWithoutAuthorInput
-    CustomDomain?: DomainUncheckedCreateNestedOneWithoutOwnerInput
+    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
+    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -10294,8 +12279,11 @@ export namespace Prisma {
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    Notebook?: NotebookUpdateManyWithoutAuthorNestedInput
-    CustomDomain?: DomainUpdateOneWithoutOwnerNestedInput
+    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
+    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
+    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -10310,9 +12298,12 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    Notebook?: NotebookUncheckedUpdateManyWithoutAuthorNestedInput
-    CustomDomain?: DomainUncheckedUpdateOneWithoutOwnerNestedInput
+    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
+    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -10328,8 +12319,11 @@ export namespace Prisma {
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
-    Notebook?: NotebookCreateNestedManyWithoutAuthorInput
-    CustomDomain?: DomainCreateNestedOneWithoutOwnerInput
+    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
+    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
+    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -10344,9 +12338,12 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
+    lastAccessWorkspaceId?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    Notebook?: NotebookUncheckedCreateNestedManyWithoutAuthorInput
-    CustomDomain?: DomainUncheckedCreateNestedOneWithoutOwnerInput
+    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
+    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -10372,8 +12369,11 @@ export namespace Prisma {
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
-    Notebook?: NotebookUpdateManyWithoutAuthorNestedInput
-    CustomDomain?: DomainUpdateOneWithoutOwnerNestedInput
+    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
+    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
+    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -10388,9 +12388,12 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    Notebook?: NotebookUncheckedUpdateManyWithoutAuthorNestedInput
-    CustomDomain?: DomainUncheckedUpdateOneWithoutOwnerNestedInput
+    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
+    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -10457,53 +12460,166 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type NotebookCreateWithoutAuthorInput = {
+  export type WorkspaceCreateWithoutUsersInput = {
     id?: string
-    title: string
-    description: string
-    published?: boolean
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    pages?: PageCreateNestedManyWithoutNotebookInput
+    trackUserAccessWorkspace?: UserCreateNestedOneWithoutLastAccessWorkspaceInput
+    notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutWorkspaceInput
   }
 
-  export type NotebookUncheckedCreateWithoutAuthorInput = {
+  export type WorkspaceUncheckedCreateWithoutUsersInput = {
     id?: string
-    title: string
-    description: string
-    published?: boolean
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    pages?: PageUncheckedCreateNestedManyWithoutNotebookInput
+    trackUserAccessWorkspace?: UserUncheckedCreateNestedOneWithoutLastAccessWorkspaceInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
-  export type NotebookCreateOrConnectWithoutAuthorInput = {
-    where: NotebookWhereUniqueInput
-    create: XOR<NotebookCreateWithoutAuthorInput, NotebookUncheckedCreateWithoutAuthorInput>
+  export type WorkspaceCreateOrConnectWithoutUsersInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutUsersInput, WorkspaceUncheckedCreateWithoutUsersInput>
   }
 
-  export type NotebookCreateManyAuthorInputEnvelope = {
-    data: Enumerable<NotebookCreateManyAuthorInput>
+  export type TrackingUserAccessCreateWithoutUserInput = {
+    id?: string
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    createdAt?: Date | string
+    workspace?: WorkspaceCreateNestedOneWithoutTrackingUserAccessInput
+  }
+
+  export type TrackingUserAccessUncheckedCreateWithoutUserInput = {
+    id?: string
+    lastAccessWorkspaceId?: string | null
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type TrackingUserAccessCreateOrConnectWithoutUserInput = {
+    where: TrackingUserAccessWhereUniqueInput
+    create: XOR<TrackingUserAccessCreateWithoutUserInput, TrackingUserAccessUncheckedCreateWithoutUserInput>
+  }
+
+  export type TrackingUserAccessCreateManyUserInputEnvelope = {
+    data: Enumerable<TrackingUserAccessCreateManyUserInput>
     skipDuplicates?: boolean
   }
 
-  export type DomainCreateWithoutOwnerInput = {
+  export type WorkspaceCreateWithoutTrackUserAccessWorkspaceInput = {
     id?: string
     name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutWorkspacesInput
+    notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutWorkspaceInput
   }
 
-  export type DomainUncheckedCreateWithoutOwnerInput = {
+  export type WorkspaceUncheckedCreateWithoutTrackUserAccessWorkspaceInput = {
     id?: string
     name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutWorkspacesInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
-  export type DomainCreateOrConnectWithoutOwnerInput = {
-    where: DomainWhereUniqueInput
-    create: XOR<DomainCreateWithoutOwnerInput, DomainUncheckedCreateWithoutOwnerInput>
+  export type WorkspaceCreateOrConnectWithoutTrackUserAccessWorkspaceInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackUserAccessWorkspaceInput>
+  }
+
+  export type PageCreateWithoutUpdatedByUserInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    deletedByUser?: UserCreateNestedOneWithoutPagesUserDeletedInput
+    notebook: NotebookCreateNestedOneWithoutPagesInput
+  }
+
+  export type PageUncheckedCreateWithoutUpdatedByUserInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedBy?: string | null
+    deletedAt?: Date | string | null
+    notebookId: string
+  }
+
+  export type PageCreateOrConnectWithoutUpdatedByUserInput = {
+    where: PageWhereUniqueInput
+    create: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
+  }
+
+  export type PageCreateWithoutDeletedByUserInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    updatedByUser?: UserCreateNestedOneWithoutPagesUserUpdatedInput
+    notebook: NotebookCreateNestedOneWithoutPagesInput
+  }
+
+  export type PageUncheckedCreateWithoutDeletedByUserInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    notebookId: string
+  }
+
+  export type PageCreateOrConnectWithoutDeletedByUserInput = {
+    where: PageWhereUniqueInput
+    create: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
   }
 
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
@@ -10568,55 +12684,165 @@ export namespace Prisma {
     expires?: DateTimeFilter | Date | string
   }
 
-  export type NotebookUpsertWithWhereUniqueWithoutAuthorInput = {
-    where: NotebookWhereUniqueInput
-    update: XOR<NotebookUpdateWithoutAuthorInput, NotebookUncheckedUpdateWithoutAuthorInput>
-    create: XOR<NotebookCreateWithoutAuthorInput, NotebookUncheckedCreateWithoutAuthorInput>
+  export type WorkspaceUpsertWithWhereUniqueWithoutUsersInput = {
+    where: WorkspaceWhereUniqueInput
+    update: XOR<WorkspaceUpdateWithoutUsersInput, WorkspaceUncheckedUpdateWithoutUsersInput>
+    create: XOR<WorkspaceCreateWithoutUsersInput, WorkspaceUncheckedCreateWithoutUsersInput>
   }
 
-  export type NotebookUpdateWithWhereUniqueWithoutAuthorInput = {
-    where: NotebookWhereUniqueInput
-    data: XOR<NotebookUpdateWithoutAuthorInput, NotebookUncheckedUpdateWithoutAuthorInput>
+  export type WorkspaceUpdateWithWhereUniqueWithoutUsersInput = {
+    where: WorkspaceWhereUniqueInput
+    data: XOR<WorkspaceUpdateWithoutUsersInput, WorkspaceUncheckedUpdateWithoutUsersInput>
   }
 
-  export type NotebookUpdateManyWithWhereWithoutAuthorInput = {
-    where: NotebookScalarWhereInput
-    data: XOR<NotebookUpdateManyMutationInput, NotebookUncheckedUpdateManyWithoutNotebookInput>
+  export type WorkspaceUpdateManyWithWhereWithoutUsersInput = {
+    where: WorkspaceScalarWhereInput
+    data: XOR<WorkspaceUpdateManyMutationInput, WorkspaceUncheckedUpdateManyWithoutWorkspacesInput>
   }
 
-  export type NotebookScalarWhereInput = {
-    AND?: Enumerable<NotebookScalarWhereInput>
-    OR?: Enumerable<NotebookScalarWhereInput>
-    NOT?: Enumerable<NotebookScalarWhereInput>
+  export type WorkspaceScalarWhereInput = {
+    AND?: Enumerable<WorkspaceScalarWhereInput>
+    OR?: Enumerable<WorkspaceScalarWhereInput>
+    NOT?: Enumerable<WorkspaceScalarWhereInput>
     id?: StringFilter | string
-    title?: StringFilter | string
-    description?: StringFilter | string
-    published?: BoolFilter | boolean
+    name?: StringFilter | string
+    domain?: StringFilter | string
+    stripeCustomerId?: StringNullableFilter | string | null
+    stripeWorkspaceId?: StringNullableFilter | string | null
+    stripeSubscriptionId?: StringNullableFilter | string | null
+    stripePriceId?: StringNullableFilter | string | null
+    stripeCurrentPeriodEnd?: DateTimeNullableFilter | Date | string | null
+    createdBy?: StringFilter | string
     createdAt?: DateTimeFilter | Date | string
     updatedAt?: DateTimeFilter | Date | string
-    authorId?: StringFilter | string
   }
 
-  export type DomainUpsertWithoutOwnerInput = {
-    update: XOR<DomainUpdateWithoutOwnerInput, DomainUncheckedUpdateWithoutOwnerInput>
-    create: XOR<DomainCreateWithoutOwnerInput, DomainUncheckedCreateWithoutOwnerInput>
+  export type TrackingUserAccessUpsertWithWhereUniqueWithoutUserInput = {
+    where: TrackingUserAccessWhereUniqueInput
+    update: XOR<TrackingUserAccessUpdateWithoutUserInput, TrackingUserAccessUncheckedUpdateWithoutUserInput>
+    create: XOR<TrackingUserAccessCreateWithoutUserInput, TrackingUserAccessUncheckedCreateWithoutUserInput>
   }
 
-  export type DomainUpdateWithoutOwnerInput = {
+  export type TrackingUserAccessUpdateWithWhereUniqueWithoutUserInput = {
+    where: TrackingUserAccessWhereUniqueInput
+    data: XOR<TrackingUserAccessUpdateWithoutUserInput, TrackingUserAccessUncheckedUpdateWithoutUserInput>
+  }
+
+  export type TrackingUserAccessUpdateManyWithWhereWithoutUserInput = {
+    where: TrackingUserAccessScalarWhereInput
+    data: XOR<TrackingUserAccessUpdateManyMutationInput, TrackingUserAccessUncheckedUpdateManyWithoutTrackingUserAccessInput>
+  }
+
+  export type TrackingUserAccessScalarWhereInput = {
+    AND?: Enumerable<TrackingUserAccessScalarWhereInput>
+    OR?: Enumerable<TrackingUserAccessScalarWhereInput>
+    NOT?: Enumerable<TrackingUserAccessScalarWhereInput>
+    id?: StringFilter | string
+    userId?: StringFilter | string
+    lastAccessWorkspaceId?: StringNullableFilter | string | null
+    lastAccessNotebookId?: StringNullableFilter | string | null
+    lastAccessPageId?: StringNullableFilter | string | null
+    createdAt?: DateTimeFilter | Date | string
+  }
+
+  export type WorkspaceUpsertWithoutTrackUserAccessWorkspaceInput = {
+    update: XOR<WorkspaceUpdateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedUpdateWithoutTrackUserAccessWorkspaceInput>
+    create: XOR<WorkspaceCreateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackUserAccessWorkspaceInput>
+  }
+
+  export type WorkspaceUpdateWithoutTrackUserAccessWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutWorkspacesNestedInput
+    notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutWorkspaceNestedInput
   }
 
-  export type DomainUncheckedUpdateWithoutOwnerInput = {
+  export type WorkspaceUncheckedUpdateWithoutTrackUserAccessWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutWorkspacesNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
-  export type UserCreateWithoutCustomDomainInput = {
+  export type PageUpsertWithoutUpdatedByUserInput = {
+    update: XOR<PageUpdateWithoutUpdatedByUserInput, PageUncheckedUpdateWithoutUpdatedByUserInput>
+    create: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
+  }
+
+  export type PageUpdateWithoutUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedByUser?: UserUpdateOneWithoutPagesUserDeletedNestedInput
+    notebook?: NotebookUpdateOneRequiredWithoutPagesNestedInput
+  }
+
+  export type PageUncheckedUpdateWithoutUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebookId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PageUpsertWithoutDeletedByUserInput = {
+    update: XOR<PageUpdateWithoutDeletedByUserInput, PageUncheckedUpdateWithoutDeletedByUserInput>
+    create: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
+  }
+
+  export type PageUpdateWithoutDeletedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedByUser?: UserUpdateOneWithoutPagesUserUpdatedNestedInput
+    notebook?: NotebookUpdateOneRequiredWithoutPagesNestedInput
+  }
+
+  export type PageUncheckedUpdateWithoutDeletedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebookId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UserCreateWithoutTrackingUserAccessInput = {
     id?: string
     name?: string | null
     email?: string | null
@@ -10630,10 +12856,13 @@ export namespace Prisma {
     stripeCurrentPeriodEnd?: Date | string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    Notebook?: NotebookCreateNestedManyWithoutAuthorInput
+    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
+    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
+    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
   }
 
-  export type UserUncheckedCreateWithoutCustomDomainInput = {
+  export type UserUncheckedCreateWithoutTrackingUserAccessInput = {
     id?: string
     name?: string | null
     email?: string | null
@@ -10645,22 +12874,64 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
+    lastAccessWorkspaceId?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    Notebook?: NotebookUncheckedCreateNestedManyWithoutAuthorInput
+    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
+    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
   }
 
-  export type UserCreateOrConnectWithoutCustomDomainInput = {
+  export type UserCreateOrConnectWithoutTrackingUserAccessInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutCustomDomainInput, UserUncheckedCreateWithoutCustomDomainInput>
+    create: XOR<UserCreateWithoutTrackingUserAccessInput, UserUncheckedCreateWithoutTrackingUserAccessInput>
   }
 
-  export type UserUpsertWithoutCustomDomainInput = {
-    update: XOR<UserUpdateWithoutCustomDomainInput, UserUncheckedUpdateWithoutCustomDomainInput>
-    create: XOR<UserCreateWithoutCustomDomainInput, UserUncheckedCreateWithoutCustomDomainInput>
+  export type WorkspaceCreateWithoutTrackingUserAccessInput = {
+    id?: string
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    trackUserAccessWorkspace?: UserCreateNestedOneWithoutLastAccessWorkspaceInput
+    users?: UserCreateNestedManyWithoutWorkspacesInput
+    notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
   }
 
-  export type UserUpdateWithoutCustomDomainInput = {
+  export type WorkspaceUncheckedCreateWithoutTrackingUserAccessInput = {
+    id?: string
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    trackUserAccessWorkspace?: UserUncheckedCreateNestedOneWithoutLastAccessWorkspaceInput
+    users?: UserUncheckedCreateNestedManyWithoutWorkspacesInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceCreateOrConnectWithoutTrackingUserAccessInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutTrackingUserAccessInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessInput>
+  }
+
+  export type UserUpsertWithoutTrackingUserAccessInput = {
+    update: XOR<UserUpdateWithoutTrackingUserAccessInput, UserUncheckedUpdateWithoutTrackingUserAccessInput>
+    create: XOR<UserCreateWithoutTrackingUserAccessInput, UserUncheckedCreateWithoutTrackingUserAccessInput>
+  }
+
+  export type UserUpdateWithoutTrackingUserAccessInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10674,10 +12945,13 @@ export namespace Prisma {
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    Notebook?: NotebookUpdateManyWithoutAuthorNestedInput
+    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
+    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
+    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutCustomDomainInput = {
+  export type UserUncheckedUpdateWithoutTrackingUserAccessInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10689,40 +12963,54 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    Notebook?: NotebookUncheckedUpdateManyWithoutAuthorNestedInput
+    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
+    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
   }
 
-  export type PageCreateWithoutNotebookInput = {
-    id?: string
-    title: string
-    content?: NullableJsonNullValueInput | InputJsonValue
-    published?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
+  export type WorkspaceUpsertWithoutTrackingUserAccessInput = {
+    update: XOR<WorkspaceUpdateWithoutTrackingUserAccessInput, WorkspaceUncheckedUpdateWithoutTrackingUserAccessInput>
+    create: XOR<WorkspaceCreateWithoutTrackingUserAccessInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessInput>
   }
 
-  export type PageUncheckedCreateWithoutNotebookInput = {
-    id?: string
-    title: string
-    content?: NullableJsonNullValueInput | InputJsonValue
-    published?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
+  export type WorkspaceUpdateWithoutTrackingUserAccessInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trackUserAccessWorkspace?: UserUpdateOneWithoutLastAccessWorkspaceNestedInput
+    users?: UserUpdateManyWithoutWorkspacesNestedInput
+    notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
   }
 
-  export type PageCreateOrConnectWithoutNotebookInput = {
-    where: PageWhereUniqueInput
-    create: XOR<PageCreateWithoutNotebookInput, PageUncheckedCreateWithoutNotebookInput>
+  export type WorkspaceUncheckedUpdateWithoutTrackingUserAccessInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trackUserAccessWorkspace?: UserUncheckedUpdateOneWithoutLastAccessWorkspaceNestedInput
+    users?: UserUncheckedUpdateManyWithoutWorkspacesNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
-  export type PageCreateManyNotebookInputEnvelope = {
-    data: Enumerable<PageCreateManyNotebookInput>
-    skipDuplicates?: boolean
-  }
-
-  export type UserCreateWithoutNotebookInput = {
+  export type UserCreateWithoutLastAccessWorkspaceInput = {
     id?: string
     name?: string | null
     email?: string | null
@@ -10736,10 +13024,13 @@ export namespace Prisma {
     stripeCurrentPeriodEnd?: Date | string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    CustomDomain?: DomainCreateNestedOneWithoutOwnerInput
+    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
+    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
   }
 
-  export type UserUncheckedCreateWithoutNotebookInput = {
+  export type UserUncheckedCreateWithoutLastAccessWorkspaceInput = {
     id?: string
     name?: string | null
     email?: string | null
@@ -10753,12 +13044,313 @@ export namespace Prisma {
     stripeCurrentPeriodEnd?: Date | string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    CustomDomain?: DomainUncheckedCreateNestedOneWithoutOwnerInput
+    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
+    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
   }
 
-  export type UserCreateOrConnectWithoutNotebookInput = {
+  export type UserCreateOrConnectWithoutLastAccessWorkspaceInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutNotebookInput, UserUncheckedCreateWithoutNotebookInput>
+    create: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
+  }
+
+  export type UserCreateWithoutWorkspacesInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
+    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
+    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
+  }
+
+  export type UserUncheckedCreateWithoutWorkspacesInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
+    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
+    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
+  }
+
+  export type UserCreateOrConnectWithoutWorkspacesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutWorkspacesInput, UserUncheckedCreateWithoutWorkspacesInput>
+  }
+
+  export type NotebookCreateWithoutWorkspaceInput = {
+    id?: string
+    title: string
+    description: string
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    pages?: PageCreateNestedManyWithoutNotebookInput
+  }
+
+  export type NotebookUncheckedCreateWithoutWorkspaceInput = {
+    id?: string
+    title: string
+    description: string
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    pages?: PageUncheckedCreateNestedManyWithoutNotebookInput
+  }
+
+  export type NotebookCreateOrConnectWithoutWorkspaceInput = {
+    where: NotebookWhereUniqueInput
+    create: XOR<NotebookCreateWithoutWorkspaceInput, NotebookUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type NotebookCreateManyWorkspaceInputEnvelope = {
+    data: Enumerable<NotebookCreateManyWorkspaceInput>
+    skipDuplicates?: boolean
+  }
+
+  export type TrackingUserAccessCreateWithoutWorkspaceInput = {
+    id?: string
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutTrackingUserAccessInput
+  }
+
+  export type TrackingUserAccessUncheckedCreateWithoutWorkspaceInput = {
+    id?: string
+    userId: string
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type TrackingUserAccessCreateOrConnectWithoutWorkspaceInput = {
+    where: TrackingUserAccessWhereUniqueInput
+    create: XOR<TrackingUserAccessCreateWithoutWorkspaceInput, TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type TrackingUserAccessCreateManyWorkspaceInputEnvelope = {
+    data: Enumerable<TrackingUserAccessCreateManyWorkspaceInput>
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutLastAccessWorkspaceInput = {
+    update: XOR<UserUpdateWithoutLastAccessWorkspaceInput, UserUncheckedUpdateWithoutLastAccessWorkspaceInput>
+    create: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
+  }
+
+  export type UserUpdateWithoutLastAccessWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
+    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutLastAccessWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
+    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUpsertWithWhereUniqueWithoutWorkspacesInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutWorkspacesInput, UserUncheckedUpdateWithoutWorkspacesInput>
+    create: XOR<UserCreateWithoutWorkspacesInput, UserUncheckedCreateWithoutWorkspacesInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutWorkspacesInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutWorkspacesInput, UserUncheckedUpdateWithoutWorkspacesInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutWorkspacesInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutUsersInput>
+  }
+
+  export type UserScalarWhereInput = {
+    AND?: Enumerable<UserScalarWhereInput>
+    OR?: Enumerable<UserScalarWhereInput>
+    NOT?: Enumerable<UserScalarWhereInput>
+    id?: StringFilter | string
+    name?: StringNullableFilter | string | null
+    email?: StringNullableFilter | string | null
+    emailVerified?: DateTimeNullableFilter | Date | string | null
+    image?: StringNullableFilter | string | null
+    createdAt?: DateTimeFilter | Date | string
+    updatedAt?: DateTimeFilter | Date | string
+    stripeCustomerId?: StringNullableFilter | string | null
+    stripeSubscriptionId?: StringNullableFilter | string | null
+    stripePriceId?: StringNullableFilter | string | null
+    stripeCurrentPeriodEnd?: DateTimeNullableFilter | Date | string | null
+    lastAccessWorkspaceId?: StringNullableFilter | string | null
+  }
+
+  export type NotebookUpsertWithWhereUniqueWithoutWorkspaceInput = {
+    where: NotebookWhereUniqueInput
+    update: XOR<NotebookUpdateWithoutWorkspaceInput, NotebookUncheckedUpdateWithoutWorkspaceInput>
+    create: XOR<NotebookCreateWithoutWorkspaceInput, NotebookUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type NotebookUpdateWithWhereUniqueWithoutWorkspaceInput = {
+    where: NotebookWhereUniqueInput
+    data: XOR<NotebookUpdateWithoutWorkspaceInput, NotebookUncheckedUpdateWithoutWorkspaceInput>
+  }
+
+  export type NotebookUpdateManyWithWhereWithoutWorkspaceInput = {
+    where: NotebookScalarWhereInput
+    data: XOR<NotebookUpdateManyMutationInput, NotebookUncheckedUpdateManyWithoutNotebooksInput>
+  }
+
+  export type NotebookScalarWhereInput = {
+    AND?: Enumerable<NotebookScalarWhereInput>
+    OR?: Enumerable<NotebookScalarWhereInput>
+    NOT?: Enumerable<NotebookScalarWhereInput>
+    id?: StringFilter | string
+    title?: StringFilter | string
+    description?: StringFilter | string
+    published?: BoolFilter | boolean
+    createdAt?: DateTimeFilter | Date | string
+    updatedAt?: DateTimeFilter | Date | string
+    workspaceId?: StringFilter | string
+  }
+
+  export type TrackingUserAccessUpsertWithWhereUniqueWithoutWorkspaceInput = {
+    where: TrackingUserAccessWhereUniqueInput
+    update: XOR<TrackingUserAccessUpdateWithoutWorkspaceInput, TrackingUserAccessUncheckedUpdateWithoutWorkspaceInput>
+    create: XOR<TrackingUserAccessCreateWithoutWorkspaceInput, TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type TrackingUserAccessUpdateWithWhereUniqueWithoutWorkspaceInput = {
+    where: TrackingUserAccessWhereUniqueInput
+    data: XOR<TrackingUserAccessUpdateWithoutWorkspaceInput, TrackingUserAccessUncheckedUpdateWithoutWorkspaceInput>
+  }
+
+  export type TrackingUserAccessUpdateManyWithWhereWithoutWorkspaceInput = {
+    where: TrackingUserAccessScalarWhereInput
+    data: XOR<TrackingUserAccessUpdateManyMutationInput, TrackingUserAccessUncheckedUpdateManyWithoutTrackingUserAccessInput>
+  }
+
+  export type PageCreateWithoutNotebookInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    updatedByUser?: UserCreateNestedOneWithoutPagesUserUpdatedInput
+    deletedByUser?: UserCreateNestedOneWithoutPagesUserDeletedInput
+  }
+
+  export type PageUncheckedCreateWithoutNotebookInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedBy?: string | null
+    updatedAt?: Date | string
+    deletedBy?: string | null
+    deletedAt?: Date | string | null
+  }
+
+  export type PageCreateOrConnectWithoutNotebookInput = {
+    where: PageWhereUniqueInput
+    create: XOR<PageCreateWithoutNotebookInput, PageUncheckedCreateWithoutNotebookInput>
+  }
+
+  export type PageCreateManyNotebookInputEnvelope = {
+    data: Enumerable<PageCreateManyNotebookInput>
+    skipDuplicates?: boolean
+  }
+
+  export type WorkspaceCreateWithoutNotebooksInput = {
+    id?: string
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    trackUserAccessWorkspace?: UserCreateNestedOneWithoutLastAccessWorkspaceInput
+    users?: UserCreateNestedManyWithoutWorkspacesInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceUncheckedCreateWithoutNotebooksInput = {
+    id?: string
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdBy: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    trackUserAccessWorkspace?: UserUncheckedCreateNestedOneWithoutLastAccessWorkspaceInput
+    users?: UserUncheckedCreateNestedManyWithoutWorkspacesInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceCreateOrConnectWithoutNotebooksInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutNotebooksInput, WorkspaceUncheckedCreateWithoutNotebooksInput>
   }
 
   export type PageUpsertWithWhereUniqueWithoutNotebookInput = {
@@ -10786,16 +13378,173 @@ export namespace Prisma {
     content?: JsonNullableFilter
     published?: BoolFilter | boolean
     createdAt?: DateTimeFilter | Date | string
+    updatedBy?: StringNullableFilter | string | null
     updatedAt?: DateTimeFilter | Date | string
+    deletedBy?: StringNullableFilter | string | null
+    deletedAt?: DateTimeNullableFilter | Date | string | null
     notebookId?: StringFilter | string
   }
 
-  export type UserUpsertWithoutNotebookInput = {
-    update: XOR<UserUpdateWithoutNotebookInput, UserUncheckedUpdateWithoutNotebookInput>
-    create: XOR<UserCreateWithoutNotebookInput, UserUncheckedCreateWithoutNotebookInput>
+  export type WorkspaceUpsertWithoutNotebooksInput = {
+    update: XOR<WorkspaceUpdateWithoutNotebooksInput, WorkspaceUncheckedUpdateWithoutNotebooksInput>
+    create: XOR<WorkspaceCreateWithoutNotebooksInput, WorkspaceUncheckedCreateWithoutNotebooksInput>
   }
 
-  export type UserUpdateWithoutNotebookInput = {
+  export type WorkspaceUpdateWithoutNotebooksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trackUserAccessWorkspace?: UserUpdateOneWithoutLastAccessWorkspaceNestedInput
+    users?: UserUpdateManyWithoutWorkspacesNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateWithoutNotebooksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trackUserAccessWorkspace?: UserUncheckedUpdateOneWithoutLastAccessWorkspaceNestedInput
+    users?: UserUncheckedUpdateManyWithoutWorkspacesNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type UserCreateWithoutPagesUserUpdatedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
+    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
+    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
+  }
+
+  export type UserUncheckedCreateWithoutPagesUserUpdatedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
+    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
+  }
+
+  export type UserCreateOrConnectWithoutPagesUserUpdatedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPagesUserUpdatedInput, UserUncheckedCreateWithoutPagesUserUpdatedInput>
+  }
+
+  export type UserCreateWithoutPagesUserDeletedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
+    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
+    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
+  }
+
+  export type UserUncheckedCreateWithoutPagesUserDeletedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
+    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
+    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
+  }
+
+  export type UserCreateOrConnectWithoutPagesUserDeletedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPagesUserDeletedInput, UserUncheckedCreateWithoutPagesUserDeletedInput>
+  }
+
+  export type NotebookCreateWithoutPagesInput = {
+    id?: string
+    title: string
+    description: string
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutNotebooksInput
+  }
+
+  export type NotebookUncheckedCreateWithoutPagesInput = {
+    id?: string
+    title: string
+    description: string
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspaceId: string
+  }
+
+  export type NotebookCreateOrConnectWithoutPagesInput = {
+    where: NotebookWhereUniqueInput
+    create: XOR<NotebookCreateWithoutPagesInput, NotebookUncheckedCreateWithoutPagesInput>
+  }
+
+  export type UserUpsertWithoutPagesUserUpdatedInput = {
+    update: XOR<UserUpdateWithoutPagesUserUpdatedInput, UserUncheckedUpdateWithoutPagesUserUpdatedInput>
+    create: XOR<UserCreateWithoutPagesUserUpdatedInput, UserUncheckedCreateWithoutPagesUserUpdatedInput>
+  }
+
+  export type UserUpdateWithoutPagesUserUpdatedInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10809,10 +13558,13 @@ export namespace Prisma {
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    CustomDomain?: DomainUpdateOneWithoutOwnerNestedInput
+    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
+    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
+    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutNotebookInput = {
+  export type UserUncheckedUpdateWithoutPagesUserUpdatedInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10824,34 +13576,57 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    CustomDomain?: DomainUncheckedUpdateOneWithoutOwnerNestedInput
+    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
+    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
   }
 
-  export type NotebookCreateWithoutPagesInput = {
-    id?: string
-    title: string
-    description: string
-    published?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    author: UserCreateNestedOneWithoutNotebookInput
+  export type UserUpsertWithoutPagesUserDeletedInput = {
+    update: XOR<UserUpdateWithoutPagesUserDeletedInput, UserUncheckedUpdateWithoutPagesUserDeletedInput>
+    create: XOR<UserCreateWithoutPagesUserDeletedInput, UserUncheckedCreateWithoutPagesUserDeletedInput>
   }
 
-  export type NotebookUncheckedCreateWithoutPagesInput = {
-    id?: string
-    title: string
-    description: string
-    published?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    authorId: string
+  export type UserUpdateWithoutPagesUserDeletedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
+    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
+    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
   }
 
-  export type NotebookCreateOrConnectWithoutPagesInput = {
-    where: NotebookWhereUniqueInput
-    create: XOR<NotebookCreateWithoutPagesInput, NotebookUncheckedCreateWithoutPagesInput>
+  export type UserUncheckedUpdateWithoutPagesUserDeletedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
+    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
   }
 
   export type NotebookUpsertWithoutPagesInput = {
@@ -10866,7 +13641,7 @@ export namespace Prisma {
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    author?: UserUpdateOneRequiredWithoutNotebookNestedInput
+    workspace?: WorkspaceUpdateOneRequiredWithoutNotebooksNestedInput
   }
 
   export type NotebookUncheckedUpdateWithoutPagesInput = {
@@ -10876,7 +13651,7 @@ export namespace Prisma {
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    authorId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AccountCreateManyUserInput = {
@@ -10901,13 +13676,12 @@ export namespace Prisma {
     expires: Date | string
   }
 
-  export type NotebookCreateManyAuthorInput = {
+  export type TrackingUserAccessCreateManyUserInput = {
     id?: string
-    title: string
-    description: string
-    published?: boolean
+    lastAccessWorkspaceId?: string | null
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
     createdAt?: Date | string
-    updatedAt?: Date | string
   }
 
   export type AccountUpdateWithoutUserInput = {
@@ -10976,7 +13750,151 @@ export namespace Prisma {
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type NotebookUpdateWithoutAuthorInput = {
+  export type WorkspaceUpdateWithoutUsersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trackUserAccessWorkspace?: UserUpdateOneWithoutLastAccessWorkspaceNestedInput
+    notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateWithoutUsersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trackUserAccessWorkspace?: UserUncheckedUpdateOneWithoutLastAccessWorkspaceNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateManyWithoutWorkspacesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackingUserAccessUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneWithoutTrackingUserAccessNestedInput
+  }
+
+  export type TrackingUserAccessUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackingUserAccessUncheckedUpdateManyWithoutTrackingUserAccessInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotebookCreateManyWorkspaceInput = {
+    id?: string
+    title: string
+    description: string
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TrackingUserAccessCreateManyWorkspaceInput = {
+    id?: string
+    userId: string
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type UserUpdateWithoutWorkspacesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
+    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
+    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutWorkspacesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
+    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
+    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutUsersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type NotebookUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
@@ -10986,7 +13904,7 @@ export namespace Prisma {
     pages?: PageUpdateManyWithoutNotebookNestedInput
   }
 
-  export type NotebookUncheckedUpdateWithoutAuthorInput = {
+  export type NotebookUncheckedUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
@@ -10996,7 +13914,7 @@ export namespace Prisma {
     pages?: PageUncheckedUpdateManyWithoutNotebookNestedInput
   }
 
-  export type NotebookUncheckedUpdateManyWithoutNotebookInput = {
+  export type NotebookUncheckedUpdateManyWithoutNotebooksInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
@@ -11005,13 +13923,32 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type TrackingUserAccessUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutTrackingUserAccessNestedInput
+  }
+
+  export type TrackingUserAccessUncheckedUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type PageCreateManyNotebookInput = {
     id?: string
     title: string
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: boolean
     createdAt?: Date | string
+    updatedBy?: string | null
     updatedAt?: Date | string
+    deletedBy?: string | null
+    deletedAt?: Date | string | null
   }
 
   export type PageUpdateWithoutNotebookInput = {
@@ -11021,6 +13958,9 @@ export namespace Prisma {
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedByUser?: UserUpdateOneWithoutPagesUserUpdatedNestedInput
+    deletedByUser?: UserUpdateOneWithoutPagesUserDeletedNestedInput
   }
 
   export type PageUncheckedUpdateWithoutNotebookInput = {
@@ -11029,7 +13969,10 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PageUncheckedUpdateManyWithoutPagesInput = {
@@ -11038,7 +13981,10 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
 

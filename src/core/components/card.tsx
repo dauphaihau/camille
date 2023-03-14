@@ -1,5 +1,5 @@
 import { cn } from "lib/utils"
-import { Skeleton } from "ui/skeleton"
+import { Skeleton } from "core/components/skeleton"
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
 

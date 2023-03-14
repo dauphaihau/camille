@@ -6,14 +6,12 @@ import { RegisterOptions, useFormContext } from 'react-hook-form';
 
 export type InputProps = {
   /** Input label */
-  label: string;
+  label?: string;
   /**
    * id to be initialized with React Hook Form,
    * must be the same with the pre-defined types.
    */
   id: string;
-  /** Input placeholder */
-  placeholder?: string;
   /** Small text below input, useful for additional information */
   helperText?: string;
   /**
@@ -26,15 +24,15 @@ export type InputProps = {
   readOnly?: boolean;
   /** Disable error style (not disabling error validation) */
   hideError?: boolean;
+
   size?: 'xs' | 'sm' | 'md';
+
   /** Manual validation using RHF, it is encouraged to use yup resolver instead */
   validation?: RegisterOptions;
-}
-// } & React.ComponentPropsWithoutRef<'input'>;
+} & React.ComponentPropsWithoutRef<'input'>;
 
 export default function Input({
   label,
-  placeholder = '',
   helperText,
   id,
   classes,
@@ -54,8 +52,10 @@ export default function Input({
   return (
     <div className='w-full'>
       {label && <label htmlFor={id} className='text-sm text-[#3c4149] dark:text-white'>{label}</label>}
-      <div className={cn('',
-        'group')}>
+      <div
+        className={cn('',
+          'group')}
+      >
         {/*<div className='input__contentLeft'>{contentLeft}</div>*/}
         {/*<div className='input__contentRight'>{contentRight}</div>*/}
         {/*<Clear/>*/}
@@ -66,7 +66,7 @@ export default function Input({
           // value={value}
           // name={name}
           // onChange={handleOnChange}
-           {...register(id, validation)}
+          {...register(id, validation)}
           className={cn(
             `
           bg-[#f7f7f7] focus:bg-white
@@ -77,7 +77,13 @@ export default function Input({
           w-full appearance-none
           text-gray-900 text-xs lg:text-sm
           dark:bg-[#16161a]
-          dark:border-0 dark:text-white;
+          dark:border-0 dark:text-white
+          
+          disabled:bg-red-300
+          disabled:cursor-not-allowed
+          disabled:hover:border-gray-300
+          disabled:bg-[#e9ecef] 
+          disabled:text-[#aeb5bc]
         `,
 
             [
@@ -93,6 +99,10 @@ export default function Input({
         />
       </div>
       {helperText && <p className='text-red-500 text-sm mt-2'>{helperText}</p>}
+      {errors[id] && <p className='text-red-500 text-sm mt-2'>
+        {errors[id]?.message as unknown as string}
+      </p>}
+
     </div>
   );
 }

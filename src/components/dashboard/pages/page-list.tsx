@@ -3,20 +3,18 @@
 import { PageItem } from "./page-item";
 import { EmptyPlaceholder } from "../empty-placeholder";
 import { PostCreateButton } from "../post-create-button";
-import { useDetailNotebook } from "services/page";
+import { useGetPages } from "lib/request-by-swr/page";
 
 export default function PageList({ notebookId }) {
-
-  // get all pages from a notebook
-  const { isLoading, pageList } = useDetailNotebook(notebookId)
+  const { isLoading, pages } = useGetPages(notebookId)
 
   return (
     <div>
       {
-        pageList && pageList.length ? (
+        pages && pages.length ? (
           // <div className="divide-y divide-neutral-200 rounded-md border border-slate-200 mb-4">
           <div className="">
-            {pageList.map((page) => (
+            {pages.map((page) => (
               <PageItem notebookId={notebookId} key={page.id} page={page}/>
             ))}
           </div>

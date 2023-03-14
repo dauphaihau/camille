@@ -5,29 +5,31 @@ import { useRouter } from "next/navigation"
 
 import { Button } from "core/components"
 import { toast } from "core/components/Toast"
+import { useWorkspaceContext } from "../context/WorkspaceContext";
 
 interface PostCreateButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   notebookId: string
 }
 
 export function PageCreateButton({
-  className, notebookId,
+  className, notebookId, children,
   ...props
 }: PostCreateButtonProps) {
   const router = useRouter()
+  const { workspace } = useWorkspaceContext();
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   async function onClick() {
     setIsLoading(true)
 
-    const response = await fetch("/api/notebook/pages", {
+    const response = await fetch("/api/notebook/page", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        notebookId ,
-        title: "Untitled Post",
+        notebookId,
+        title: "Untitled Page",
       }),
     })
 
@@ -54,8 +56,14 @@ export function PageCreateButton({
     // This forces a cache invalidation.
     router.refresh()
 
-    router.push(`/dashboard/notebooks/${notebookId}/${page.id}`)
-    // router.push(`/editor/${post.id}`)
+    router.push(`/${workspace.domain}/${notebookId}/${page.id}`)
+  }
+
+  if (children) {
+    return <div onClick={onClick}>
+      {children}
+    </div>
+
   }
 
   return (

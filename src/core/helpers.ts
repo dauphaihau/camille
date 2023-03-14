@@ -25,12 +25,6 @@ export function debounce(callback, interval: number) {
   };
 }
 
-export const isDarkMode = () => {
-  if (typeof window !== 'undefined') {
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-  }
-}
-
 export const wordInString = (s, word) => new RegExp('\\b' + word + '\\b', 'i').test(s);
 
 export const uniqElement = (arr) => {

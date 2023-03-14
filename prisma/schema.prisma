@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output = "./src/generated/client"
 }
 
 datasource db {
@@ -42,34 +43,67 @@ model Session {
 }
 
 model User {
-  id                     String      @id @default(cuid())
+  id                     String               @id @default(cuid())
   name                   String?
-  email                  String?     @unique
+  email                  String?              @unique
   emailVerified          DateTime?
   image                  String?
-  createdAt              DateTime    @default(now()) @map("created_at")
-  updatedAt              DateTime    @default(now()) @map("updated_at")
-  stripeCustomerId       String?     @unique @map("stripe_customer_id")
-  stripeSubscriptionId   String?     @unique @map("stripe_subscription_id")
-  stripePriceId          String?     @map("stripe_price_id")
-  stripeCurrentPeriodEnd DateTime?   @map("stripe_current_period_end")
+  createdAt              DateTime             @default(now()) @map("created_at")
+  updatedAt              DateTime             @default(now()) @map("updated_at")
+  stripeCustomerId       String?              @unique @map("stripe_customer_id")
   accounts               Account[]
   sessions               Session[]
   workspaces             Workspace[]
+  trackingUserAccess     TrackingUserAccess[]
 
+  lastAccessWorkspaceId String?    @unique @map("last_access_workspace_id")
+  lastAccessWorkspace   Workspace? @relation("trackUserAccessWorkspace", fields: [lastAccessWorkspaceId], references: [id])
+
+  pagesUserUpdated Page? @relation("updatedByUser")
+  pagesUserDeleted Page? @relation("deletedByUser")
+
+  @@index([lastAccessWorkspaceId])
   @@map("users")
 }
 
+model TrackingUserAccess {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  lastAccessWorkspaceId String?
+  workspace             Workspace? @relation(fields: [lastAccessWorkspaceId], references: [id])
+
+  lastAccessNotebookId String?
+  lastAccessPageId     String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([lastAccessWorkspaceId])
+  @@map("tracking_user_access")
+}
+
 model Workspace {
-  id        String   @id @default(cuid())
-  name      String
-  domain    String   @unique
+  id                     String    @id @default(cuid())
+  name                   String
+  domain                 String    @unique
+  stripeCustomerId       String?   @unique @map("stripe_customer_id")
+  stripeWorkspaceId      String?   @unique @map("stripe_workspace_id")
+  stripeSubscriptionId   String?   @unique @map("stripe_subscription_id")
+  stripePriceId          String?   @map("stripe_price_id")
+  stripeCurrentPeriodEnd DateTime? @map("stripe_current_period_end")
+
   createdBy String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
 
-  users     User[]
-  notebooks Notebook[]
+  trackUserAccessWorkspace User? @relation("trackUserAccessWorkspace")
+
+  users              User[]
+  notebooks          Notebook[]
+  trackingUserAccess TrackingUserAccess[]
 
   @@map("workspaces")
 }
@@ -100,15 +134,25 @@ model Notebook {
 }
 
 model Page {
-  id         String   @id @default(cuid())
-  title      String
-  content    Json?
-  published  Boolean  @default(false)
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @default(now()) @map("updated_at")
+  id        String   @id @default(cuid())
+  title     String
+  content   Json?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  updatedBy     String?  @unique
+  updatedAt     DateTime @default(now()) @map("updated_at")
+  updatedByUser User?    @relation("updatedByUser", fields: [updatedBy], references: [email])
+
+  deletedBy     String?   @unique
+  deletedAt     DateTime? @map("deleted_at")
+  deletedByUser User?     @relation("deletedByUser", fields: [deletedBy], references: [email])
+
   notebookId String
   notebook   Notebook @relation(fields: [notebookId], references: [id])
 
   @@index([notebookId])
+  @@index([updatedBy])
+  @@index([deletedBy])
   @@map("pages")
 }

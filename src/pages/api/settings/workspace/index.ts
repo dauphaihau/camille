@@ -8,15 +8,19 @@ import { RequiresProPlanError } from "lib/exceptions"
 import { authOptions } from "lib/auth"
 import { omitFieldNullish } from "core/helpers";
 
-const workspaceCreateSchema = z.object({
+const workspaceUpdateSchema = z.object({
   workspaceId: z.string(),
+  name: z.string().optional(),
+  domain: z.string().optional(),
+})
+
+const workspaceCreateSchema = z.object({
   name: z.string().optional(),
   domain: z.string().optional(),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
-  console.log('dauphaihau debug: session', session)
 
   if (!session) {
     return res.status(403).end()
@@ -90,6 +94,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           }
         },
       })
+
       return res.end()
     } catch (error) {
       console.log('dauphaihau debug: error', error)
@@ -107,12 +112,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === "PATCH") {
     try {
-      const body = workspaceCreateSchema.parse(req.body)
+      const body = workspaceUpdateSchema.parse(req.body)
 
       if (body?.domain) {
         const domainExist = !!await db.workspace.findFirst({
           where: {
-            name: body.domain
+            domain: body.domain
           }
         })
 

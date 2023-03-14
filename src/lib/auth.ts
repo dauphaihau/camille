@@ -51,8 +51,6 @@ export const authOptions: NextAuthOptions = {
           },
         })
 
-        // console.log('dauphaihau debug: user', user)
-
         // const { identifier, url, provider, theme } = params
         const { host } = new URL(url)
 
@@ -123,36 +121,44 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id
         session.user.name = token.name
         session.user.email = token.email
-        session.user.image = token.picture
-        session.user.workspace = token.workspace
-        // session.user.domain = token.domain
+        session.user.image = token.image
+        session.user.workspaces = token.workspaces
+        session.user.lastAccessWorkspace = token.workspaces.find(ws => ws.id === token.lastAccessWorkspaceId)
       }
-
-      // console.log('dauphaihau debug: modified session', session)
-
       return session
+
     },
-    async jwt({ token, user }) {
+    async jwt({ token , user }) {
       // console.log('dauphaihau debug: token from jwt', token)
       // console.log('dauphaihau debug: user from jwt', user)
 
-      // console.log('dauphaihau debug: token at jwt', token)
-
       const dbUser = await db.user.findFirst({
         where: {
-          email: token.email,
+          email: token.email
         },
         // select: {
         //   workspaces: true
         // }
         include: {
-          workspaces: true
+          workspaces: {
+            select: {
+              id: true,
+              name: true,
+              domain: true,
+            }
+          },
+          // trackingUserAccess: {
+          //   where: {
+          //     lastAccessWorkspaceId: token.trackingUserAccess.lastAccessWorkspaceId
+          //   },
+          //   select: {
+          //     lastAccessWorkspaceId: true,
+          //     lastAccessNotebookId: true,
+          //     lastAccessPageId: true,
+          //   }
+          // }
         },
       })
-
-      // console.log('dauphaihau debug: db-user', dbUser)
-
-      // console.log('dauphaihau debug: db-user', dbUser)
 
       if (!dbUser) {
         token.id = user.id
@@ -161,71 +167,19 @@ export const authOptions: NextAuthOptions = {
 
       return {
         id: dbUser.id,
-        // name: dbUser?.name ?? '',
+        name: dbUser?.name ?? '',
         email: dbUser.email,
-        picture: dbUser.image,
-        workspace: dbUser.workspaces,
-        // domain: dbUser.domain.name,
+        lastAccessWorkspaceId: dbUser.lastAccessWorkspaceId,
+        image: dbUser.image,
+        workspaces: dbUser.workspaces,
       }
-
-      // const res = {
-      //   id: dbUser.id,
-      //   // name: dbUser?.name ?? '',
-      //   email: dbUser.email,
-      //   picture: dbUser.image,
-      //   // domain: dbUser.domain.name,
-      // }
-      //
-      // if (dbUser?.name) {
-      //   res.name = dbUser.name
-      // }
-      //
-      // return res
     },
-    async signIn({ user, account, profile, email, credentials }) {
-
-      // console.log('dauphaihau debug: user', user)
-      // console.log('dauphaihau debug: account', account)
-      // console.log('dauphaihau debug: profile', profile)
-      // console.log('dauphaihau debug: email', email)
-      // console.log('dauphaihau debug: credentials', credentials)
-
-      // await db.user.update({
-      //   where: {
-      //     id: user.id,
-      //   },
-      //   data: {
-      //     name: '',
-      //   },
-      // })
-
-      return true
-      // const response = await axios.post(
-      //   process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/userExists",
-      //   { email: profile?.email }
-      // );
-      // if (response && response.data?.value === true) {
-      //   return true;
-      // } else {
-      //   const data = {
-      //     firstName: profile.given_name,
-      //     lastName: profile.family_name,
-      //     email: profile.email,
-      //     profileUrl: profile.picture,
-      //   };
-      //   const response = await axios.post(
-      //     process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/signup",
-      //     data
-      //   );
-      //   return true;
-      // }
-    }
   },
 }
 
 function htmlSignIn(params: {url: string; host: string; theme}) {
   const { url, host, theme } = params
-  // console.log('dauphaihau debug: url', url)
+  console.log('dauphaihau debug: url sign in', url)
 
   const escapedHost = host.replace(/\./g, "&#8203;.")
 
@@ -277,7 +231,7 @@ function htmlSignIn(params: {url: string; host: string; theme}) {
 
 function htmlActivation(params: {url: string; host: string; theme}) {
   const { url, host, theme } = params
-  // console.log('dauphaihau debug: url', url)
+  const redirectToWorkspace = url.replace('notebooks', 'workspace')
 
   const escapedHost = host.replace(/\./g, "&#8203;.")
 
@@ -315,7 +269,7 @@ function htmlActivation(params: {url: string; host: string; theme}) {
               onmouseover="this.style.color='white'"
               onmouseout="this.style.opacity='0.8'"
       >
-            <a target="_" href="${url}">Activation Account</a>
+            <a target="_" href="${redirectToWorkspace}">Activation Account</a>
       </button>
       <p
       style="margin-bottom: 10px; font-size: 16px; line-height: 1.625; color: ${color.text}"

@@ -1,14 +1,12 @@
 import { Notebook } from "@prisma/client"
 import Link from "next/link"
 
-import { formatDate } from "lib/utils"
-import { PostOperations } from "components/dashboard/post-operations"
-import { Skeleton } from "ui/skeleton"
-import { Icons } from "../../../core/components";
-import { cn } from "../../../core";
+import { Skeleton } from "core/components/skeleton"
+import { Icons } from "core/components";
+import { cn } from "core/helpers";
 import { usePathname } from "next/navigation";
-import { PageCreateButton } from "./page-create-button-sidebar";
-import { PageOperations } from "./post-operations-sidebar"
+import { PageOperations } from "./page-operations-sidebar"
+import { useWorkspaceContext } from "../../context/WorkspaceContext";
 
 interface NotebookItemProps {
   page: Pick<Notebook, "id" | "title" | "published" | "createdAt">
@@ -16,20 +14,17 @@ interface NotebookItemProps {
 }
 
 export function PageItem({ page, notebookId }: NotebookItemProps) {
-
   const pathName = usePathname()
+  const { page: pageContext } = useWorkspaceContext()
+  const domain = pathName.split('/')[1]
+  const arrPath = pathName.split('/')
 
-  // const res = await getDetailNotebook(params.notebookId)
-  // const { isLoading, pages } = useDetailNotebook(notebook.id)
-
-  // console.log('dauphaihau debug: pages', pages)
-  console.log('dauphaihau debug: path-name', pathName.split('/'))
-  const splited = pathName.split('/')
+  console.log('dauphaihau debug: page-context', pageContext)
 
   return (
     <div
       className={cn(' flex items-center justify-between hover:bg-[#ecebea] rounded-sm py-[2px] pr-[10px] pl-[20px] group/page mb-0.5',
-        { ['bg-[#f1f1f0]']: splited[4] === page.id }
+        { ['bg-[#f1f1f0]']: arrPath[3] === page.id }
       )}
     >
       <div className='flex gap-1 items-center'>
@@ -38,20 +33,22 @@ export function PageItem({ page, notebookId }: NotebookItemProps) {
           className='text-[#73726e] invisible'
         />
         <Link
-          href={`/dashboard/notebooks/${notebookId}/${page.id}`}
+          href={`${domain}/${notebookId}/${page.id}`}
+          // href={`/dashboard/notebooks/${notebookId}/${page.id}`}
           // href={`/dashboard/notebooks/${page.id}`}
           // href={`/editor/${page.id}`}
-          className={cn("font-semibold text-[14px] text-[#73726e]",
-            { ['text-[#373530]']: splited[4] === page.id }
+          className={cn("font-semibold text-[14px] text-[#73726e] w-[175px] truncate",
+            { ['text-[#373530]']: arrPath[3] === page.id }
           )}
         >
-          {page.title}
+          {pageContext?.id === page.id && pageContext.title || page.title}
+          {/*<p className="truncate ...">...</p>*/}
         </Link>
 
       </div>
       <div className='flex gap-1'>
         {/*<Icons.ellipsisHorizontal size={15} className='btn-icon invisible group-hover/page:visible text-[#686662]'/>*/}
-        <PageOperations page={{ id: page.id, title: page.title }}/>
+        <PageOperations notebookId={notebookId} page={{ id: page.id, title: page.title }}/>
 
         {/*<Icons.plus size={15} className='btn-icon invisible group-hover/page:visible text-[#686662]'/>*/}
       </div>
