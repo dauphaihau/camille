@@ -15,24 +15,24 @@ export default async function MarketingLayout({
 
   const user = await getCurrentUser()
 
-  if (user) {
-
-    if (!user.lastAccessWorkspace || user.workspaces.length === 0) {
-      redirect('/workspace')
-    }
-
-    const track = await getTrackingUserAccess(user.lastAccessWorkspace.id, user.id)
-    const domain = user.lastAccessWorkspace.domain
-
-    if (track.lastAccessNotebookId && !track.lastAccessPageId) {
-      return redirect(`/${domain}/${track.lastAccessNotebookId}`)
-    }
-    if (track.lastAccessPageId && track.lastAccessNotebookId) {
-      return redirect(`/${domain}/${track.lastAccessNotebookId}/${track.lastAccessPageId}`)
-    }
-
-    redirect(`/${domain}`)
-  }
+  // if (user) {
+  //
+  //   if (!user.lastAccessWorkspace || user.workspaces.length === 0) {
+  //     redirect('/workspace')
+  //   }
+  //
+  //   const track = await getTrackingUserAccess(user.lastAccessWorkspace.id, user.id)
+  //   const domain = user.lastAccessWorkspace.domain
+  //
+  //   if (track.lastAccessNotebookId && !track.lastAccessPageId) {
+  //     return redirect(`/${domain}/${track.lastAccessNotebookId}`)
+  //   }
+  //   if (track.lastAccessPageId && track.lastAccessNotebookId) {
+  //     return redirect(`/${domain}/${track.lastAccessNotebookId}/${track.lastAccessPageId}`)
+  //   }
+  //
+  //   redirect(`/${domain}`)
+  // }
 
   return (
     <Col className='min-h-screen max-w-5xl mx-auto'>
