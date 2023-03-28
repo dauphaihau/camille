@@ -55,33 +55,31 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           where: { workspaceId: body.workspaceId }
         })
 
-        // if (count >= 3) {
-        //   throw new RequiresProPlanError()
-        // }
+        if (count >= 3) {
+          throw new RequiresProPlanError()
+        }
       }
 
-      const notebook = await db.notebook.create({
+      await db.notebook.create({
         data: {
           workspaceId: body.workspaceId,
           title: body.title,
           description: body.description,
         },
-        select: {
-          id: true,
-        },
       })
 
-      // return res.send({code: '200', data: notebook})
-      return res.json(notebook)
+      return res.send({ code: '200', message: 'create notebook success' })
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(422).json(error.issues)
       }
 
       if (error instanceof RequiresProPlanError) {
-        return res.status(402).end()
+        return res.status(402).send({
+          code: '402', message: 'This action requires a pro plan'
+        })
+        // return res.status(402).end()
       }
-
       return res.status(500).end()
     }
   }

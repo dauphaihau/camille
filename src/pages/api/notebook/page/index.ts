@@ -4,10 +4,10 @@ import { getServerSession } from "next-auth/next"
 
 import { db } from "lib/db"
 import { withMethods } from "lib/api-middlewares/with-methods"
-import { getUserSubscriptionPlan } from "lib/subscription"
 import { RequiresProPlanError } from "lib/exceptions"
 import { authOptions } from "lib/auth"
 import { pagePatchSchema } from "lib/validations/page"
+import { connectRelations } from "../../../../core/helpers";
 
 const pageCreateSchema = z.object({
   notebookId: z.string(),
@@ -52,23 +52,72 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const body = pageCreateSchema.parse(req.body)
 
-      console.log('dauphaihau debug: body', body)
-
+      console.log('dauphaihau debug: session', session)
+      // const page = await db.page.create({
+      //   data: {
+      //     notebookId: body.notebookId,
+      //     title: body.title,
+      //     content: body.content,
+      //     updatedBy: 'dauphaihau@yopmail.com',
+      //
+      //     // updatedBy: session.user.email,
+      //     // updatedAt: new Date(),
+      //     // deletedBy: session.user.email
+      //     // updatedBy: {
+      //     //   connectOrCreate: {
+      //     //     where: {
+      //     //       email: session.user.email,
+      //     //     },
+      //     //     create: {
+      //     //       email: session.user.email,
+      //     //       name: session.user.name,
+      //     //     },
+      //     //   }
+      //     // }
+      //   },
+      //   select: {
+      //     id: true,
+      //   },
+      // })
       const page = await db.page.create({
-        data: {
-          title: body.title,
-          content: body.content,
-          notebookId: body.notebookId,
-          // updatedBy: session.user.email,
-          // updatedAt: new Date(),
-          // deletedBy: session.user.email
-        },
+        data: connectRelations(
+          {
+            title: body.title,
+            content: body.content,
+            updatedBy: session.user.email,
+            // updatedBy: session.user.id,
+
+            // updatedAt: new Date(),
+            // deletedBy: session.user.email
+            // updatedBy: {
+            //   connectOrCreate: {
+            //     where: {
+            //       email: session.user.email,
+            //     },
+            //     create: {
+            //       email: session.user.email,
+            //       name: session.user.name,
+            //     },
+            //   }
+            // }
+          },
+          {
+            notebook: { id: body.notebookId },
+            // updatedByUser: { email: session.user.email }
+          }
+        ),
+
         select: {
           id: true,
         },
       })
 
-      return res.json(page)
+      // return res.json(page)
+      return res.send({
+        code: '200', message: 'create page success', data: {
+          pageId: page.id
+        }
+      })
     } catch (error) {
       console.log('dauphaihau debug: error', error)
       if (error instanceof z.ZodError) {

@@ -4,10 +4,11 @@ import { getServerSession } from 'next-auth/next'
 
 import { db } from 'lib/db'
 import { withMethods } from 'lib/api-middlewares/with-methods'
-import { getUserSubscriptionPlan, getWorkspaceSubscriptionPlan } from 'lib/subscription'
+import { getWorkspaceSubscriptionPlan } from 'lib/subscription'
 import { RequiresProPlanError } from 'lib/exceptions'
 import { authOptions } from 'lib/auth'
 import { pagePatchSchema } from 'lib/validations/page'
+import { withNotebook } from "../../../lib/api-middlewares/with-notebook";
 
 const notebookCreateSchema = z.object({
   workspaceId: z.string(),
@@ -40,7 +41,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           pages: {
             where: {
               deletedAt: null
-            }
+            },
+            select: {
+              id: true,
+              title: true,
+              updatedAt: true,
+              updatedBy: true,
+              // deletedBy: null,
+              // deletedAt: null,
+              // notebookId: 'clfozkjin0001m3fqwn4mi6hx'
+            },
           },
           // pages: true,
           published: true,
@@ -104,11 +114,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           id: req.query.notebookId as string,
         },
       })
-      return res.status(204).end()
+      return res.send({ code: 200, message: 'delete notebook success' })
+      // return res.status(204).end()
     } catch (error) {
+      console.log('dauphaihau debug: error', error)
       return res.status(500).end()
     }
   }
 }
 
-export default withMethods(['DELETE', 'GET', 'POST'], handler)
+export default withMethods(['DELETE', 'GET', 'POST'], withNotebook(handler))

@@ -10,7 +10,9 @@ export function DashboardSettingsShell({
   ...props
 }: DashboardShellProps) {
   return (
-    <div className={cn("grid items-start gap-8 max-w-[600px] mx-auto", className)} {...props}>
+    // <div className={cn("grid items-start gap-8 max-w-[600px] mx-auto", className)} {...props}>
+    <div className={cn("grid items-start gap-8 min-w-[600px] max-w-[600px] mx-auto", className)} {...props}>
+    {/*<div className={cn("grid items-start gap-8 min-w-[600px] mx-auto", className)} {...props}>*/}
       {children}
     </div>
   )

@@ -51,9 +51,10 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
       disabled={disabled}
       className={cn(
         // font-semibold
-        `
+        // font-medium
+          `
           inline-flex items-center justify-center rounded 
-          font-medium
+          font-semibold
           transition ease-in-out duration-300
           leading-4 cursor-pointer
         `,
@@ -73,6 +74,7 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
 
             // 'border-2 border-black dark:border-white',
             { 'border-[1px] border-solid border-black': variant !== 'text' && !disabled },
+            // { 'border-[1px] border-solid border-black': variant !== 'default' && variant !== 'text' && !disabled },
 
             'dark:bg-white dark:text-black',
             // 'dark:hover:bg-black dark:hover:text-white',
@@ -102,13 +104,14 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
           ],
 
           variant === 'default' && [
-            { 'border-[1px] border-solid border-[#cfd4d9]': variant !== 'default' && !disabled },
+            // { 'border-[1px] border-solid border-[#cfd4da]': variant !== 'default' && !disabled },
+            { 'border-[1px] border-solid border-[#cfd4da]': !disabled },
             { 'hover:bg-[#f8f9fa]': !disabled }
           ],
         ],
         [
           disabled && !isLoading && [
-            'bg-[#e9ecef] text-[#aeb5bc] dark:bg-[#383a3f] dark:text-[#25262b] cursor-not-allowed'
+            'bg-[#e5e5e5] text-[#acacac] dark:bg-[#383a3f] dark:text-[#25262b] cursor-not-allowed hover:opacity-100'
           ]
         ],
         {

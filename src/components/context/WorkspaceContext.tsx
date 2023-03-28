@@ -4,10 +4,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter, useSelectedLayoutSegments } from "next/navigation";
 import { Notebook, Page, User, Workspace } from "@prisma/client";
 
-import SidebarDashboard from "../dashboard/sidebar/sidebar-dashboard";
-import HeaderDashboard from "../dashboard/header-dashboard";
+import SidebarDashboard from "../dashboard/layout/sidebar/sidebar-dashboard";
+import HeaderDashboard from "../dashboard/layout/header";
 import { Row } from "core/components";
-import { cn } from "core/helpers";
+import { cn, fetcher } from "core/helpers";
 
 export interface WorkspaceState {
   page: Page,
@@ -17,7 +17,9 @@ export interface WorkspaceState {
 export interface WorkspaceProps {
   workspaces: Workspace[],
   notebooks: Notebook[],
-  workspace: Workspace,
+  workspace: Workspace & {
+    notebooks: Notebook[]
+  },
   user: Partial<User>,
   children: React.ReactNode
 }
@@ -56,12 +58,11 @@ export const WorkspaceProvider = ({ children, ...res }: Partial<WorkspaceProps>)
       }
 
       (async () => {
-          // await fetch(`http://localhost:3000/api/user/tracking/${res.user.id}`, {
-          await fetch(`/api/user/tracking/${res.user.id}`, {
-            method: 'PATCH',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(paramsUpdateTracking)
-          })
+          await fetcher(
+            `/api/user/tracking/${res.user.id}`,
+            paramsUpdateTracking,
+            'PATCH'
+          )
           router.refresh()
         }
       )()
@@ -82,7 +83,7 @@ export const WorkspaceProvider = ({ children, ...res }: Partial<WorkspaceProps>)
           <HeaderDashboard/>
           <main
             className={cn('flex mx-auto flex-1 flex-col overflow-hidden mt-12',
-            // className={cn('flex mx-auto flex-1 flex-col overflow-hidden mt-12 max-w-[708px]',
+              // className={cn('flex mx-auto flex-1 flex-col overflow-hidden mt-12 max-w-[708px]',
               { 'max-w-[708px]': !!!segments[1] }
             )}
           >

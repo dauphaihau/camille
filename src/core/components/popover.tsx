@@ -7,8 +7,6 @@ import { cn } from "lib/utils"
 
 type PopoverProps = PopoverPrimitive.PopoverProps
 
-// type PopoverProps = PopoverPrimitive.PopoverProps
-
 export function Popover({ ...props }: PopoverProps) {
   return <PopoverPrimitive.Root {...props} />
 }
@@ -38,35 +36,3 @@ Popover.Content = React.forwardRef<HTMLDivElement,
     </Popover.Portal>
   )
 })
-
-// Popover.Item = React.forwardRef<
-//   HTMLDivElement,
-//   PopoverPrimitive.DropdownMenuItemProps
-// >(function DropdownMenuItem({ className, ...props }, ref) {
-//   return (
-//     <PopoverPrimitive.Item
-//       ref={ref}
-//       className={cn(
-//         "flex cursor-pointer select-none rounded-[3px] items-center py-2 px-3 text-sm text-[#373530] outline-none hover:bg-[#efefef] focus:text-black",
-//         // "flex cursor-default select-none rounded-[3px] items-center py-2 px-3 text-sm text-[#373530] outline-none hover:bg-[#efefef] focus:text-black",
-//         // "flex cursor-default select-none items-center py-2 px-3 text-sm text-slate-600 outline-none focus:bg-slate-50 focus:text-black",
-//         className
-//       )}
-//       {...props}
-//     />
-//   )
-// })
-//
-
-// DropdownMenu.Separator = React.forwardRef<
-//   HTMLDivElement,
-//   PopoverPrimitive.DropdownMenuSeparatorProps
-// >(function DropdownMenuItem({ className, ...props }, ref) {
-//   return (
-//     <PopoverPrimitive.Separator
-//       ref={ref}
-//       className={cn("h-px my-2 bg-[#ededec]", className)}
-//       {...props}
-//     />
-//   )
-// })

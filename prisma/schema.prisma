@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output = "./src/generated/client"
+  // output   = "./src/generated/client"
 }
 
 datasource db {
@@ -34,43 +34,58 @@ model Account {
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
-  userId       String
+  accessToken  String?  @db.Text
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("sessions")
 }
 
 model User {
-  id                     String               @id @default(cuid())
-  name                   String?
-  email                  String?              @unique
-  emailVerified          DateTime?
-  image                  String?
-  createdAt              DateTime             @default(now()) @map("created_at")
-  updatedAt              DateTime             @default(now()) @map("updated_at")
-  stripeCustomerId       String?              @unique @map("stripe_customer_id")
-  accounts               Account[]
-  sessions               Session[]
-  workspaces             Workspace[]
-  trackingUserAccess     TrackingUserAccess[]
+  id                 String               @id @default(cuid())
+  name               String?
+  email              String?              @unique
+  emailVerified      DateTime?
+  image              String?
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @default(now()) @map("updated_at")
+  stripeCustomerId   String?              @unique @map("stripe_customer_id")
+  accounts           Account[]
+  sessions           Session[]
+  workspaces         Workspace[]
+  trackingUserAccess TrackingUserAccess[]
 
   lastAccessWorkspaceId String?    @unique @map("last_access_workspace_id")
   lastAccessWorkspace   Workspace? @relation("trackUserAccessWorkspace", fields: [lastAccessWorkspaceId], references: [id])
 
-  pagesUserUpdated Page? @relation("updatedByUser")
-  pagesUserDeleted Page? @relation("deletedByUser")
+  // pagesUserUpdated Page? @relation("updatedByUser")
+  // pagesUserDeleted Page? @relation("deletedByUser")
 
   @@index([lastAccessWorkspaceId])
   @@map("users")
 }
 
+model VerificationToken {
+  id         String   @id @default(cuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
 model TrackingUserAccess {
   id String @id @default(cuid())
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
 
   lastAccessWorkspaceId String?
   workspace             Workspace? @relation(fields: [lastAccessWorkspaceId], references: [id])
@@ -108,15 +123,6 @@ model Workspace {
   @@map("workspaces")
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@map("verification_tokens")
-}
-
 model Notebook {
   id          String   @id @default(cuid())
   title       String
@@ -140,19 +146,31 @@ model Page {
   published Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
 
-  updatedBy     String?  @unique
-  updatedAt     DateTime @default(now()) @map("updated_at")
-  updatedByUser User?    @relation("updatedByUser", fields: [updatedBy], references: [email])
+  updatedAt DateTime @default(now()) @map("updated_at")
+  updatedBy String?
+  //updatedBy     String?  @unique
+  // updatedByUser User?    @relation("updatedByUser", fields: [updatedBy], references: [email])
 
-  deletedBy     String?   @unique
-  deletedAt     DateTime? @map("deleted_at")
-  deletedByUser User?     @relation("deletedByUser", fields: [deletedBy], references: [email])
+  // deletedBy     String?   @unique
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?
+  //deletedByUser User?     @relation("deletedByUser", fields: [deletedBy], references: [email])
 
   notebookId String
-  notebook   Notebook @relation(fields: [notebookId], references: [id])
+  notebook   Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  // pagesOnUsers PagesOnUsers[]
 
   @@index([notebookId])
-  @@index([updatedBy])
-  @@index([deletedBy])
+  // @@index([updatedBy])
+  //   @@index([deletedBy])
   @@map("pages")
 }
+
+//    model PagesOnUsers {
+//      pageId String
+//      page    Page @relation(fields: [pageId], references: [id])
+//      userId    String
+//      user       User    @relation(fields: [userId], references: [id])
+//      @@id([pageId, userId])
+//    }

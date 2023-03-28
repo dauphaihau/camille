@@ -10,6 +10,8 @@ import { db } from "lib/db"
 
 // const postmarkClient = new Client(process.env.POSTMARK_API_TOKEN)
 
+// import { PrismaClient } from "@prisma/client";
+
 const configEmail = {
   service: 'gmail',
   auth: {
@@ -20,6 +22,7 @@ const configEmail = {
 }
 
 export const authOptions: NextAuthOptions = {
+  // adapter: PrismaAdapter(PrismaClient as any),
   adapter: PrismaAdapter(db as any),
   session: {
     strategy: "jwt",
@@ -175,11 +178,37 @@ export const authOptions: NextAuthOptions = {
       }
     },
   },
+  events: {
+    createUser: async (user) => {
+      // console.log('dauphaihau debug: create user')
+      // console.log('dauphaihau debug: user at auth', user)
+      // try {
+      //   const count = await prisma.admin.count({
+      //     where: {
+      //       email: user.email,
+      //     },
+      //   });
+      //
+      //   if (count > 0) {
+      //     await prisma.user.update({
+      //       where: {
+      //         id: user.id,
+      //       },
+      //       data: {
+      //         role: "admin",
+      //       },
+      //     });
+      //   }
+      // } catch (err) {
+      //   console.log(err);
+      // }
+    },
+  }
 }
 
 function htmlSignIn(params: {url: string; host: string; theme}) {
   const { url, host, theme } = params
-  console.log('dauphaihau debug: url sign in', url)
+  // console.log('dauphaihau debug: url sign in', url)
 
   const escapedHost = host.replace(/\./g, "&#8203;.")
 

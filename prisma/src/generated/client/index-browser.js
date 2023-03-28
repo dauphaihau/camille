@@ -13,11 +13,11 @@ const Prisma = {}
 exports.Prisma = Prisma
 
 /**
- * Prisma Client JS version: 4.8.0
+ * Prisma Client JS version: 4.11.0
  * Query Engine version: 8fde8fef4033376662cad983758335009d522acb
  */
 Prisma.prismaVersion = {
-  client: "4.8.0",
+  client: "4.11.0",
   engine: "8fde8fef4033376662cad983758335009d522acb"
 }
 
@@ -143,8 +143,9 @@ exports.Prisma.PageScalarFieldEnum = makeEnum({
 exports.Prisma.SessionScalarFieldEnum = makeEnum({
   id: 'id',
   sessionToken: 'sessionToken',
-  userId: 'userId',
-  expires: 'expires'
+  accessToken: 'accessToken',
+  expires: 'expires',
+  userId: 'userId'
 });
 
 exports.Prisma.SortOrder = makeEnum({
@@ -177,16 +178,16 @@ exports.Prisma.UserScalarFieldEnum = makeEnum({
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   stripeCustomerId: 'stripeCustomerId',
-  stripeSubscriptionId: 'stripeSubscriptionId',
-  stripePriceId: 'stripePriceId',
-  stripeCurrentPeriodEnd: 'stripeCurrentPeriodEnd',
   lastAccessWorkspaceId: 'lastAccessWorkspaceId'
 });
 
 exports.Prisma.VerificationTokenScalarFieldEnum = makeEnum({
+  id: 'id',
   identifier: 'identifier',
   token: 'token',
-  expires: 'expires'
+  expires: 'expires',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 });
 
 exports.Prisma.WorkspaceScalarFieldEnum = makeEnum({
@@ -208,9 +209,9 @@ exports.Prisma.ModelName = makeEnum({
   Account: 'Account',
   Session: 'Session',
   User: 'User',
+  VerificationToken: 'VerificationToken',
   TrackingUserAccess: 'TrackingUserAccess',
   Workspace: 'Workspace',
-  VerificationToken: 'VerificationToken',
   Notebook: 'Notebook',
   Page: 'Page'
 });

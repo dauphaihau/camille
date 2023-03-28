@@ -5,6 +5,52 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function absoluteUrl(path: string) {
+  return `${process.env.NEXTAUTH_URL}${path}`
+}
+
+export function formatDate(input: Date | string | number): string {
+  const date = new Date(input)
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  })
+}
+
+export const fetcher = async (
+  url: string,
+  payload?: any,
+  method?: string,
+) => {
+  const options = {
+    method: method ?? (payload ? "POST" : "GET"),
+    ...(payload && { body: JSON.stringify(payload) }),
+    headers: {
+      accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  };
+  return fetch(url, options).then(r => r.json()).catch(err => err);
+};
+
+function isDefined(value) {
+  return value !== null && typeof value !== 'undefined';
+}
+
+export function connectRelations(data, relations) {
+  const d = { ...data }; // it would be better to deep clone the data
+
+  Object.keys(relations).forEach((key) => {
+    if (Object.values(relations[key]).filter(isDefined).length > 0) {
+      d[key] = { connect: relations[key] };
+    }
+  });
+  return d;
+}
+
 export const capitalize = s => (s && s[0].toUpperCase() + s.slice(1)) || ""
 
 export const sliceText = (text: string, quantity: number): string => {

@@ -2,30 +2,50 @@
 
 import { FormProvider, useForm } from "react-hook-form";
 import * as React from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { getSession } from "next-auth/react";
 
-import { Button, Input } from "core/components";
+import { Button, Col, Input } from "core/components";
 import { toast } from "core/components/Toast";
 import * as z from "zod";
 import { workspaceSchema } from "lib/validations/workspace";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type FormData = z.infer<typeof workspaceSchema>
 
 export default function FormCreateWorkspace() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false)
+  const [isFocusDomainField, setIsFocusDomainField] = useState(false)
 
   const methods = useForm<FormData>({
     mode: 'onChange',
-    defaultValues: {
-      // domain: pathname.slice(1).split('/')[0]
-    }
+    resolver: zodResolver(workspaceSchema),
   });
+
+  useEffect(() => {
+    if (!isFocusDomainField) {
+      let suggestDomain = methods.watch('name')
+      .toLowerCase()
+      .replace(/ +/g, '-')
+      .replace(/[^a-z0-9._-]/gi, '');
+
+      if (suggestDomain.at(-1) === '-') {
+        suggestDomain.substring(0, suggestDomain.length - 1)
+      }
+
+      if (suggestDomain.at(0) === '-') {
+        suggestDomain = suggestDomain.substring(1)
+      }
+      methods.setValue('domain', suggestDomain)
+
+    }
+  }, [methods.watch('name')])
 
   async function onSubmit(values) {
     setIsLoading(true)
+
     const response = await fetch('/api/settings/workspace', {
       method: 'POST',
       headers: { "Content-Type": "application/json", },
@@ -54,9 +74,6 @@ export default function FormCreateWorkspace() {
     }
 
     await getSession()
-    // const session = await getSession()
-    // console.log('dauphaihau debug: session', session)
-
     router.refresh()
     router.push(`/${values.domain}`)
 
@@ -71,15 +88,25 @@ export default function FormCreateWorkspace() {
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <div className='flex flex-col gap-6 p-6 border-gray-200 shadow-2xl rounded-md mb-4'>
-          <Input size='md' id='name' label='Workspace name'/>
-          <Input size='md' id='domain' label='Workspace URL'/>
-        </div>
+        <Col
+          style={{ boxShadow: 'rgba(0, 0, 0, 0.15) 0px 5px 20px' }}
+          classes='gap-6 p-6 border-gray-200 rounded-md mb-4'
+        >
+          <Input disabled={isLoading} autoFocus size='md' id='name' label='Workspace name'/>
+          <Input
+            disabled={isLoading}
+            onFocus={() => setIsFocusDomainField(true)}
+            labelLeft={window.location.host + '/'}
+            classesLabelLeft='left-[-2%] text-[#6c6f75] font-medium text-[13px]'
+            classes='pl-[7rem]' size='md' id='domain' label='Workspace URL'
+          />
+        </Col>
         <div className='text-center'>
           <Button
             disabled={!methods.formState.isDirty}
             isLoading={isLoading}
-            size='md' classes='mt-2' type='submit'>Create workspace</Button>
+            size='md' classes='mt-2' type='submit'
+          >Create workspace</Button>
         </div>
       </form>
     </FormProvider>

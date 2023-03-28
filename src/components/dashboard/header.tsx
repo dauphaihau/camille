@@ -1,3 +1,5 @@
+import { Skeleton } from "core/components";
+
 interface DashboardHeaderProps {
   heading: string
   text?: string
@@ -19,5 +21,19 @@ export function DashboardHeader({
       </div>
       {children}
     </div>
+  )
+}
+
+DashboardHeader.Skeleton = function DashboardHeaderSkeleton() {
+  // return (
+  //   <div className="p-4">
+  //     <div className="space-y-3">
+  //       <Skeleton className="h-5 w-2/5"/>
+  //       {/*<Skeleton className="h-4 w-4/5"/>*/}
+  //     </div>
+  //   </div>
+  // )
+  return (
+    <Skeleton className="h-10 w-2/5"/>
   )
 }

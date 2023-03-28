@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "core/components"
 import { toast } from "core/components/Toast"
 import { useWorkspaceContext } from "../context/WorkspaceContext";
+import { createPage } from "lib/request-by-swr/page";
 
 interface PostCreateButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   notebookId: string
@@ -22,28 +23,14 @@ export function PageCreateButton({
   async function onClick() {
     setIsLoading(true)
 
-    const response = await fetch("/api/notebook/page", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        notebookId,
-        title: "Untitled Page",
-      }),
+    const response = await createPage({
+      notebookId,
+      title: "Untitled Page",
     })
 
     setIsLoading(false)
 
-    if (!response?.ok) {
-      if (response.status === 402) {
-        return toast({
-          title: "Limit of 3 posts reached.",
-          message: "Please upgrade to the PRO plan.",
-          type: "error",
-        })
-      }
-
+    if (response.code !== '200') {
       return toast({
         title: "Something went wrong.",
         message: "Your post was not created. Please try again.",
@@ -51,12 +38,12 @@ export function PageCreateButton({
       })
     }
 
-    const page = await response.json()
-
     // This forces a cache invalidation.
     router.refresh()
 
-    router.push(`/${workspace.domain}/${notebookId}/${page.id}`)
+    if (response?.data?.pageId) {
+      router.push(`/${workspace.domain}/${notebookId}/${response.data.pageId}`)
+    }
   }
 
   if (children) {

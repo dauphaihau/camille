@@ -1,17 +1,14 @@
 'use client'
 
-import { Notebook } from "@prisma/client"
+import { Notebook, Page } from "@prisma/client"
 import Link from "next/link"
 
-import { formatDate } from "lib/utils"
-// import { PageOperations } from "components/dashboard/pages/page-operations"
 import { Skeleton } from "core/components/skeleton"
-import { useSelectedLayoutSegment } from "next/navigation";
-import { useWorkspaceContext } from "../../context/WorkspaceContext";
-import { PageOperations } from "../sidebar/page-operations-sidebar"
+import { useWorkspaceContext } from "components/context/WorkspaceContext";
+import { PageOperations } from "../page-operations"
 
 interface NotebookItemProps {
-  page: Pick<Notebook, "id" | "title" | "published" | "createdAt">
+  page: Pick<Page, "id" | "title" | "updatedAt" | "updatedBy">
   notebookId: string
 }
 
@@ -23,26 +20,19 @@ export function PageItem({ page, notebookId }: NotebookItemProps) {
       <div className="grid gap-1">
         <Link
           href={`/${workspace.domain}/${notebookId}/${page.id}`}
-          // href={`/notebooks/${notebookId}/${page.id}`}
-          // href={`/${domain}/${notebookId}/${page.id}`}
           className="font-semibold hover:underline"
         >
           {page.title}
         </Link>
-
-        <div>
-          {/*<p className="text-sm text-slate-600">*/}
-          {/*  {formatDate(page.createdAt?.toDateString())}*/}
-          {/*</p>*/}
-        </div>
       </div>
-      <PageOperations page={{ id: page.id, title: page.title }}/>
-      {/* <PostDeleteButton post={{ id: post.id, title: post.title }} /> */}
+
+      <PageOperations page={page}/>
+      {/*<PageOperations page={{ id: page.id, title: page.title }}/>*/}
     </div>
   )
 }
 
-PageItem.Skeleton = function PostItemSkeleton() {
+PageItem.Skeleton = function PageItemSkeleton() {
   return (
     <div className="p-4">
       <div className="space-y-3">

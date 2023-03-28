@@ -1,7 +1,7 @@
 'use client'
 
-export { default as Tooltip} from './Tooltip'
-export { default as Text} from './Text'
+export { default as Tooltip} from './tooltip'
+export { default as Text} from './text'
 export { default as Dialog} from './dialog'
 // export { default as Dropdown} from './dropdown'
 // export { default as Divider} from './Divider'

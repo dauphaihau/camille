@@ -1,6 +1,5 @@
 import { Icons } from "@/components/icons"
 import { User, Workspace } from "@prisma/client"
-import type { Icon } from "lucide-react"
 
 export type NavItem = {
   title: string
@@ -17,14 +16,14 @@ export type SidebarNavItem = {
   icon?: keyof typeof Icons
 } & (
   | {
-      href: string
-      items?: never
-    }
+  href: string
+  items?: never
+}
   | {
-      href?: string
-      items: NavLink[]
-    }
-)
+  href?: string
+  items: NavLink[]
+}
+  )
 
 export type SiteConfig = {
   name: string
@@ -54,14 +53,9 @@ export type SubscriptionPlan = {
   stripePriceId: string
 }
 
-export type UserSubscriptionPlan = SubscriptionPlan &
-  Pick<User, "stripeCustomerId" | "stripeSubscriptionId"> & {
-    stripeCurrentPeriodEnd: number
-    isPro: boolean
-  }
-
 export type WorkspaceSubscriptionPlan = SubscriptionPlan &
   Pick<Workspace, "stripeWorkspaceId" | "stripeSubscriptionId"> & {
-    stripeCurrentPeriodEnd: number
-    isPro: boolean
-  }
+  stripeCurrentPeriodEnd: number
+  stripeCustomerId: string
+  isPro: boolean
+}

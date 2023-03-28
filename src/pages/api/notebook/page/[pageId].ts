@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import * as z from 'zod'
+import { getServerSession } from 'next-auth/next';
 
 import { withMethods } from 'lib/api-middlewares/with-methods'
-import { withPage } from 'lib/api-middlewares/with-page'
 import { db } from 'lib/db'
 import { pagePatchSchema } from 'lib/validations/page'
-import { getServerSession } from 'next-auth/next';
 import { authOptions } from 'lib/auth';
+import { DELETE_PAGE_TYPE } from "config/const";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
 
@@ -18,14 +18,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'GET') {
     try {
-      // const { notebookId } = req.query
-
       const page = await db.page.findFirst({
         where: {
           id: req.query.pageId as string,
         },
       })
-
       return res.json(page)
     } catch (error) {
       return res.status(500).end()
@@ -34,42 +31,43 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === 'DELETE') {
     try {
-      const { type } = JSON.parse(req.body)
+      // const { type } = JSON.parse(req.body)
+      const { type } = req.body
 
       switch (type) {
-        case 0:
+        case DELETE_PAGE_TYPE.SOFT_DELETE:
           await db.page.update({
             where: {
               id: req.query.pageId as string,
             },
             data: {
-              // deletedBy: session.user.email,
+              deletedBy: session.user.email,
               deletedAt: new Date()
             }
           })
           break
-        case 1:
+        case DELETE_PAGE_TYPE.HARD_DELETE:
           await db.page.delete({
             where: {
               id: req.query.pageId as string,
             },
           })
           break
-        case 2:
+        case DELETE_PAGE_TYPE.RECOVER:
           await db.page.update({
             where: {
               id: req.query.pageId as string,
             },
             data: {
-              // deletedBy: session.user.email,
+              deletedBy: null,
               deletedAt: null
             }
           })
       }
 
-      return res.status(204).end()
+      return res.send({ code: '200', message: 'Delete success' })
+      // return res.status(204).end()
     } catch (error) {
-      console.log('dauphaihau debug: error', error)
       return res.status(500).end()
     }
   }
@@ -95,13 +93,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         data: {
           title: body.title || page.title,
           content: body.content,
-          // updatedBy: session.user.email
+          // updatedBy: session.user.id
+          updatedBy: session.user.email
         },
       })
 
-      return res.end()
+      return res.send({ code: '200', message: 'update page success' })
     } catch (error) {
-      console.log('dauphaihau debug: error', error)
       if (error instanceof z.ZodError) {
         return res.status(422).json(error.issues)
       }
@@ -112,4 +110,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withMethods(['GET', 'DELETE', 'PATCH'], withPage(handler))
+export default withMethods(['GET', 'DELETE', 'PATCH'], handler)

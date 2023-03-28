@@ -2,6 +2,8 @@ export const BASE_URL = process.env.NODE_ENV === "production" ? process.env.NEXT
 
 export enum USER_STATUS {NOT_ACTIVATED = -1, LOCKED, ACTIVE}
 
+export enum DELETE_PAGE_TYPE {SOFT_DELETE = 0, HARD_DELETE, RECOVER}
+
 export const PATH = {
   HOME: '/',
   LOGIN: '/login',

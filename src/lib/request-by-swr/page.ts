@@ -2,15 +2,19 @@
 
 import useSWR from "swr";
 
+import { fetcher } from "core/helpers";
+import { DELETE_PAGE_TYPE } from "config/const";
+
 export function useGetPages(notebookId) {
   const fetcher = (input, init) => fetch(input, init).then(res => res.json())
   const {
     data,
     error,
     mutate
-  } = useSWR(notebookId ? `http://localhost:3000/api/notebook/${notebookId}` : null, fetcher)
+  } = useSWR(notebookId ? `/api/notebook/${notebookId}` : null, fetcher, {
+    revalidateOnFocus: false
+  })
   return {
-    // notebook: data,
     pageList: data?.pages,
     pages: data?.pages,
     isLoading: !data,
@@ -19,26 +23,15 @@ export function useGetPages(notebookId) {
   };
 }
 
-export async function deletePage(pageId: string, type = 0) {
-  // const response = await fetch(`/api/posts/${pageId}`, {
-  return await fetch(`/api/notebook/page/${pageId}`, {
-    method: "DELETE",
-    body: JSON.stringify({ type })
-  })
-}
-
 export function useGetPagesDeleted(workspaceId) {
   const fetcher = (input, init) => fetch(input, init).then(res => res.json())
   const {
     data,
     error,
     mutate
-  } = useSWR(workspaceId ? `http://localhost:3000/api/notebook/page/deleted?workspaceId=${workspaceId}` : null, fetcher)
-
-  console.log('dauphaihau debug: data', data)
+  } = useSWR(workspaceId ? `/api/notebook/page/deleted?workspaceId=${workspaceId}` : null, fetcher)
 
   return {
-    // notebook: data,
     pages: data?.data,
     isLoading: !data,
     isError: !!error,
@@ -47,19 +40,19 @@ export function useGetPagesDeleted(workspaceId) {
 }
 
 export async function updatePage(id: string, values) {
-  return await fetch(`/api/notebook/page/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(values),
-  })
+  return fetcher(`/api/notebook/page/${id}`,
+    values,
+    'PATCH'
+  )
 }
 
+export function createPage(payload) {
+  return fetcher(`/api/notebook/page`, payload)
+}
 
-// export async function getPagesDeleted(pageId: string) {
-//   // const response = await fetch(`/api/posts/${pageId}`, {
-//   return  await fetch(`/api/notebook/page/${pageId}`, {
-//     method: "DELETE",
-//   })
-// }
+export function deletePage(pageId: string, type = DELETE_PAGE_TYPE.SOFT_DELETE) {
+  return fetcher(`/api/notebook/page/${pageId}`,
+    { type },
+    'DELETE'
+  )
+}

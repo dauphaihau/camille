@@ -4,9 +4,6 @@ import React from "react";
 import { HydrationProvider, Client } from "react-hydration-provider";
 import { Inter as FontSans } from "@next/font/google"
 
-// import { Dancing_Script, Oswald } from '@next/font/google';
-// const dancingScript = Dancing_Script();
-
 import 'styles/globals.css'
 import { cn } from 'core/helpers';
 import { Toaster } from 'core/components/Toast';

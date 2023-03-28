@@ -82,12 +82,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       // console.log('dauphaihau debug: session', session)
 
-      console.log('dauphaihau debug: req-body', req.body)
-      console.log('dauphaihau debug: -session-user-id-req-body-workspace-id-', [session.user.id, req.body.workspaceId])
-
       // const body = getTrackingUserAccessSchema.parse(req.body)
-
-      console.log('dauphaihau debug: body', JSON.parse(req.body))
 
       const body = JSON.parse(req.body)
 
@@ -110,8 +105,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const body = workspacePathSchema.parse(req.body)
       const userId = req.query.userId as string
-
-      console.log('dauphaihau debug: body', body)
 
       await db.user.update({
         where: {

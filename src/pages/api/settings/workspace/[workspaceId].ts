@@ -13,7 +13,6 @@ const workspacePathSchema = z.object({
   lastAccessPageId: z.string().optional(),
 })
 
-
 const getTrackingUserAccessSchema = z.object({
   workspaceId: z.string().optional(),
 })
@@ -66,9 +65,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   // }
   //
 
-
   if (req.method === "DELETE") {
     try {
+      // const updateUsers = db.user.updateMany({
+      //   where: {
+      //     trackingUserAccess: {
+      //       some: {
+      //         lastAccessWorkspaceId: req.query.workspaceId as string
+      //       }
+      //     }
+      //   },
+      //   data: {
+      //     trackingUserAccess: {
+      //      delete: {
+      //        lastAccessWorkspaceId: req.query.workspaceId as string
+      //      }
+      //     }
+      //   }
+      // })
+      // console.log('dauphaihau debug: update-users', updateUsers)
+
       const deleteTracks = db.trackingUserAccess.deleteMany({
         where: {
           lastAccessWorkspaceId: req.query.workspaceId as string
@@ -87,7 +103,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
 
-      const transaction = await db.$transaction([deleteTracks,  deleteNotebooks, deleteWorkspace])
+      const transaction = await db.$transaction([deleteTracks, deleteNotebooks, deleteWorkspace])
       // console.log('dauphaihau debug: transaction', transaction)
 
       res.end()
@@ -96,7 +112,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).end()
     }
   }
-
 
   if (req.method === "POST") {
     try {
@@ -137,7 +152,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).end()
     }
   }
-
 
   if (req.method === "PATCH") {
     try {

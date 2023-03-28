@@ -18,7 +18,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: User.id
     image: string
-    workspaces: Workspace[]
+    // workspaces: Workspace[]
   }
 }
 

@@ -1,29 +1,6 @@
 import { cache } from "react";
-import useSWR from "swr";
 import { Notebook, Page, User, Workspace } from "@prisma/client";
-
 import { db } from "lib/db";
-// import { toast } from "core/components";
-
-// export const getListNotebooks = cache(async (userId: User["id"]) => {
-//   return await db.notebook.findMany({
-//     where: {
-//       authorId: userId,
-//     },
-//     select: {
-//       id: true,
-//       title: true,
-//       // Page: true,
-//       pages: true,
-//       description: true,
-//       published: true,
-//       createdAt: true,
-//     },
-//     orderBy: {
-//       updatedAt: "desc",
-//     },
-//   })
-// })
 
 export const omitFieldNullish = (obj) => {
   return Object.entries(obj)
@@ -55,7 +32,7 @@ export const getListNotebooks = cache(async (workspaceId: Workspace["id"]) => {
 })
 
 export const getDetailNotebook = cache(async (notebookId: Notebook["id"]) => {
-  return await db.notebook.findFirst({
+  const res = await db.notebook.findFirst({
     where: {
       id: notebookId,
     },
@@ -66,9 +43,14 @@ export const getDetailNotebook = cache(async (notebookId: Notebook["id"]) => {
       pages: {
         where: {
           deletedAt: null
-        }
+        },
+        select: {
+          id: true,
+          title: true,
+          updatedAt: true,
+          updatedBy: true,
+        },
       },
-      // pages: true,
       published: true,
       createdAt: true,
     },
@@ -76,6 +58,8 @@ export const getDetailNotebook = cache(async (notebookId: Notebook["id"]) => {
       updatedAt: "desc",
     },
   })
+
+  return JSON.parse(JSON.stringify(res))
 })
 
 // export const getDetailWorkspace = cache(async (domainWorkspace: Workspace["domain"]) => {
@@ -85,20 +69,11 @@ export const getDetailWorkspace = cache(async (domainWorkspace: Workspace["domai
       domain: domainWorkspace,
       id: workspaceId,
     }),
-    // where: {
-    //   // domain: workspaceId,
-    //   // domain: domainWorkspace,
-    //   id: workspaceId,
-    // },
     select: {
       id: true,
       name: true,
       domain: true,
       notebooks: true
-      // notebooks: true
-      // pages: true,
-      // published: true,
-      // createdAt: true,
     },
     orderBy: {
       updatedAt: "desc",
@@ -159,7 +134,7 @@ export async function getPage(pageId: Page["id"], userId: User["id"]) {
 
 export async function deleteNotebook(notebookId: string) {
   // const response = await fetch(`/api/posts/${notebookId}`, {
-  return  await fetch(`/api/notebook/${notebookId}`, {
+  return await fetch(`/api/notebook/${notebookId}`, {
     method: "DELETE",
   })
 }

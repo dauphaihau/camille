@@ -2,41 +2,31 @@
 
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { Input, Button, Dialog, Icons } from "core/components";
-import { useWorkspaceContext } from "../context/WorkspaceContext";
+import { useWorkspaceContext } from "components/context/WorkspaceContext";
 import { toast } from "core/components/Toast";
+import { createNotebook } from "lib/request-by-swr/notebook";
 
 export default function NewNotebookDialog() {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false)
   const formHandler = useForm();
   const router = useRouter();
-  const pathName = usePathname();
   const { workspace } = useWorkspaceContext();
 
   async function onSubmit(data) {
     setIsLoading(true)
-    const response = await fetch(`/api/notebook`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        workspaceId: workspace.id,
-        title: data.title,
-        description: data.description,
-      }),
+    const response = await createNotebook({
+      workspaceId: workspace.id,
+      title: data.title,
+      description: data.description,
     })
-    // }).then(res => res.json())
-
-    // console.log('dauphaihau debug: response', response.data)
-
     setIsLoading(false)
 
-    if (!response?.ok) {
-      if (response.status === 402) {
+    if (response.code !== '200') {
+      if (response.code === '402') {
         return toast({
           title: "Limit of 3 notebooks reached.",
           message: "Please upgrade to the PRO plan.",
@@ -46,7 +36,7 @@ export default function NewNotebookDialog() {
 
       return toast({
         title: "Something went wrong.",
-        message: "Your post was not created. Please try again.",
+        message: "Your notebooks was not created. Please try again.",
         type: "error",
       })
     }

@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { unstable_getServerSession } from "next-auth/next"
+import { getServerSession } from "next-auth/next"
 
 import { proPlan } from "config/subscriptions"
 import { withMethods } from "lib/api-middlewares/with-methods"
-import { getUserSubscriptionPlan } from "lib/subscription"
+import { getWorkspaceSubscriptionPlan } from "lib/subscription"
 import { stripe } from "lib/stripe"
 import { withAuthentication } from "lib/api-middlewares/with-authentication"
-import { absoluteUrl } from "lib/utils"
+import { absoluteUrl } from "core/helpers"
 import { authOptions } from "lib/auth"
 
 const billingUrl = absoluteUrl("/dashboard/billing")
@@ -14,12 +14,9 @@ const billingUrl = absoluteUrl("/dashboard/billing")
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
-      const session = await unstable_getServerSession(req, res, authOptions)
-      console.log('dauphaihau debug: session', session)
+      const session = await getServerSession(req, res, authOptions)
       const user = session.user
-      console.log('dauphaihau debug: user', user)
-      const subscriptionPlan = await getUserSubscriptionPlan(user.id)
-      console.log('dauphaihau debug: subscription-plan', subscriptionPlan)
+      const subscriptionPlan = await getWorkspaceSubscriptionPlan(user.id)
 
       // The user is on the pro plan.
       // Create a portal session to manage subscription.
@@ -28,8 +25,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           customer: subscriptionPlan.stripeCustomerId,
           return_url: billingUrl,
         })
-
-        console.log('dauphaihau debug: stripe-session', stripeSession)
 
         return res.json({ url: stripeSession.url })
       }

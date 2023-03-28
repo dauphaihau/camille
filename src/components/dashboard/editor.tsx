@@ -93,7 +93,7 @@ export function Editor({ page }: EditorProps) {
   async function handleUpdatePage(id, values: FormData) {
     const response = await updatePage(id, values)
 
-    if (!response?.ok) {
+    if (response.code !== '200') {
       return toast({
         title: "Something went wrong.",
         message: "Your page was not saved. Please try again.",

@@ -20,6 +20,7 @@ export type InputProps = {
    */
   type?: React.HTMLInputTypeAttribute;
   classes?: string
+  labelLeft?: string
   /** Disables the input and shows defaultValue (can be set from React Hook Form) */
   readOnly?: boolean;
   /** Disable error style (not disabling error validation) */
@@ -36,11 +37,13 @@ export default function Input({
   helperText,
   id,
   classes,
+  classesLabelLeft,
   size = 'sm',
   type = 'text',
   readOnly = false,
   hideError = false,
   validation,
+  labelLeft,
   ...others
 }: InputProps) {
 
@@ -49,18 +52,30 @@ export default function Input({
     formState: { errors },
   } = useFormContext();
 
+  const arrSize = [
+    size === 'xs' && ['px-[14px] h-[28px] text-xs'],
+    size === 'sm' && ['px-4 h-[34px] text-sm'],
+    size === 'md' && ['px-[22px] h-[42px] text-base'],
+  ]
+
   return (
     <div className='w-full'>
-      {label && <label htmlFor={id} className='text-sm text-[#3c4149] dark:text-white'>{label}</label>}
+      {label && <label htmlFor={id} className='text-sm font-medium text-[#3c4149] dark:text-white'>{label}</label>}
       <div
         className={cn('',
-          'group')}
+          'group relative')}
       >
         {/*<div className='input__contentLeft'>{contentLeft}</div>*/}
+        <span
+          className={cn('absolute flex items-center justify-center top-0 left-0 bottom-0',
+            arrSize,
+            classesLabelLeft
+          )}
+        >{labelLeft}</span>
         {/*<div className='input__contentRight'>{contentRight}</div>*/}
         {/*<Clear/>*/}
         <input
-          autoFocus={false}
+          // autoFocus={false}
           // ref={ref}
           type={type}
           // value={value}
@@ -85,12 +100,7 @@ export default function Input({
           disabled:bg-[#e9ecef] 
           disabled:text-[#aeb5bc]
         `,
-
-            [
-              size === 'xs' && ['px-[14px] h-[28px] text-xs'],
-              size === 'sm' && ['px-4 h-[34px] text-sm'],
-              size === 'md' && ['px-[22px] h-[42px] text-base'],
-            ],
+            arrSize,
             'p-2.5 md:pr-5',
             // { 'pl-10': contentLeft },
             classes
