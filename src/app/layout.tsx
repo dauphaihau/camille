@@ -30,7 +30,8 @@ export default function RootLayout({ children }: {
     <HydrationProvider>
       <Client>
         <UIControllerProvider>
-          {children}
+          {/*{children}*/}
+          abc
           <Toaster position="bottom-right"/>
         </UIControllerProvider>
       </Client>
