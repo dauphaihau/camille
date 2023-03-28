@@ -1,3 +1,4 @@
+'use client'
 import { PATH } from "config/const";
 import { Button, Text, Icons, Row, Col, Grid } from "core/components";
 import Link from "next/link";
