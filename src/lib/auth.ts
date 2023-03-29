@@ -204,7 +204,8 @@ export const authOptions: NextAuthOptions = {
   //     }
   //   },
   // }
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: 'dauphaihau',
+  // secret: process.env.NEXTAUTH_SECRET,
 }
 
 function htmlSignIn(params: {url: string; host: string; theme}) {
