@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  // secret: 'dauphaihau',
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
@@ -178,32 +178,33 @@ export const authOptions: NextAuthOptions = {
       }
     },
   },
-  events: {
-    createUser: async (user) => {
-      // console.log('dauphaihau debug: create user')
-      // console.log('dauphaihau debug: user at auth', user)
-      // try {
-      //   const count = await prisma.admin.count({
-      //     where: {
-      //       email: user.email,
-      //     },
-      //   });
-      //
-      //   if (count > 0) {
-      //     await prisma.user.update({
-      //       where: {
-      //         id: user.id,
-      //       },
-      //       data: {
-      //         role: "admin",
-      //       },
-      //     });
-      //   }
-      // } catch (err) {
-      //   console.log(err);
-      // }
-    },
-  }
+  // events: {
+  //   createUser: async (user) => {
+  //     console.log('dauphaihau debug: create user')
+  //     console.log('dauphaihau debug: user at auth', user)
+  //     try {
+  //       const count = await prisma.admin.count({
+  //         where: {
+  //           email: user.email,
+  //         },
+  //       });
+  //
+  //       if (count > 0) {
+  //         await prisma.user.update({
+  //           where: {
+  //             id: user.id,
+  //           },
+  //           data: {
+  //             role: "admin",
+  //           },
+  //         });
+  //       }
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   },
+  // }
+  secret: process.env.NEXTAUTH_SECRET,
 }
 
 function htmlSignIn(params: {url: string; host: string; theme}) {
