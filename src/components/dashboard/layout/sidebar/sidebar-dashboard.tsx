@@ -55,7 +55,6 @@ export default function SidebarDashboard() {
   }
 
   return (
-    // <aside className="w-[330px] flex-col md:flex bg-[#fafafa] h-screen group">
     <aside className="min-w-[278px] flex-col md:flex bg-[#fafafa] h-screen group">
       {
         isSettingPage ? <SettingSidebar/>

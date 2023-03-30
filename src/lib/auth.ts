@@ -45,6 +45,8 @@ export const authOptions: NextAuthOptions = {
         theme
       }) => {
 
+        console.log('dauphaihau debug: email', email)
+
         const user = await db.user.findUnique({
           where: {
             email,
@@ -53,6 +55,8 @@ export const authOptions: NextAuthOptions = {
             emailVerified: true,
           },
         })
+
+        console.log('dauphaihau debug: user', user)
 
         // const { identifier, url, provider, theme } = params
         const { host } = new URL(url)
@@ -71,6 +75,7 @@ export const authOptions: NextAuthOptions = {
               htmlActivation({ url, host, theme })
           ,
         })
+        console.log('dauphaihau debug: result', result)
         const failed = result.rejected.concat(result.pending).filter(Boolean)
         if (failed.length) {
           throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`)
