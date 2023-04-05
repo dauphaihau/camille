@@ -69,12 +69,12 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
               />
               <p className='text-sm mb-2 mt-1 text-[#7d7b77]'>
                 {!loginForm && 'You can also '}
-                <p
-                  className="  underline underline-offset-1 cursor-pointer"
+                <span
+                  className="underline underline-offset-1 cursor-pointer"
                   onClick={!isLoading ? () => setLoginForm(!loginForm) : () => {}}
                 >
                   {loginForm ? 'Forgot password?' : 'continue with email'}
-                </p>
+                </span>
               </p>
             </div>
             <Button

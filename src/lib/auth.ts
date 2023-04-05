@@ -1,4 +1,5 @@
 import { NextAuthOptions } from "next-auth"
+import NextAuth from "next-auth"
 import GitHubProvider from "next-auth/providers/github"
 import EmailProvider from "next-auth/providers/email"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
@@ -33,8 +34,8 @@ export const authOptions: NextAuthOptions = {
   // secret: 'dauphaihau',
   providers: [
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     }),
     EmailProvider({
       from: process.env.SMTP_FROM,
@@ -144,9 +145,6 @@ export const authOptions: NextAuthOptions = {
         where: {
           email: token.email
         },
-        // select: {
-        //   workspaces: true
-        // }
         include: {
           workspaces: {
             select: {
@@ -155,16 +153,6 @@ export const authOptions: NextAuthOptions = {
               domain: true,
             }
           },
-          // trackingUserAccess: {
-          //   where: {
-          //     lastAccessWorkspaceId: token.trackingUserAccess.lastAccessWorkspaceId
-          //   },
-          //   select: {
-          //     lastAccessWorkspaceId: true,
-          //     lastAccessNotebookId: true,
-          //     lastAccessPageId: true,
-          //   }
-          // }
         },
       })
 
@@ -210,6 +198,7 @@ export const authOptions: NextAuthOptions = {
   //   },
   // }
   secret: process.env.NEXTAUTH_SECRET,
+  debug: true
 }
 
 function htmlSignIn(params: {url: string; host: string; theme}) {

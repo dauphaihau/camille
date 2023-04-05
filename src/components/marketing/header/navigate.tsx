@@ -34,17 +34,17 @@ export default function Navigate() {
               </Link>
             </NavigationMenu.Item>
             <Row>
-              <NavigationMenu.Item>
-                <NavigationMenu.Trigger
-                  className={cn('NavigationMenuTrigger',
-                    { "!text-black": pathName === PATH.HOME }
-                  )}
-                >
-                  <Link href={PATH.HOME}>
-                    Home
-                  </Link>
-                </NavigationMenu.Trigger>
-              </NavigationMenu.Item>
+              {/*<NavigationMenu.Item>*/}
+              {/*  <NavigationMenu.Trigger*/}
+              {/*    className={cn('NavigationMenuTrigger',*/}
+              {/*      { "!text-black": pathName === PATH.HOME }*/}
+              {/*    )}*/}
+              {/*  >*/}
+              {/*    <Link href={PATH.HOME}>*/}
+              {/*      Home*/}
+              {/*    </Link>*/}
+              {/*  </NavigationMenu.Trigger>*/}
+              {/*</NavigationMenu.Item>*/}
 
               <NavigationMenu.Item>
                 <NavigationMenu.Trigger className={'NavigationMenuTrigger'}>
@@ -54,7 +54,7 @@ export default function Navigate() {
                   <ul className="List one">
                     <li style={{ gridRow: 'span 3' }}>
                       <NavigationMenu.Link asChild>
-                        <a className="Callout" href="/public">
+                        <a className="Callout" href="/">
                           <svg aria-hidden width="38" height="38" viewBox="0 0 25 25" fill="white">
                             <path d="M12 25C7.58173 25 4 21.4183 4 17C4 12.5817 7.58173 9 12 9V25Z"></path>
                             <path d="M12 0H4V8H12V0Z"></path>

@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server"
-import { getToken } from "next-auth/jwt"
-import { withAuth } from "next-auth/middleware"
+import { NextResponse } from 'next/server'
+import { getToken } from 'next-auth/jwt'
+import { withAuth } from 'next-auth/middleware'
 
 export default withAuth(
   async function middleware(req) {
@@ -8,27 +8,31 @@ export default withAuth(
 
     const isAuth = !!token
     const isAuthPage =
-      req.nextUrl.pathname.startsWith("/login") ||
-      req.nextUrl.pathname.startsWith("/register")
+      req.nextUrl.pathname.startsWith('/login') ||
+      req.nextUrl.pathname.startsWith('/register')
 
     if (isAuthPage) {
       if (isAuth) {
         return NextResponse.redirect(new URL('/', req.url))
       }
-      // return null
+    } else {
+      if (!isAuth) {
+        return NextResponse.redirect(new URL('/login', req.url))
+      }
     }
 
-    if (!isAuth) {
-      return NextResponse.redirect(new URL('/login', req.url))
+    // if (!isAuth) {
+      // return NextResponse.redirect(new URL('/login', req.url))
       // let from = req.nextUrl.pathname;
       // if (req.nextUrl.search) {
       //   from += req.nextUrl.search;
       // }
       //
+      // console.log('dauphaihau debug: from', from)
       // return NextResponse.redirect(
       //   new URL(`/login?from=${encodeURIComponent(from)}`, req.url)
       // );
-    }
+    // }
   },
   {
     callbacks: {
@@ -43,14 +47,7 @@ export default withAuth(
 )
 
 export const config = {
-  // matcher: ["/dashboard/:path*", "/editor/:path*", "/login", "/register"],
-  // matcher: ["/login", "/register"],
-  // matcher: [ "/workspace", "/login", "/register"],
-  // matcher: ["/:path*", "/login", "/register"],
-  // matcher: ['/', "/login", "/register"],
-  matcher: ["/register"],
-  // matcher: ["/login", "/register"],
-  // matcher: ['/', "/:path", "/login", "/register"],
+  matcher: ['/login','/workspace'],
 
   // matcher: [
   //   /*
@@ -62,7 +59,7 @@ export const config = {
   //    * 5. /workspace (inside /workspace)
   //    * 6. all root files inside /public (e.g. /favicon.ico)
   //    */
-  //   // "/((?!api|_next|fonts|examples|workspace|[\\w-]+\\.\\w+).*)",
+  //   // '/((?!api|_next|fonts|examples|workspace|[\\w-]+\\.\\w+).*)',
   // ],
 }
 

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { Col } from "core/components";
 import { getDetailWorkspace, getListWorkspaceByUser } from "lib/request/notebook";
@@ -16,7 +16,9 @@ export default async function DashboardLayout({
   const user = await getCurrentUser()
 
   if (!user) {
-    return notFound()
+    // return notFound()
+    redirect('/')
+    // redirect('/login')
   }
 
   const workspaces = await getListWorkspaceByUser(user.id)

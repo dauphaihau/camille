@@ -16,6 +16,10 @@ export default function NotebookPageBreadcrumb() {
   const notebookIdCurrent = segments[0]
   const notebookSelected = notebooks.find((notebook) => notebook.id === notebookIdCurrent)
 
+  if (!workspace?.domain || !notebookSelected?.id) {
+    return null
+  }
+
   return (
     <Row align='center' gap={2}>
       <Link
