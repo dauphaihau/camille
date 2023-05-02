@@ -4,11 +4,8 @@ import { getServerSession } from "next-auth/next"
 
 import { db } from "lib/db"
 import { withMethods } from "lib/api-middlewares/with-methods"
-import { getUserSubscriptionPlan } from "lib/subscription"
-import { RequiresProPlanError } from "lib/exceptions"
+import { RequiresStandardPlanError } from "lib/exceptions"
 import { authOptions } from "lib/auth"
-import { pagePatchSchema } from "lib/validations/page"
-import { userNameSchema } from "../../../lib/validations/user";
 
 const settingsUpdateSchema = z.object({
   name: z.string().optional(),
@@ -96,7 +93,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(422).json(error.issues)
       }
 
-      if (error instanceof RequiresProPlanError) {
+      if (error instanceof RequiresStandardPlanError) {
         return res.status(402).end()
       }
 
@@ -135,7 +132,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(422).json(error.issues)
       }
 
-      if (error instanceof RequiresProPlanError) {
+      if (error instanceof RequiresStandardPlanError) {
         return res.status(402).end()
       }
 

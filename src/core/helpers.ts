@@ -9,9 +9,9 @@ export function absoluteUrl(path: string) {
   return `${process.env.NEXTAUTH_URL}${path}`
 }
 
-export function formatDate(input: Date | string | number): string {
+export function formatDate(input: Date | string | number, options?: object): string {
   const date = new Date(input)
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString("en-US", options ?? {
     month: "long",
     day: "numeric",
     year: "numeric",
@@ -71,6 +71,16 @@ export function debounce(callback, interval: number) {
   };
 }
 
+export function getValueOfLastBracketInString(str) {
+  if (!str) {
+    return '';
+  }
+  let isStringHaveBrackets = str.match(/(.*)\(.*\)/);
+  if (isStringHaveBrackets) {
+    return str.match(/\(([^)]+)\)?(){1}$/)[1];
+  }
+}
+
 export const wordInString = (s, word) => new RegExp('\\b' + word + '\\b', 'i').test(s);
 
 export const uniqElement = (arr) => {
@@ -90,15 +100,6 @@ export const toLower = (value) => {
 
 export const isEmptyObject = (obj = {}) => {
   return Object.keys(obj).length === 0
-}
-
-export function parseJSON<T>(value: string | null): T | undefined {
-  try {
-    return JSON.parse(value)
-  } catch {
-    // console.log('parsing error on', { value })
-    return undefined
-  }
 }
 
 export const isNil = (value) => {
@@ -185,22 +186,6 @@ export const paginateRows = (sortedRows, currentPage, rowsPerPage) => {
 }
 
 // ---------- others
-
-export const slugify = (text: string): string => {
-  if (!text) return
-  const a = 'àáäâãåăæąçćčđďèéěėëêęğǵḧìíïîįłḿǹńňñòóöôœøṕŕřßşśšșťțùúüûǘůűūųẃẍÿýźžż·/_,:;'
-  const b = 'aaaaaaaaacccddeeeeeeegghiiiiilmnnnnooooooprrsssssttuuuuuuuuuwxyyzzz------'
-  const p = new RegExp(a.split('').join('|'), 'g')
-
-  return text.toString().toLowerCase()
-  .replace(/\s+/g, '-') // Replace spaces with -
-  .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
-  .replace(/&/g, '-and-') // Replace & with 'and'
-  .replace(/[^\w-]+/g, '') // Remove all non-word characters
-  .replace(/--+/g, '-') // Replace multiple - with single -
-  .replace(/^-+/, '') // Trim - from start of text
-  .replace(/-+$/, '') // Trim - from end of text
-}
 
 export function titleIfy(slug: string, except = ['and', 'with', 'of']) {
   if (!slug) return

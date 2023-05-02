@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next"
 
 import { db } from "lib/db"
 import { withMethods } from "lib/api-middlewares/with-methods"
-import { RequiresProPlanError } from "lib/exceptions"
+import { RequiresStandardPlanError } from "lib/exceptions"
 import { authOptions } from "lib/auth"
 import { pagePatchSchema } from "../../../../lib/validations/page";
 
@@ -25,47 +25,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).end()
   }
 
-  const { user } = session
-
-  // if (req.method === "GET") {
-  //   try {
-  //     // const notebooks = await db.notebook.findMany({
-  //     //   select: {
-  //     //     id: true,
-  //     //     title: true,
-  //     //     published: true,
-  //     //     createdAt: true,
-  //     //   },
-  //     //   where: {
-  //     //     authorId: user.id,
-  //     //   },
-  //     // })
-  //
-  //     const dbUser = await db.user.findFirst({
-  //       where: {
-  //         email: 'dauphaihau@yopmail.com',
-  //       },
-  //     })
-  //
-  //     console.log('dauphaihau debug: db-user', dbUser)
-  //
-  //     const domain = await db.domain.findFirst({
-  //       select: {
-  //         name: true,
-  //       },
-  //       where: {
-  //         ownerId: user.id,
-  //       },
-  //     })
-  //
-  //     console.log('dauphaihau debug: domain', domain)
-  //     return res.json(domain)
-  //   } catch (error) {
-  //     return res.status(500).end()
-  //   }
-  // }
-  //
-
   if (req.method === "POST") {
     try {
       // const notebooks = await db.notebook.findMany({
@@ -80,22 +39,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       //   },
       // })
 
-      // console.log('dauphaihau debug: session', session)
-
       // const body = getTrackingUserAccessSchema.parse(req.body)
 
       const body = JSON.parse(req.body)
 
-      const data = await db.trackingUserAccess.findFirstOrThrow({
+      // const data = await db.trackingUserAccessOnWorkspace.findFirstOrThrow({
+      const data = await db.trackingUserAccessOnWorkspace.findFirst({
         where: {
           AND: [
             { userId: session.user.id },
-            { lastAccessWorkspaceId: body.workspaceId },
+            { workspaceId: body.workspaceId },
           ]
         }
       })
 
-      return res.json(data)
+      if (!data) {
+        return res.send({ code: '200', message: 'success' })
+      }
+      return res.send({ code: '200', message: 'success', data })
     } catch (error) {
       return res.status(500).end()
     }
@@ -115,18 +76,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
       })
 
-      const isTrackingUserAccessExist = await db.trackingUserAccess.findFirst({
+      // const isTrackingUserAccessExist = await db.trackingUserAccess.findFirst({
+      const isTrackingUserAccessExist = await db.trackingUserAccessOnWorkspace.findFirst({
         where: {
           AND: [
             { userId },
-            { lastAccessWorkspaceId: body.lastAccessWorkspaceId },
+            { workspaceId: body.lastAccessWorkspaceId },
+            // { lastAccessWorkspaceId: body.lastAccessWorkspaceId },
           ]
         }
       })
 
       if (isTrackingUserAccessExist) {
         // console.log('dauphaihau debug: case update')
-        await db.trackingUserAccess.update({
+        // await db.trackingUserAccess.update({
+        await db.trackingUserAccessOnWorkspace.update({
           where: {
             id: isTrackingUserAccessExist.id
           },
@@ -184,7 +148,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         //   // }
         // })
 
-        await db.trackingUserAccess.create({
+        // await db.trackingUserAccess.create({
+        await db.trackingUserAccessOnWorkspace.create({
           data: {
             user: {
               connect: {
@@ -262,7 +227,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(422).json(error.issues)
       }
 
-      if (error instanceof RequiresProPlanError) {
+      if (error instanceof RequiresStandardPlanError) {
         return res.status(402).end()
       }
 
@@ -272,4 +237,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 }
 
-export default withMethods(["PATCH", "GET", "POST"], handler)
+export default withMethods(["PATCH", "POST"], handler)

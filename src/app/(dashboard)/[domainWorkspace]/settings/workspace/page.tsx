@@ -2,19 +2,20 @@ import React from "react";
 import { redirect } from "next/navigation"
 
 import { getCurrentUser } from "lib/session"
-import { authOptions } from "lib/auth"
-import FormsUpdateWorkspace from "components/dashboard/settings/form-update-workspace";
-import { getDetailWorkspace } from "lib/request/notebook";
+import UpdateWorkspaceForm from "components/dashboard/settings/workspace/form-update-workspace";
+import { getDetailWorkspace } from "lib/request/workspace";
 import { DashboardSettingsHeader } from "components/dashboard/settings/header";
 import { DashboardSettingsShell } from "components/dashboard/settings/shell"
-import DeleteWorkspaceButton from "components/dashboard/workspace/delete-workspace-button";
+import DeleteWorkspaceButton from "components/dashboard/settings/workspace/delete-workspace-button";
 import { Grid } from "core/components";
+import { PATH } from "config/const";
+import UpdateLogo from "components/dashboard/settings/workspace/upload-logo";
 
 export default async function WorkspaceSettingPage({ params }) {
   const user = await getCurrentUser()
 
   if (!user) {
-    redirect(authOptions.pages.signIn)
+    redirect(PATH.LOGIN)
   }
 
   const workspace = await getDetailWorkspace(params.domainWorkspace)
@@ -29,9 +30,7 @@ export default async function WorkspaceSettingPage({ params }) {
       <Grid classes="gap-8 max-w-[600px] mx-auto">
         <div className='space-y-3'>
           <div>Logo</div>
-          <div className='avatar bg-[#ecebea] group-hover:bg-[#dcdbda] h-16 w-16 rounded text-md text-[#777572] grid place-items-center'>
-            {workspace.name.charAt(0)}
-          </div>
+          <UpdateLogo/>
           <div className='text-sm text-[#6b6f7c]'>Pick a logo for your workspace. Recommend size is 256x256</div>
         </div>
 
@@ -39,7 +38,7 @@ export default async function WorkspaceSettingPage({ params }) {
 
         <div className='space-y-3 w-1/2'>
           <div className='text-base'>General</div>
-          <FormsUpdateWorkspace workspace={workspace}/>
+          <UpdateWorkspaceForm workspace={workspace}/>
         </div>
         <div className='border-gray-200 border-b'/>
 

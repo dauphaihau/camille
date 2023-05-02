@@ -1,23 +1,30 @@
 'use client'
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-import { Input, Button, Dialog, Icons } from "core/components";
-import { useWorkspaceContext } from "components/context/WorkspaceContext";
+import { Input, Button, Dialog, Icons, Tooltip, Textarea, Col } from "core/components";
+import { useWorkspaceContext } from "components/context/workspace-context";
 import { toast } from "core/components/Toast";
 import { createNotebook } from "lib/request-by-swr/notebook";
+import useStore from "lib/store";
+import { freePlan } from "config/subscriptions";
 
-export default function NewNotebookDialog() {
+export default function NewNotebookDialog({ trigger }: {trigger?: ReactNode}) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false)
   const formHandler = useForm();
   const router = useRouter();
   const { workspace } = useWorkspaceContext();
 
+  const setShowLimitedNotebookBar = useStore(state => state.setShowLimitedNotebookBar)
+
+  if (!workspace) return null
+
   async function onSubmit(data) {
     setIsLoading(true)
+    if (!workspace) return
     const response = await createNotebook({
       workspaceId: workspace.id,
       title: data.title,
@@ -27,11 +34,9 @@ export default function NewNotebookDialog() {
 
     if (response.code !== '200') {
       if (response.code === '402') {
-        return toast({
-          title: "Limit of 3 notebooks reached.",
-          message: "Please upgrade to the PRO plan.",
-          type: "error",
-        })
+        setShowLimitedNotebookBar(true)
+        setOpen(!open)
+        return
       }
 
       return toast({
@@ -46,39 +51,71 @@ export default function NewNotebookDialog() {
     formHandler.reset()
   }
 
+  const Trigger = () => {
+    return trigger ? <>{trigger}</> : <Tooltip>
+      <Tooltip.Trigger asChild>
+        <div>
+          <Icons.plus className='btn-icon invisible group-hover:visible'/>
+        </div>
+      </Tooltip.Trigger>
+      <Tooltip.Content className='ml-2.5 mt-1'>
+        <div>New notebook</div>
+        <div className='text-[#82817f]'>Notebook you created that are not in any teamspace.</div>
+      </Tooltip.Content>
+    </Tooltip>
+  }
+
+  if (!workspace.isStandard && workspace.totalMembers > 1 && workspace.totalNotebooks >= freePlan.limitedNotebooks) {
+    return <div onClick={() => setShowLimitedNotebookBar(true)}>
+      <Trigger/>
+    </div>
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Dialog.Trigger>
-        <Icons.plus className='btn-icon invisible group-hover:visible'/>
+        <Trigger/>
       </Dialog.Trigger>
-
       <Dialog.Content>
-        <h3>
-          New Notebook
-        </h3>
-        <p>
-          A notebook contains notes and tasks. You can add team members to a notebook so that they have access to all of
-          its content.
-        </p>
+        <div
+          onClick={() => setOpen(false)}
+          className='
+          absolute top-[14px] right-[14px] cursor-pointer
+          btn-icon bg-[#efefef] rounded-full text-xs flex justify-center items-center'
+        >
+          <Icons.close/>
+        </div>
+
+        <Col gap={1}>
+          <h4>New Notebook</h4>
+          <p className={'text-[#9b9a98] text-sm font-medium'}>
+            A notebook contains pages.
+            Each page you create can share with select people, your whole team, or the entire web, so that they have
+            access to all of its content.
+            {/*A notebook contains notes and tasks. You can add team members to a notebook so that they have access to all*/}
+            {/*of*/}
+            {/*its content.*/}
+          </p>
+        </Col>
+
         <FormProvider {...formHandler} >
-          <form onSubmit={formHandler.handleSubmit(onSubmit)} className='space-y-3'>
+          <form onSubmit={formHandler.handleSubmit(onSubmit)} className='space-y-4'>
             <Input
               placeholder='Enter a name for your notebook'
-              size='md'
+              sizeInput='md'
               label='Name notebook'
               id='title'
             />
-            <Input
-              placeholder=''
-              size='md'
-              label='Description'
+            <Textarea
+              rows={4}
               id='description'
+              label='Description (optional)'
             />
             <div className='flex justify-end pt-5 gap-1'>
-              <Button disabled={isLoading} classes='mr-2' variant='text' onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" isLoading={isLoading}>
+              <Button
+                disabled={!formHandler.watch('title')}
+                type="submit" isLoading={isLoading}
+              >
                 Create
               </Button>
             </div>

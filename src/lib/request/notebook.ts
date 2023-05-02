@@ -1,6 +1,7 @@
 import { cache } from "react";
-import { Notebook, Page, User, Workspace } from "@prisma/client";
+import { Notebook, User, Workspace } from "@prisma/client";
 import { db } from "lib/db";
+import { fetcher } from "../../core/helpers";
 
 export const omitFieldNullish = (obj) => {
   return Object.entries(obj)
@@ -31,7 +32,7 @@ export const getListNotebooks = cache(async (workspaceId: Workspace["id"]) => {
   })
 })
 
-export const getDetailNotebook = cache(async (notebookId: Notebook["id"]) => {
+export const getDetailNotebook = cache(async (notebookId: Notebook["id"], userId: User['id']) => {
   const res = await db.notebook.findFirst({
     where: {
       id: notebookId,
@@ -49,6 +50,13 @@ export const getDetailNotebook = cache(async (notebookId: Notebook["id"]) => {
           title: true,
           updatedAt: true,
           updatedBy: true,
+          notebookId: true,
+          favorites: {
+            // Favorite: {
+            where: {
+              userId
+            }
+          }
         },
       },
       published: true,
@@ -62,79 +70,3 @@ export const getDetailNotebook = cache(async (notebookId: Notebook["id"]) => {
   return JSON.parse(JSON.stringify(res))
 })
 
-// export const getDetailWorkspace = cache(async (domainWorkspace: Workspace["domain"]) => {
-export const getDetailWorkspace = cache(async (domainWorkspace: Workspace["domain"], workspaceId?: Workspace["id"]) => {
-  const res = await db.workspace.findFirst({
-    where: omitFieldNullish({
-      domain: domainWorkspace,
-      id: workspaceId,
-    }),
-    select: {
-      id: true,
-      name: true,
-      domain: true,
-      notebooks: true
-    },
-    orderBy: {
-      updatedAt: "desc",
-    },
-  })
-
-  return JSON.parse(JSON.stringify(res))
-})
-
-export const getListWorkspaceByUser = cache(async (userId: User["id"]) => {
-  const res = await db.workspace.findMany({
-    where: {
-      // domain: domainWorkspace,
-      // id: workspaceId,
-      users: {
-        some: {
-          id: userId
-        }
-      }
-    },
-
-    // select: {
-    //   id: true,
-    //   name: true,
-    //   domain: true,
-    //   notebooks: true
-    //   // pages: true,
-    //   // published: true,
-    //   // createdAt: true,
-    // },
-    // orderBy: {
-    //   updatedAt: "desc",
-    // },
-    //
-  })
-  return JSON.parse(JSON.stringify(res))
-})
-
-export const deleteWorkspace = cache(async (domainWorkspace: Workspace["domain"], workspaceId?: Workspace["id"]) => {
-  await db.workspace.delete({
-    where: omitFieldNullish({
-      domain: domainWorkspace,
-      id: workspaceId,
-    }),
-  })
-
-  // return JSON.parse(JSON.stringify(res))
-})
-
-export async function getPage(pageId: Page["id"], userId: User["id"]) {
-  return await db.page.findFirst({
-    where: {
-      id: pageId,
-      // authorId: userId,
-    },
-  })
-}
-
-export async function deleteNotebook(notebookId: string) {
-  // const response = await fetch(`/api/posts/${notebookId}`, {
-  return await fetch(`/api/notebook/${notebookId}`, {
-    method: "DELETE",
-  })
-}

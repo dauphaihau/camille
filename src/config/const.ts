@@ -1,8 +1,12 @@
-export const BASE_URL = process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_BASE_URL : "http://localhost:3000"
+export const BASE_URL = process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_BASE_URL : 'http://localhost:3000'
 
 export enum USER_STATUS {NOT_ACTIVATED = -1, LOCKED, ACTIVE}
 
+export enum ROLE_USER_ON_WORKSPACE {ADMIN = 0, MEMBER}
+
 export enum DELETE_PAGE_TYPE {SOFT_DELETE = 0, HARD_DELETE, RECOVER}
+
+export enum ARCHIVED_TEAMSPACE {SOFT_DELETE = 0, HARD_DELETE, RECOVER}
 
 export const PATH = {
   HOME: '/',
@@ -10,20 +14,5 @@ export const PATH = {
   PRICING: '/pricing',
   FEATURES: '/features',
   SOLUTIONS: '/solutions',
-
-  PRODUCT: {
-    _: '/product',
-  },
-  CATEGORIES: {
-    _: '/categories',
-  },
-  ABOUT: {
-    _: '/about',
-  },
-  CHECKOUT: {
-    _: '/checkout',
-  },
-  NEWS: {
-    _: '/news',
-  },
+  WORKSPACE: '/workspace',
 };

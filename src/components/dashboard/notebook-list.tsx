@@ -2,10 +2,11 @@
 
 import { NotebookItem } from "./notebooks/notebook-item";
 import { EmptyPlaceholder } from "./empty-placeholder";
-import { useWorkspaceContext } from "components/context/WorkspaceContext";
+import useStore from "lib/store";
 
 export default function NotebookList() {
-  const { workspace } = useWorkspaceContext()
+  const workspace = useStore(state => state.workspace)
+
   return (
     <div>
       {

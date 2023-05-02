@@ -1,12 +1,13 @@
 import { getCurrentUser } from "lib/session";
 import { redirect } from "next/navigation";
 
-import { authOptions } from "lib/auth";
 import { DashboardHeader } from "components/dashboard/header";
 import { EmptyPlaceholder } from "components/dashboard/empty-placeholder";
 import { DashboardShell } from "components/dashboard/shell";
-import { PageItem } from "components/dashboard/pages/page-item";
+import { PageItem } from "components/dashboard/page/page-item";
 import { getDetailNotebook } from "lib/request/notebook";
+import { PATH } from "config/const";
+import { Loading } from "core/components";
 
 interface NotebookPageProps {
   params: {notebookId: string}
@@ -20,29 +21,31 @@ export default async function NotebookPage({ params }: NotebookPageProps) {
   const user = await getCurrentUser()
 
   if (!user) {
-    redirect(authOptions.pages.signIn)
+    redirect(PATH.LOGIN)
   }
 
-  const notebook = await getDetailNotebook(params.notebookId)
+  const notebook = await getDetailNotebook(params.notebookId, user.id)
 
   return (
     <DashboardShell>
       <DashboardHeader heading={notebook?.title} text={notebook?.description}/>
       <div>
         {
-          notebook.pages?.length ?
+          notebook && notebook.pages?.length ?
             notebook.pages.map((page) => (
-                <PageItem notebookId={params.notebookId} key={page.id} page={page}/>
+                <PageItem key={page.id} page={page}/>
+                // <PageItem notebookId={params.notebookId} key={page.id} page={page}/>
               )
             )
-            : (
-              <EmptyPlaceholder>
-                <EmptyPlaceholder.Icon name="book"/>
-                <EmptyPlaceholder.Description>
-                  You don&apos;t have any pages yet.
-                </EmptyPlaceholder.Description>
-              </EmptyPlaceholder>
-            )
+            : null
+          // : (
+          //   <EmptyPlaceholder>
+          //     <EmptyPlaceholder.Icon name="book"/>
+          //     <EmptyPlaceholder.Description>
+          //       You don&apos;t have any pages yet.
+          //     </EmptyPlaceholder.Description>
+          //   </EmptyPlaceholder>
+          // )
         }
       </div>
     </DashboardShell>

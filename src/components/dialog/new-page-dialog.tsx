@@ -45,18 +45,18 @@ export default function NewPageDialog() {
           <form onSubmit={formHandler.handleSubmit(onSubmit)} className='space-y-3'>
             <Input
               placeholder='Enter a name for your notebook'
-              size='md'
+              sizeInput='md'
               label='Name notebook'
               id='title'
             />
             <Input
               placeholder=''
-              size='md'
+              sizeInput='md'
               label='Description'
               id='description'
             />
             <div className='flex justify-end pt-5'>
-              <Button variant='light' onClick={() => setOpen(false)}>
+              <Button variant='text' onClick={() => setOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit">

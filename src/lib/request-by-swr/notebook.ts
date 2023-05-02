@@ -57,10 +57,21 @@ export async function updatePage(id: string, values) {
   })
 }
 
+export async function updateNotebook(id: string, values) {
+  return fetcher(`/api/notebook/${id}`,
+    values,
+    'PATCH'
+  )
+}
+
 export async function deleteNotebook(id: string) {
   return fetcher(`/api/notebook/${id}`, null, 'DELETE')
 }
 
 export async function createNotebook(payload) {
   return fetcher(`/api/notebook/`, payload)
+}
+
+export async function createNotebookOnTeamspace(payload) {
+  return fetcher(`/api/teamspace/notebook`, payload)
 }

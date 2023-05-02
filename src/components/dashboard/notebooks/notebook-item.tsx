@@ -4,16 +4,16 @@ import Link from "next/link"
 import { Notebook } from "@prisma/client"
 
 import { Skeleton } from "core/components/skeleton"
-import { useWorkspaceContext } from "components/context/WorkspaceContext";
 import { NotebookOperations } from "../notebook-operations";
 import { Grid, Row } from "core/components";
+import useStore from "lib/store";
 
 interface NotebookItemProps {
   notebook: Pick<Notebook, "id" | "title" | "description" | "published" | "createdAt">
 }
 
 export function NotebookItem({ notebook }: NotebookItemProps) {
-  const { workspace } = useWorkspaceContext()
+  const workspace = useStore(state => state.workspace)
   return (
     <Row align='center' justify='between'>
       <Grid gap={1}>

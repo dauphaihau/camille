@@ -1,14 +1,25 @@
 import { cache } from "react";
-import { User } from "@prisma/client";
+import { Workspace } from "@prisma/client";
 import { db } from "lib/db";
 
-export const getDomain = cache(async (userId: User["id"]) => {
-  return await db.domain.findFirst({
-    select: {
-      name: true,
-    },
-    where: {
-      ownerId: userId,
-    },
+export const getListMembers = cache(async (domain: Workspace["domain"]) => {
+  const workspaceExists = await db.workspace.findFirst({
+    where: { domain }
   })
+
+  if (workspaceExists) {
+    const res = await db.userOnWorkspace.findMany({
+      where: {
+        workspaceId: workspaceExists.id,
+      },
+      select: {
+        user: true,
+        role: true
+      },
+      orderBy: [
+        { role: 'asc' }
+      ]
+    })
+    return JSON.parse(JSON.stringify(res))
+  }
 })

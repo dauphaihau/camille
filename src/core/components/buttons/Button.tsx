@@ -50,11 +50,10 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
       type={type}
       disabled={disabled}
       className={cn(
-        // font-semibold
         // font-medium
+        //   font-semibold
           `
           inline-flex items-center justify-center rounded 
-          font-semibold
           transition ease-in-out duration-300
           leading-4 cursor-pointer
         `,
@@ -93,9 +92,10 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
           color === 'red' && [
             { 'bg-[#eb5757] text-white': variant === 'filled' },
             { 'bg-white text-black': variant === 'outline' },
+            { 'hover:bg-[#c45753]': !disabled },
             // 'border-[1px] border-solid border-black',
             'dark:bg-white dark:text-black',
-            'hover:bg-[#c45753]',
+            // 'hover:bg-[#c45753]',
           ],
 
           color === 'gray' && !disabled && [
@@ -114,6 +114,11 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
             'bg-[#e5e5e5] text-[#acacac] dark:bg-[#383a3f] dark:text-[#25262b] cursor-not-allowed hover:opacity-100'
           ]
         ],
+        // [
+        //   disabled && !isLoading && [
+        //     'bg-[#e5e5e5] text-[#acacac] dark:bg-[#383a3f] dark:text-[#25262b] cursor-not-allowed hover:opacity-100'
+        //   ]
+        // ],
         {
           // 'opacity-30 hover:opacity-30': disabled || isLoading,
           'opacity-30 hover:opacity-30': isLoading,

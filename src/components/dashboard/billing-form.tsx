@@ -1,16 +1,19 @@
 "use client"
 
 import * as React from "react"
+import { Workspace } from "@prisma/client";
 
-import { UserSubscriptionPlan } from "types"
+import { WorkspaceSubscriptionPlan } from "types"
 import { cn, formatDate } from "lib/utils"
 import { Card } from "core/components/card"
 import { toast } from "core/components/Toast"
 import { Button } from "core/components"
+import { ROLE_USER_ON_WORKSPACE } from "config/const";
+import useStore from "lib/store";
 
 interface BillingFormProps extends React.HTMLAttributes<HTMLFormElement> {
-  workspace: object
-  subscriptionPlan: UserSubscriptionPlan & {
+  workspace: Workspace,
+  subscriptionPlan: WorkspaceSubscriptionPlan & {
     isCanceled: boolean
   }
 }
@@ -22,6 +25,8 @@ export function BillingForm({
   ...props
 }: BillingFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const userOnWorkspace = useStore(state => state.userOnWorkspace)
+  if (!userOnWorkspace) return null
 
   async function onSubmit(event) {
     event.preventDefault()
@@ -29,7 +34,8 @@ export function BillingForm({
 
     // Get a Stripe session URL.
     const response = await fetch("http://localhost:3000/api/settings/workspace/stripe?" + new URLSearchParams({
-      workspaceId: workspace.id
+      workspaceId: workspace.id,
+      domainWorkspace: workspace.domain,
     }))
     // const response = await fetch("/api/users/stripe")
 
@@ -66,32 +72,15 @@ export function BillingForm({
         {/*<Card.Content>Advanced collaboration and support for teams</Card.Content>*/}
         <Card.Footer className="flex flex-col items-start space-y-2 md:flex-row md:justify-between md:space-x-0">
 
-          {/*<button*/}
-          {/*  type="submit"*/}
-          {/*  className={cn(*/}
-          {/*    "relative inline-flex h-9 items-center justify-center rounded-md border border-transparent bg-brand-500 px-4 py-2 text-center text-sm font-medium text-white hover:bg-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2",*/}
-          {/*    {*/}
-          {/*      "cursor-not-allowed opacity-60": isLoading,*/}
-          {/*    }*/}
-          {/*  )}*/}
-          {/*  disabled={isLoading}*/}
-          {/*>*/}
-          {/*  {isLoading && (*/}
-          {/*    <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>*/}
-          {/*  )}*/}
-          {/*  {subscriptionPlan.isPro ? "Manage Subscription" : "Upgrade"}*/}
-          {/*</button>*/}
-
           <Button
             type='submit'
             isLoading={isLoading}
-            disabled={isLoading}
+            disabled={userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER || isLoading}
           >
-            {subscriptionPlan.isPro ? "Manage Subscription" : "Upgrade"}
+            {subscriptionPlan.isStandard ? "Manage Subscription" : "Upgrade"}
           </Button>
 
-
-          {subscriptionPlan.isPro ? (
+          {subscriptionPlan.isStandard ? (
             <p className="rounded-full text-xs font-medium">
               {subscriptionPlan.isCanceled
                 ? "Your plan will be canceled on "

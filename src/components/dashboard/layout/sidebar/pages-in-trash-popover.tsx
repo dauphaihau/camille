@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Button, Col, Icons, Row } from "core/components";
-import { useWorkspaceContext } from "components/context/WorkspaceContext";
+import { Button, Col, Icons, Row, Tooltip } from "core/components";
+import { useWorkspaceContext } from "components/context/workspace-context";
 import { Popover } from "core/components/popover";
 import { deletePage, useGetPagesDeleted } from "lib/request-by-swr/page";
 import { toast } from "core/components/Toast";
@@ -22,7 +22,7 @@ export default function PagesInTrashPopover() {
 
   const { workspace } = useWorkspaceContext();
   const router = useRouter();
-  const { isLoading, pages, mutate } = useGetPagesDeleted(state.showPopover ? workspace.id : null)
+  const { isLoading, pages, mutate } = useGetPagesDeleted(state.showPopover && workspace ? workspace.id : null)
 
   const handleDelete = async (event, pageId, type = DELETE_PAGE_TYPE.HARD_DELETE) => {
     event.preventDefault()
@@ -43,18 +43,28 @@ export default function PagesInTrashPopover() {
   }
 
   return (
-    <>
+    <div className={''}>
       <Popover
         open={state.showPopover}
         onOpenChange={(open) => setState({ ...state, showPopover: open })}
       >
-        <Popover.Trigger className='w-full'>
-          <Row align='center' gap={2} classes='hover:bg-[#ecebea] rounded px-3 py-2 cursor-pointer'>
-            <Icons.basket className='h-5 w-5 font-semibold rounded text-sm text-[#777572] flex justify-center'/>
-            <p className='text-sm font-semibold text-[#73726e] tracking-wider'>Trash</p>
-          </Row>
+        <Popover.Trigger className='w-full relative'>
+
+          <Tooltip>
+            <Tooltip.Trigger asChild>
+              <Row align='center' gap={2} classes='hover:bg-[#ecebea] rounded px-3 py-2 cursor-pointer'>
+                <Icons.basket className='h-5 w-5 font-semibold rounded text-sm text-[#777572] flex justify-center'/>
+                <p className='text-sm font-semibold text-[#73726e] tracking-wider'>Trash</p>
+              </Row>
+            </Tooltip.Trigger>
+            <Tooltip.Content side='right'>
+              Restore deleted pages.
+            </Tooltip.Content>
+          </Tooltip>
+
         </Popover.Trigger>
-        <Popover.Content side='right' className='w-[414px] ml-3 mt-32'>
+        {/*<Popover.Content side='right' className='w-[414px] ml-3 absolute z-[1000px] '>*/}
+        <Popover.Content side='right' className='w-[414px] ml-3 mt-32 z-[1000px] '>
           <div className='mb-2'>
             <Input id='search' placeholder='Filter by page title ...'/>
           </div>
@@ -74,7 +84,7 @@ export default function PagesInTrashPopover() {
                     <Icons.trash
                       className='btn-icon'
                       onClick={() => {
-                        setState({ ...state, showDeleteAlert: true, pageIdDelete : page.id });
+                        setState({ ...state, showDeleteAlert: true, pageIdDelete: page.id });
                       }}
                     />
                   </Row>
@@ -105,6 +115,6 @@ export default function PagesInTrashPopover() {
 
         </Popover.Content>
       </Popover>
-    </>
-  );
+    </div>
+  )
 }

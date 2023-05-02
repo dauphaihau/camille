@@ -74,7 +74,7 @@ type RowProps = {
 } & ComponentPropsWithoutRef<'div'>
 
 const Row = forwardRef(({
-  children, classes, gap, hideIf, justify, align, content, wrap, reverse, ...others
+  children, classes, gap = 0, hideIf, justify, align, content, wrap, reverse, ...others
 }: Partial<RowProps>, ref: any) => {
 
   if (hideIf) return null
@@ -84,10 +84,10 @@ const Row = forwardRef(({
       ref={ref}
       className={cn('flex',
         GAP_MAPS[gap],
-        JUSTIFY_MAPS[justify],
-        ALIGN_ITEM_MAPS[align],
-        ALIGN_CONTENT_MAPS[content],
-        WRAP_MAPS[wrap],
+        justify && JUSTIFY_MAPS[justify],
+        align && ALIGN_ITEM_MAPS[align],
+        content && ALIGN_CONTENT_MAPS[content],
+        wrap && WRAP_MAPS[wrap],
         { 'flex-row-reverse': reverse },
         cn(classes),
       )}

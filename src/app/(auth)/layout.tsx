@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import Link from "next/link";
 
-import { Box, Button, Row } from "core/components";
+import { Col, Row } from "core/components";
 
 interface AuthProps {
   children: ReactNode
@@ -11,7 +11,7 @@ export default function AuthLayout({
   children
 }: AuthProps) {
   return (
-    <div className='flex flex-col min-h-screen max-w-5xl mx-auto'>
+    <Col className='min-h-screen max-w-6xl mx-auto'>
       <header className='w-full bg-white'>
         <Row
           justify='between'
@@ -27,6 +27,6 @@ export default function AuthLayout({
         </Row>
       </header>
       <main>{children}</main>
-    </div>
+    </Col>
   );
 }

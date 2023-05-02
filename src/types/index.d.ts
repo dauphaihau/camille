@@ -50,7 +50,8 @@ export type DashboardConfig = {
 export type SubscriptionPlan = {
   name: string
   description: string
-  stripePriceId: string
+  stripePriceId: string | null
+  limitedNotebooks: number
 }
 
 export type WorkspaceSubscriptionPlan = SubscriptionPlan &
@@ -58,4 +59,5 @@ export type WorkspaceSubscriptionPlan = SubscriptionPlan &
   stripeCurrentPeriodEnd: number
   stripeCustomerId: string
   isPro: boolean
+  isStandard: boolean
 }

@@ -1,26 +1,27 @@
 import { redirect } from "next/navigation"
 
 import { getCurrentUser } from "lib/session"
-import { authOptions } from "lib/auth"
 import { stripe } from "lib/stripe"
-import { getWorkspaceSubscriptionPlan } from "lib/subscription"
+import { getWorkspaceSubscriptionPlan } from "lib/request/subscription"
 import { BillingForm } from "components/dashboard/billing-form"
 import { DashboardSettingsShell } from "components/dashboard/settings/shell"
 import { DashboardSettingsHeader } from "components/dashboard/settings/header"
+import { PATH } from "config/const";
 
 export default async function PlansPage({ params }) {
   const user = await getCurrentUser()
-
   if (!user) {
-    redirect(authOptions.pages.signIn)
+    redirect(PATH.LOGIN)
   }
 
   const workspaceCurrent = user.workspaces.find((item) => item.domain === params.domainWorkspace)
+  if (!workspaceCurrent) return null
   const subscriptionPlan = await getWorkspaceSubscriptionPlan(workspaceCurrent.id)
 
-  // If workspace has a pro plan, check cancel status on Stripe.
+  // If workspace has a standard plan, check cancel status on Stripe.
   let isCanceled = false
-  if (subscriptionPlan.isPro) {
+
+  if (subscriptionPlan?.isStandard && subscriptionPlan.stripeSubscriptionId) {
     const stripePlan = await stripe.subscriptions.retrieve(
       subscriptionPlan.stripeSubscriptionId
     )
@@ -54,13 +55,13 @@ export default async function PlansPage({ params }) {
                 You can test the upgrade and won&apos;t be charged.
               </strong>
             </p>
-            <p>
+            <p className=''>
               {' '} You can find a list of test card numbers on the{" "}
               <a
                 href="https://stripe.com/docs/testing#cards"
                 target="_blank"
                 rel="noreferrer"
-                className="font-medium underline underline-offset-8"
+                className="text-link"
               >
                 Stripe docs
               </a>

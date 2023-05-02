@@ -4,12 +4,13 @@ import { getCurrentUser } from "lib/session"
 import { authOptions } from "lib/auth"
 import { DashboardSettingsShell } from "components/dashboard/settings/shell"
 import { DashboardSettingsHeader } from "components/dashboard/settings/header";
+import { PATH } from "config/const";
 
 export default async function SettingsPage({ params }) {
   const user = await getCurrentUser()
 
   if (!user) {
-    redirect(authOptions.pages.signIn)
+    redirect(PATH.LOGIN)
   }
 
   console.log('dauphaihau debug: params', params)

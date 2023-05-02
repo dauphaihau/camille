@@ -1,19 +1,20 @@
 import { FaGithub } from "react-icons/fa";
 import { RxClock } from "react-icons/rx";
 import { BiLogIn } from "react-icons/bi";
-import { GiWhiteBook } from "react-icons/gi";
-import { BsThreeDotsVertical, BsPlus, BsTrash2Fill, BsThreeDots } from "react-icons/bs";
+import { GiBlackBook, GiWhiteBook } from "react-icons/gi";
+import { BsThreeDotsVertical, BsPlus, BsTrash2Fill, BsThreeDots, BsFileText } from "react-icons/bs";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { RxDoubleArrowLeft, RxDoubleArrowRight } from "react-icons/rx";
 import { HiBars4, HiStar, HiOutlineStar } from "react-icons/hi2";
-import { AiOutlineSetting, AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineSetting, AiOutlineSearch, AiOutlineGoogle } from "react-icons/ai";
 import { TiArrowBack } from "react-icons/ti";
 import { HiOutlineTrash } from "react-icons/hi";
 import { GoCheck } from "react-icons/go";
-import { IoArrowForwardSharp } from "react-icons/io5";
+import { IoArrowForwardSharp, IoClose } from "react-icons/io5";
+import { FiFile, FiFileText } from "react-icons/fi";
 
 export const Icons = {
-  // close: X,
+  close: IoClose,
   // spinner: Loader2,
   // chevronLeft: ChevronLeft,
   // chevronRight: ChevronRight,
@@ -40,6 +41,7 @@ export const Icons = {
   // twitter: Twitter,
   check: GoCheck,
   github: FaGithub,
+  google: AiOutlineGoogle,
   star: HiStar,
   starOutline: HiOutlineStar,
   threeDotVertical: BsThreeDotsVertical,
@@ -51,4 +53,7 @@ export const Icons = {
   plus: BsPlus,
   book: GiWhiteBook,
   arrowBack: TiArrowBack,
+  page: FiFile,
+  pageText: FiFileText,
+  notebook: GiBlackBook,
 }

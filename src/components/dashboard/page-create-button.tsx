@@ -3,10 +3,11 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 
-import { Button } from "core/components"
+import { Button, Loading } from "core/components"
 import { toast } from "core/components/Toast"
-import { useWorkspaceContext } from "../context/WorkspaceContext";
+import { useWorkspaceContext } from "../context/workspace-context";
 import { createPage } from "lib/request-by-swr/page";
+import useStore from "lib/store";
 
 interface PostCreateButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   notebookId: string
@@ -17,8 +18,10 @@ export function PageCreateButton({
   ...props
 }: PostCreateButtonProps) {
   const router = useRouter()
-  const { workspace } = useWorkspaceContext();
+  const { setReFetchNotebookId } = useWorkspaceContext();
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+
+  const workspace = useStore(state => state.workspace)
 
   async function onClick() {
     setIsLoading(true)
@@ -33,22 +36,28 @@ export function PageCreateButton({
     if (response.code !== '200') {
       return toast({
         title: "Something went wrong.",
-        message: "Your post was not created. Please try again.",
+        message: "Your page was not created. Please try again.",
         type: "error",
       })
     }
 
     // This forces a cache invalidation.
-    router.refresh()
+    // router.refresh()
 
-    if (response?.data?.pageId) {
-      router.push(`/${workspace.domain}/${notebookId}/${response.data.pageId}`)
+    setReFetchNotebookId?.(notebookId)
+
+    if (response?.data?.pageId && workspace) {
+      router.push(`/${workspace?.domain}/${notebookId}/${response.data.pageId}`)
     }
   }
 
   if (children) {
     return <div onClick={onClick}>
-      {children}
+      {isLoading ?
+        <div className='btn-icon hidden group-hover/notebook:flex text-[#686662] !flex justify-center items-center'>
+          <Loading/>
+        </div>
+        : children}
     </div>
 
   }

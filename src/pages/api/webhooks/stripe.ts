@@ -46,6 +46,10 @@ export default async function handler(
     // Update the workspace stripe into in our database.
     // Since this is the initial subscription, we need to update
     // the subscription id and workspace id.
+    if (!session.metadata || !session.metadata?.workspaceId) {
+      return res.status(400).send({ message: 'metadata is null ' })
+    }
+
     await db.workspace.update({
       where: {
         id: session.metadata.workspaceId,

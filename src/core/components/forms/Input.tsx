@@ -20,13 +20,14 @@ export type InputProps = {
    */
   type?: React.HTMLInputTypeAttribute;
   classes?: string
+  classesLabelLeft?: string
   labelLeft?: string
   /** Disables the input and shows defaultValue (can be set from React Hook Form) */
   readOnly?: boolean;
   /** Disable error style (not disabling error validation) */
   hideError?: boolean;
 
-  size?: 'xs' | 'sm' | 'md';
+  sizeInput?: 'xs' | 'sm' | 'md';
 
   /** Manual validation using RHF, it is encouraged to use yup resolver instead */
   validation?: RegisterOptions;
@@ -38,7 +39,7 @@ export default function Input({
   id,
   classes,
   classesLabelLeft,
-  size = 'sm',
+  sizeInput = 'sm',
   type = 'text',
   readOnly = false,
   hideError = false,
@@ -53,9 +54,9 @@ export default function Input({
   } = useFormContext();
 
   const arrSize = [
-    size === 'xs' && ['px-[14px] h-[28px] text-xs'],
-    size === 'sm' && ['px-4 h-[34px] text-sm'],
-    size === 'md' && ['px-[22px] h-[42px] text-base'],
+    sizeInput === 'xs' && ['px-[14px] h-[28px] text-xs'],
+    sizeInput === 'sm' && ['px-4 h-[34px] text-sm'],
+    sizeInput === 'md' && ['px-[22px] h-[42px] text-base'],
   ]
 
   return (
@@ -97,7 +98,7 @@ export default function Input({
           disabled:bg-red-300
           disabled:cursor-not-allowed
           disabled:hover:border-gray-300
-          disabled:bg-[#e9ecef] 
+          disabled:bg-[#e5e5e5] 
           disabled:text-[#aeb5bc]
         `,
             arrSize,

@@ -1,32 +1,38 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import { getServerSession } from "next-auth/next"
 
-import { proPlan } from "config/subscriptions"
+import { standardPlan } from "config/subscriptions"
 import { withMethods } from "lib/api-middlewares/with-methods"
-import { getWorkspaceSubscriptionPlan } from "lib/subscription"
+import { getWorkspaceSubscriptionPlan } from "lib/request/subscription"
 import { stripe } from "lib/stripe"
-import { withAuthentication } from "lib/api-middlewares/with-authentication"
 import { absoluteUrl } from "core/helpers"
 import { authOptions } from "lib/auth"
-
-const billingUrl = absoluteUrl("/")
-
-// const billingUrl = absoluteUrl("/dashboard/billing")
+import { withPermission } from "lib/api-middlewares/with-permission";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
       const session = await getServerSession(req, res, authOptions)
+      if (!session) {
+        console.log('dauphaihau debug: session is null')
+        return res.status(400)
+      }
       const user = session.user
 
-      const subscriptionPlan = await getWorkspaceSubscriptionPlan(req.query.workspaceId as string)
+      const settingsPlansUrl = absoluteUrl(`/${req.query.domainWorkspace}/settings/plans`)
 
-      // The workspace is on the pro plan.
+      const subscriptionPlan = await getWorkspaceSubscriptionPlan(req.query.workspaceId as string)
+      if (!subscriptionPlan) {
+        console.log('dauphaihau debug: subscriptionPlan is null')
+        return res.status(400)
+      }
+
+      // The workspace is on the standard plan.
       // Create a portal session to manage subscription.
-      if (subscriptionPlan.isPro) {
+      if (subscriptionPlan.isStandard) {
         const stripeSession = await stripe.billingPortal.sessions.create({
           customer: subscriptionPlan.stripeCustomerId,
-          return_url: billingUrl,
+          return_url: settingsPlansUrl,
         })
         return res.json({ url: stripeSession.url })
       }
@@ -34,15 +40,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       // The workspace is on the free plan.
       // Create a checkout session to upgrade.
       const stripeSession = await stripe.checkout.sessions.create({
-        success_url: billingUrl,
-        cancel_url: billingUrl,
+        success_url: settingsPlansUrl,
+        cancel_url: settingsPlansUrl,
         payment_method_types: ["card"],
         mode: "subscription",
         billing_address_collection: "auto",
-        customer_email: user.email,
+        customer_email: user?.email ?? undefined,
         line_items: [
           {
-            price: proPlan.stripePriceId,
+            // price: proPlan?.stripePriceId ?? undefined,
+            price: standardPlan?.stripePriceId ?? undefined,
             quantity: 1,
           },
         ],
@@ -60,4 +67,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withMethods(["GET"], withAuthentication(handler))
+export default withMethods(["GET"], withPermission(handler))

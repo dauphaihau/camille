@@ -2,14 +2,21 @@ import { SubscriptionPlan } from "types"
 
 export const freePlan: SubscriptionPlan = {
   name: "Free",
-  description: "The free plan is limited to 3 notebooks. Upgrade to the PRO plan for unlimited notebooks.",
-  // description: "The free plan is limited to 3 posts. Upgrade to the PRO plan for unlimited posts.",
+  description: "The free plan is limited to 5 notebooks & permission teams.",
   stripePriceId: null,
+  limitedNotebooks: 5,
 }
 
-export const proPlan: SubscriptionPlan = {
-  name: "PRO",
-  description: "The PRO plan has unlimited notebooks.",
-  // description: "The PRO plan has unlimited posts.",
-  stripePriceId: process.env.STRIPE_PRO_MONTHLY_PLAN_ID,
+export const standardPlan: SubscriptionPlan = {
+  stripePriceId: process.env.STRIPE_PRO_MONTHLY_PLAN_ID ?? null,
+  name: "Standard",
+  description: "The Standard plan has unlimited blocks for teams and permission feature",
+  limitedNotebooks: 0,
+}
+
+export const plusPlan: SubscriptionPlan = {
+  name: "Plus",
+  description: "The Plus plan has private teamspaces, increase page retention time",
+  stripePriceId: process.env.STRIPE_PRO_MONTHLY_PLAN_ID ?? null,
+  limitedNotebooks: 0,
 }

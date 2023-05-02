@@ -47,20 +47,11 @@ export default function HomePage() {
       />
       <div className='py-28 max-w-lg mx-auto text-center'>
         <h1 className='text-4xl mb-4 px-12'>
-          Millions run on Notion every day
+          Millions run on Camille every day
         </h1>
         <h5 className='text-xl'>
           Powering the world’s best teams, from next-generation startups to established enterprises.
         </h5>
-        <Link href={PATH.LOGIN}>
-          <Button
-            size='md'
-            classes='mt-6'
-            iconRight={<Icons.arrowRight className='h-4 w-4'/>}
-          >
-            Get start for free
-          </Button>
-        </Link>
       </div>
     </>
   );

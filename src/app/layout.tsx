@@ -7,7 +7,6 @@ import { Inter as FontSans } from "@next/font/google"
 import 'styles/globals.css'
 import { cn } from 'core/helpers';
 import { Toaster } from 'core/components/Toast';
-import { UIControllerProvider } from "components/context/UIControllerContext";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -29,11 +28,8 @@ export default function RootLayout({ children }: {
     <body className="min-h-screen">
     <HydrationProvider>
       <Client>
-        <UIControllerProvider>
-          {children}
-          {/*abc*/}
-          <Toaster position="bottom-right"/>
-        </UIControllerProvider>
+        {children}
+        <Toaster position="bottom-right"/>
       </Client>
     </HydrationProvider>
     </body>

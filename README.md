@@ -17,9 +17,12 @@ A note-taking web application where you can think, write, and plan
 The app is being under maintenance, as more work needs to be done.
 
 Current functionality includes:
-- Sign in, Sign out, Email Verification
+- Sign in, Sign out, Email Verification, OAuth via GitHub, google
 - CURD workspace, notebook, page
-- Soft delete, undo delete page
+- Soft delete, undo delete, page
+- Add to favorite, duplicate, copy link page
+- Add, remove, change role member in workspace
+- Quick open and search all pages by dialog 
 - Upgrade plan for workspace
 - Redirecting user to previous workspace, notebook, page after login
 - Subscribe plan with Stripe (Testing Mode)
@@ -30,10 +33,7 @@ and feel free to share your opinion, constructive criticism, or comments about m
 
 ## Future Updates
 - Improve overall UX/UI and fix bugs
-- Add members into workspace
-- Search Notebooks, pages
-- Nested pages in notebooks
-
+- Nested page in page
 
 And More ! There's always room for improvement!
 

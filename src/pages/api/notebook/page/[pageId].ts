@@ -16,6 +16,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).end()
   }
 
+  // get detail page
   if (req.method === 'GET') {
     try {
       const page = await db.page.findFirst({
@@ -29,6 +30,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
+  // update delete status page
   if (req.method === 'DELETE') {
     try {
       // const { type } = JSON.parse(req.body)
@@ -41,7 +43,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               id: req.query.pageId as string,
             },
             data: {
-              deletedBy: session.user.email,
+              deletedBy: session.user.id,
               deletedAt: new Date()
             }
           })
@@ -66,12 +68,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
 
       return res.send({ code: '200', message: 'Delete success' })
+
       // return res.status(204).end()
     } catch (error) {
       return res.status(500).end()
     }
   }
 
+  // update title, content page
   if (req.method === 'PATCH') {
     try {
       const pageId = req.query.pageId as string
@@ -86,6 +90,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       // TODO: Implement sanitization for content.
 
+      if (!page) return
+
       await db.page.update({
         where: {
           id: page.id,
@@ -93,8 +99,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         data: {
           title: body.title || page.title,
           content: body.content,
-          // updatedBy: session.user.id
-          updatedBy: session.user.email
+          updatedBy: session.user.id
         },
       })
 
