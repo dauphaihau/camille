@@ -19,7 +19,7 @@ The app is being under maintenance, as more work needs to be done.
 Current functionality includes:
 - Sign in, Sign out, Email Verification, OAuth via GitHub, Google
 - CURD workspace, teamspace, notebook, page
-- Soft delete, undo delete, page
+- Soft delete, undo delete, hard delete page
 - Add to favorite, duplicate, share to web, copy link page
 - Add, remove, change role member in workspace
 - Quick open and search all pages by dialog 
