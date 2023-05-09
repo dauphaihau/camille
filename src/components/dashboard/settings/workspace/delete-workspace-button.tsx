@@ -36,16 +36,13 @@ export default function DeleteWorkspaceButton({ workspaceId }) {
       setIsLoading(false)
       if (response.status === '409') {
         return toast({
-          title: "Domain exists",
-          message: "Create workspace failed. Please try again.",
+          message: "Domain exists",
           type: "error",
         })
       }
 
       return toast({
-        title: "Something went wrong.",
         message: "Delete workspace failed. Please try again.",
-
         type: "error",
       })
     }
@@ -63,7 +60,7 @@ export default function DeleteWorkspaceButton({ workspaceId }) {
     <>
       <LoadingDialog message={`Deleting workspace...`} open={isLoading}/>
       <Dialog open={open} onOpenChange={setOpen}>
-        <Dialog.Trigger>
+        <Dialog.Trigger asChild>
           <Button
             disabled={userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER}
             color='red'

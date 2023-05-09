@@ -3,17 +3,17 @@
 import { useState } from "react";
 
 import { cn } from "core/helpers";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import NewTeamspaceDialog from "components/dialog/new-teamspace-dialog";
 import { Box, Row, Tooltip } from "core/components";
 import TeamspaceItemSidebar from "./teamspace-item-sidebar";
 import * as React from "react";
+import useStore from "lib/store";
 
 export default function TeamspaceListSidebar() {
   const [showTeamspaces, setShowTeamspaces] = useState(true)
-  const { workspace } = useWorkspaceContext();
+  const workspace = useStore(state => state.workspace)
 
-  if (!workspace || workspace.teamspaces.length === 0) {
+  if (!workspace || !workspace.teamspaces || workspace.teamspaces.length === 0) {
     return null
   }
 
@@ -33,17 +33,16 @@ export default function TeamspaceListSidebar() {
             <div className='text-[#82817f]'>Teamspaces you have joined.</div>
           </Tooltip.Content>
         </Tooltip>
+
         <NewTeamspaceDialog/>
       </Row>
       {
         showTeamspaces &&
         <div className='px-1'>
           {
-            workspace && workspace.teamspaces?.length ?
-              workspace.teamspaces.map((teamspace) => (
-                <TeamspaceItemSidebar key={teamspace.id} teamspace={teamspace}/>
-              ))
-              : null
+            workspace.teamspaces.map((teamspace) => (
+              <TeamspaceItemSidebar key={teamspace.id} teamspace={teamspace}/>
+            ))
           }
         </div>
       }

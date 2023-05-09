@@ -6,7 +6,6 @@ import { withMethods } from 'lib/api-middlewares/with-methods'
 import { db } from 'lib/db'
 import { pagePatchSchema } from 'lib/validations/page'
 import { authOptions } from 'lib/auth';
-import { DELETE_PAGE_TYPE } from "config/const";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
 
@@ -25,51 +24,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
       return res.json(page)
-    } catch (error) {
-      return res.status(500).end()
-    }
-  }
-
-  // update delete status page
-  if (req.method === 'DELETE') {
-    try {
-      // const { type } = JSON.parse(req.body)
-      const { type } = req.body
-
-      switch (type) {
-        case DELETE_PAGE_TYPE.SOFT_DELETE:
-          await db.page.update({
-            where: {
-              id: req.query.pageId as string,
-            },
-            data: {
-              deletedBy: session.user.id,
-              deletedAt: new Date()
-            }
-          })
-          break
-        case DELETE_PAGE_TYPE.HARD_DELETE:
-          await db.page.delete({
-            where: {
-              id: req.query.pageId as string,
-            },
-          })
-          break
-        case DELETE_PAGE_TYPE.RECOVER:
-          await db.page.update({
-            where: {
-              id: req.query.pageId as string,
-            },
-            data: {
-              deletedBy: null,
-              deletedAt: null
-            }
-          })
-      }
-
-      return res.send({ code: '200', message: 'Delete success' })
-
-      // return res.status(204).end()
     } catch (error) {
       return res.status(500).end()
     }
@@ -115,4 +69,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withMethods(['GET', 'DELETE', 'PATCH'], handler)
+export default withMethods(['GET', 'PATCH'], handler)

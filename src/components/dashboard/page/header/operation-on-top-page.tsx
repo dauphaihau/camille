@@ -12,18 +12,28 @@ import FavoriteButton from "./favorite-button";
 import ShareButton from "./share-button";
 import ViewAllUpdatesButton from "./view-all-updates-button";
 import useStore from "lib/store";
+import { useCallback, useState } from "react";
+import { useKeyboardShortcut } from "core/hooks";
 
 dayjs.extend(relativeTime)
 
 export default function OperationOnTopPage({ page }) {
   const { pagesFavorite } = useWorkspaceContext()
+  const [triggerShortcutShare, setTriggerShortcutShare] = useState(false)
 
   const showSidebar = useStore(state => state.showSidebar)
   const setShowSidebar = useStore(state => state.setShowSidebar)
+  const shortcutOverrideSystem = useStore(state => state.shortcutOverrideSystem)
 
   const pathName = usePathname()
   const pageId = pathName && pathName.split('/')[3]
   const isFavorite = pagesFavorite?.some(p => p.id === pageId)
+
+  const shortcutSidebar = ['Meta', 's'];
+  const handleShortcutSidebar = useCallback(() => {
+    setTriggerShortcutShare(!triggerShortcutShare)
+  }, [triggerShortcutShare])
+  useKeyboardShortcut(shortcutSidebar, handleShortcutSidebar, { overrideSystem: shortcutOverrideSystem })
 
   return (
     <div className="sticky top-0 z-40 bg-white px-4">
@@ -45,7 +55,7 @@ export default function OperationOnTopPage({ page }) {
           <div className={'text-[14px] text-[#9b9a97] font-medium'}>
             Edited {dayjs(page.updatedAt).fromNow()}
           </div>
-          <ShareButton/>
+          <ShareButton page={page} triggerShortcutShare={triggerShortcutShare}/>
           <FavoriteButton page={page}/>
           <ViewAllUpdatesButton/>
           <div className='btn-icon-header'>

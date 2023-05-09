@@ -2,18 +2,20 @@
 
 import useSWR from "swr";
 
+
 import { fetcher } from "core/helpers";
 import { DELETE_PAGE_TYPE } from "config/const";
 
 export function useGetNotebooksInTeamspace(teamspaceId) {
-  console.log('dauphaihau debug: teamspace-id', teamspaceId)
   const fetcher = (input, init) => fetch(input, init).then(res => res.json())
   const {
     data,
     error,
     mutate
   } = useSWR(teamspaceId ? `/api/teamspace/${teamspaceId}` : null, fetcher, {
-    revalidateOnFocus: false
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
   return {
     // pageList: data?.pages,

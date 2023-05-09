@@ -6,10 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { Box, Col, Icons, Row, Tooltip } from "core/components";
 import NotebooksPrivate from "./notebook-list-sidebar";
-import { cn, wordInString } from "core/helpers";
+import { wordInString } from "core/helpers";
 import WorkspaceUserDropdown from "./workspace-user-dropdown";
 import PagesInTrashPopover from "./pages-in-trash-popover";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { PATH } from "config/const";
 import PagesFavoriteListSidebar from "./pages-favorite-list-sidebar";
 import SearchAllDialog from "../../../dialog/search-all-dialog";
@@ -19,37 +18,24 @@ import NewNotebookDialog from "../../../dialog/new-notebook-dialog";
 import CalcLimitNotebooks from "./calc-limit-notebooks";
 import SettingsSidebar from "./settings-sidebar";
 import useStore from "lib/store";
-import { shallow } from 'zustand/shallow'
 
 export default function SidebarDashboard() {
   const [urlBeforeNavigateSettingPage, setUrlBeforeNavigateSettingPage] = useState<string>('')
   const [scrollTop, setScrollTop] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
-  // const {  showSidebar } = useWorkspaceContext()
+  const shortcutOverrideSystem = useStore(state => state.shortcutOverrideSystem)
 
   const showSidebar = useStore(state => state.showSidebar)
   const workspace = useStore(state => state.workspace)
 
-  // const { showSidebar, workspace } = useStore(state => ({
-  //     showSidebar: state.showSidebar,
-  //     workspace: state.workspace,
-  //   }), shallow
-  // )
-
-  // const { workspace, showSidebar } = useWorkspaceContext()
-
-  // if (Object.keys(workspace).length === 0) {
-  //   return null
-  // }
-
   const isSettingPage = wordInString(pathname, 'settings')
 
-  const shortcutSettings = ['Meta', 's']
+  const shortcutSettings = ['Meta', '.']
   const handleShortcutSettings = useCallback(() => {
     router.push(workspace?.domain ? `/${workspace.domain}/settings/workspace` : PATH.HOME)
   }, [router.push])
-  useKeyboardShortcut(shortcutSettings, handleShortcutSettings, { overrideSystem: true })
+  useKeyboardShortcut(shortcutSettings, handleShortcutSettings, { overrideSystem: shortcutOverrideSystem })
 
   // or skeleton
   if (!showSidebar) {
@@ -57,10 +43,10 @@ export default function SidebarDashboard() {
   }
 
   return (
-    // <aside className="group min-w-[240px] max-w-[240px] flex-col md:flex bg-[#fafafa] h-screen overflow-hidden">
     <aside className="group w-[240px] flex-col  flex-grow-0 flex-shrink-0 md:flex bg-[#fafafa] h-screen overflow-hidden">
       {
-        isSettingPage ? <SettingsSidebar urlBeforeNavigateSettingPage={urlBeforeNavigateSettingPage}/> :
+        isSettingPage ?
+          <SettingsSidebar urlBeforeNavigateSettingPage={urlBeforeNavigateSettingPage}/> :
           <>
             <WorkspaceUserDropdown/>
 
@@ -70,7 +56,7 @@ export default function SidebarDashboard() {
                 <Tooltip.Trigger asChild>
                   <Link
                     prefetch={true}
-                    href={workspace?.domain ? `/${workspace.domain}/settings/workspace` : PATH.HOME}
+                    href={`/${workspace.domain}/settings/workspace`}
                     onClick={() => pathname ? setUrlBeforeNavigateSettingPage(pathname) : setUrlBeforeNavigateSettingPage(PATH.HOME)}
                   >
                     <Row align='center' gap={2} classes='hover:bg-[#ecebea] rounded px-3 py-2 cursor-pointer'>
@@ -81,7 +67,7 @@ export default function SidebarDashboard() {
                 </Tooltip.Trigger>
                 <Tooltip.Content side='right'>
                   <div>Quickly jump to settings</div>
-                  <div className='text-[#82817f]'>⌘ + S</div>
+                  <div className='text-[#82817f]'>⌘ + .</div>
                 </Tooltip.Content>
               </Tooltip>
               <PagesInTrashPopover/>

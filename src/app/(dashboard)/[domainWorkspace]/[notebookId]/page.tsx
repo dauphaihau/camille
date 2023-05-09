@@ -7,7 +7,6 @@ import { DashboardShell } from "components/dashboard/shell";
 import { PageItem } from "components/dashboard/page/page-item";
 import { getDetailNotebook } from "lib/request/notebook";
 import { PATH } from "config/const";
-import { Loading } from "core/components";
 
 interface NotebookPageProps {
   params: {notebookId: string}
@@ -34,7 +33,6 @@ export default async function NotebookPage({ params }: NotebookPageProps) {
           notebook && notebook.pages?.length ?
             notebook.pages.map((page) => (
                 <PageItem key={page.id} page={page}/>
-                // <PageItem notebookId={params.notebookId} key={page.id} page={page}/>
               )
             )
             : null

@@ -18,7 +18,7 @@ export function PageCreateButton({
   ...props
 }: PostCreateButtonProps) {
   const router = useRouter()
-  const { setReFetchNotebookId } = useWorkspaceContext();
+  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   const workspace = useStore(state => state.workspace)

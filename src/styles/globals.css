@@ -59,12 +59,6 @@
     @apply font-medium underline hover:text-[#d95a4b] cursor-pointer;
   }
 
-  .codex-editor {
-    z-index: -1 !important;
-  }
-
-  /*.ce-block__content, .ce-toolbar__content { max-width:calc(100% - 80px) !important; } .cdx-block { max-width: 100% !important; }*/
-
   .loading-spinner {
     -webkit-animation: rotate 1000ms linear infinite;
     animation: rotate 1000ms linear infinite;

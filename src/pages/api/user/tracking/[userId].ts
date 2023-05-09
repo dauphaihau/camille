@@ -6,16 +6,11 @@ import { db } from "lib/db"
 import { withMethods } from "lib/api-middlewares/with-methods"
 import { RequiresStandardPlanError } from "lib/exceptions"
 import { authOptions } from "lib/auth"
-import { pagePatchSchema } from "../../../../lib/validations/page";
 
 const workspacePathSchema = z.object({
   lastAccessWorkspaceId: z.string().optional(),
   lastAccessNotebookId: z.string().optional(),
   lastAccessPageId: z.string().optional(),
-})
-
-const getTrackingUserAccessSchema = z.object({
-  workspaceId: z.string().optional(),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -27,20 +22,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (req.method === "POST") {
     try {
-      // const notebooks = await db.notebook.findMany({
-      //   select: {
-      //     id: true,
-      //     title: true,
-      //     published: true,
-      //     createdAt: true,
-      //   },
-      //   where: {
-      //     authorId: user.id,
-      //   },
-      // })
-
-      // const body = getTrackingUserAccessSchema.parse(req.body)
-
       const body = JSON.parse(req.body)
 
       // const data = await db.trackingUserAccessOnWorkspace.findFirstOrThrow({
@@ -68,157 +49,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const userId = req.query.userId as string
 
       await db.user.update({
-        where: {
-          id: userId
-        },
-        data: {
-          lastAccessWorkspaceId: body.lastAccessWorkspaceId,
-        }
+        where: { id: userId },
+        data: { lastAccessWorkspaceId: body.lastAccessWorkspaceId, }
       })
 
-      // const isTrackingUserAccessExist = await db.trackingUserAccess.findFirst({
       const isTrackingUserAccessExist = await db.trackingUserAccessOnWorkspace.findFirst({
         where: {
           AND: [
             { userId },
             { workspaceId: body.lastAccessWorkspaceId },
-            // { lastAccessWorkspaceId: body.lastAccessWorkspaceId },
           ]
         }
       })
 
       if (isTrackingUserAccessExist) {
-        // console.log('dauphaihau debug: case update')
-        // await db.trackingUserAccess.update({
         await db.trackingUserAccessOnWorkspace.update({
-          where: {
-            id: isTrackingUserAccessExist.id
-          },
+          where: { id: isTrackingUserAccessExist.id },
           data: {
-            // lastAccessWorkspaceId: body.lastAccessWorkspaceId,
             lastAccessNotebookId: body.lastAccessNotebookId,
             lastAccessPageId: body.lastAccessPageId ?? '',
           }
         })
       } else {
-        // console.log('dauphaihau debug: case create')
-        // await db.user.upsert({
-        //   where: {
-        //     id: userId,
-        //   },
-        //   update: {
-        //     trackingUserAccess: {
-        //       create: {
-        //         // userId,
-        //         // lastAccessWorkspaceId: body.lastAccessWorkspaceId,
-        //         // lastAccessNotebookId: body.lastAccessNotebookId,
-        //         // lastAccessPageId: body.lastAccessPageId ?? '',
-        //         lastAccessWorkspaceId: 'cler7yd1w0004m3ngmtf5ry3a',
-        //         lastAccessNotebookId: 'clesaota90035m3rjv2jfox0i',
-        //         lastAccessPageId: body.lastAccessPageId ?? '',
-        //       }
-        //     }
-        //   },
-        //   create: {
-        //     trackingUserAccess: {
-        //       create: {
-        //         // userId,
-        //         // lastAccessWorkspaceId: body.lastAccessWorkspaceId,
-        //         // lastAccessNotebookId: body.lastAccessNotebookId,
-        //         // lastAccessPageId: body.lastAccessPageId ?? '',
-        //         lastAccessWorkspaceId: 'cler7yd1w0004m3ngmtf5ry3a',
-        //         lastAccessNotebookId: 'clesaota90035m3rjv2jfox0i',
-        //         lastAccessPageId: body.lastAccessPageId ?? '',
-        //       }
-        //     }
-        //   }
-        //   // data: {
-        //   //   trackingUserAccess: {
-        //   //     create: {
-        //   //
-        //   //       // userId,
-        //   //       // lastAccessWorkspaceId: body.lastAccessWorkspaceId,
-        //   //       // lastAccessNotebookId: body.lastAccessNotebookId,
-        //   //       // lastAccessPageId: body.lastAccessPageId ?? '',
-        //   //       lastAccessWorkspaceId: 'cler7yd1w0004m3ngmtf5ry3a',
-        //   //       lastAccessNotebookId: 'clesaota90035m3rjv2jfox0i',
-        //   //       lastAccessPageId: body.lastAccessPageId ?? '',
-        //   //     }
-        //   //   }
-        //   // }
-        // })
-
-        // await db.trackingUserAccess.create({
         await db.trackingUserAccessOnWorkspace.create({
           data: {
             user: {
-              connect: {
-                id: userId
-              }
+              connect: { id: userId }
             },
             workspace: {
-              connect: {
-                id: body.lastAccessWorkspaceId
-              }
+              connect: { id: body.lastAccessWorkspaceId }
             },
             lastAccessNotebookId: body.lastAccessNotebookId,
             lastAccessPageId: body.lastAccessPageId ?? '',
           }
         })
-
-        // await db.user.update({
-        //   where: {
-        //     id: userId
-        //   },
-        //   data: {
-        //     trackingUserAccess: {
-        //       connectOrCreate: {
-        //         where: {
-        //           // id: '1k2k',
-        //           lastAccessWorkspaceId: body.lastAccessWorkspaceId
-        //           // userId_lastAccessWorkspaceId: {
-        //           //   userId,
-        //           //   lastAccessWorkspaceId: body.lastAccessWorkspaceId
-        //           // }
-        //         },
-        //         create: {
-        //           // id: 'akcank2',
-        //           lastAccessWorkspaceId: body.lastAccessWorkspaceId,
-        //           lastAccessNotebookId: body.lastAccessNotebookId,
-        //           lastAccessPageId: body.lastAccessPageId ?? '',
-        //         }
-        //       }
-        //     }
-        //   }
-        // })
-
-        // await db.trackingUserAccess.upsert({
-        //   where: {
-        //     id: isExist.id
-        //     // userId: {
-        //     //   equals: userId
-        //     // },
-        //     // lastAccessWorkspaceId: {
-        //     //   equals: body.lastAccessWorkspaceId
-        //     // },
-        //     // lastAccessWorkspaceId: body.lastAccessWorkspaceId,
-        //     // userId
-        //     // userId,
-        //   },
-        //   update: {
-        //     lastAccessWorkspaceId: body.lastAccessWorkspaceId,
-        //     lastAccessNotebookId: body.lastAccessNotebookId,
-        //     lastAccessPageId: body.lastAccessPageId ?? '',
-        //     // lastAccessPageId: body.lastAccessPageId,
-        //   },
-        //   create: {
-        //     userId,
-        //     lastAccessWorkspaceId: body.lastAccessWorkspaceId,
-        //     lastAccessNotebookId: body.lastAccessNotebookId,
-        //     lastAccessPageId: body.lastAccessPageId,
-        //   },
-        // })
-
       }
       return res.end()
     } catch (error) {
@@ -234,7 +98,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).end()
     }
   }
-
 }
 
 export default withMethods(["PATCH", "POST"], handler)

@@ -7,13 +7,11 @@ import { DashboardSettingsHeader } from "components/dashboard/settings/header";
 import { PATH } from "config/const";
 
 export default async function SettingsPage({ params }) {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    redirect(PATH.LOGIN)
-  }
-
-  console.log('dauphaihau debug: params', params)
+  // const user = await getCurrentUser()
+  //
+  // if (!user) {
+  //   redirect(PATH.LOGIN)
+  // }
 
   redirect(`/${params.domainWorkspace}/settings/workspace`)
 

@@ -7,6 +7,7 @@ import { Inter as FontSans } from "@next/font/google"
 import 'styles/globals.css'
 import { cn } from 'core/helpers';
 import { Toaster } from 'core/components/Toast';
+import Help from "components/dashboard/layout/Help";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: {
       <Client>
         {children}
         <Toaster position="bottom-right"/>
+        <Help/>
       </Client>
     </HydrationProvider>
     </body>

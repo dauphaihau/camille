@@ -70,9 +70,6 @@ model User {
   // lastAccessWorkspaceId String?   @map("last_access_workspace_id")
   // lastAccessWorkspace   Workspace? @relation("trackUserAccessWorkspace", fields: [lastAccessWorkspaceId], references: [id])
 
-  // pagesUserUpdated Page? @relation("updatedByUser")
-  // pagesUserDeleted Page? @relation("deletedByUser")
-
   @@index([lastAccessWorkspaceId])
   @@map("users")
 }
@@ -151,7 +148,7 @@ model Teamspace {
   notebooks       Notebook[]
 
   @@index([workspaceId])
-  @@map("teamspace")
+  @@map("teamspaces")
 }
 
 model Notebook {
@@ -179,23 +176,23 @@ model Notebook {
 }
 
 model Page {
-  id        String    @id @default(cuid())
-  title     String
-  content   Json?
-  published Boolean   @default(false)
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  id         String    @id @default(cuid())
+  title      String
+  content    Json?
+  shareToWeb Boolean   @default(false)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
 
-  notebookId String
-  notebook   Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  notebookId    String
+  notebook      Notebook   @relation(fields: [notebookId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   createdBy     String
-  createdByUser User    @relation("PageCreatedBy", fields: [createdBy], references: [id])
+  createdByUser User       @relation("PageCreatedBy", fields: [createdBy], references: [id])
   deletedBy     String?
-  deletedByUser User?   @relation("PageDeletedBy", fields: [deletedBy], references: [id])
+  deletedByUser User?      @relation("PageDeletedBy", fields: [deletedBy], references: [id])
   updatedBy     String
-  updatedByUser User    @relation("PageUpdatedBy", fields: [updatedBy], references: [id])
-  favorites Favorite[]
+  updatedByUser User       @relation("PageUpdatedBy", fields: [updatedBy], references: [id])
+  favorites     Favorite[]
 
   @@index([notebookId])
   @@index([deletedBy])

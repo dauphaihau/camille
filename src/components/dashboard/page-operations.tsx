@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { useCallback, useReducer } from "react"
 import { useRouter, useSelectedLayoutSegments } from "next/navigation"
-import { Page, Favorite } from "@prisma/client"
+import { Page, Favorite, User } from "@prisma/client"
 import hotToast from "react-hot-toast";
 
 import { InputWithoutRhf, Popover, Col, Icons, Tooltip, DropdownMenu } from "core/components"
@@ -14,10 +14,14 @@ import { cn, debounce, formatDate, getValueOfLastBracketInString } from "core/he
 import { DELETE_PAGE_TYPE, PATH } from "config/const";
 import { updatePage } from "lib/request-by-swr/page";
 import { pagePatchSchema } from "lib/validations/page";
+import useStore from "../../lib/store";
 
 interface PageOperationsProps {
   page: Pick<Page, "id" | "title" | "content" | "updatedAt" | "updatedBy" | "notebookId"> & {
-    favorites: Favorite[]
+    favorites?: Favorite[]
+    createdByUser: {
+      email: string
+    }
   }
   placeOnSidebar?: boolean
   favorite?: boolean
@@ -41,7 +45,9 @@ export function PageOperations({
 }: PageOperationsProps) {
   const router = useRouter()
   const segment = useSelectedLayoutSegments()
-  const { setPage, workspace, setReFetchNotebookId } = useWorkspaceContext();
+  // const { setPage, workspace, setReFetchNotebookId } = useWorkspaceContext();
+  const { setPage, workspace } = useWorkspaceContext();
+  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
   const [event, setEvent] = useReducer((prev, next) => ({
     ...prev, ...next
   }), initialState)
@@ -218,10 +224,15 @@ export function PageOperations({
           <Tooltip>
             <Tooltip.Trigger asChild>
               <div>
-                <Icons.ellipsisHorizontal size={12} className={'btn-icon text-[#686662]'}/>
+                <Icons.ellipsisHorizontal
+                  size={12} className={cn('btn-icon text-[#686662]',
+
+                  !placeOnSidebar && 'hover:bg-[#efefef]'
+                )}
+                />
               </div>
             </Tooltip.Trigger>
-            <Tooltip.Content>
+            <Tooltip.Content className={!placeOnSidebar ? 'mt-2 mr-4' : ''}>
               Delete, duplicate, and more...
             </Tooltip.Content>
           </Tooltip>
@@ -249,7 +260,7 @@ export function PageOperations({
             <DropdownMenu.Item className='hover:bg-white'>
               <Col>
                 <p className='text-xs text-[#9b9a98] mb-2'>Last edited
-                  by {page.updatedBy && page.updatedBy.split('@')[0]}</p>
+                  by {page?.createdByUser?.email && page?.createdByUser?.email.split('@')[0]}</p>
                 <p className='text-xs text-[#9b9a98]'>{formatDate(page.updatedAt)}</p>
               </Col>
             </DropdownMenu.Item>

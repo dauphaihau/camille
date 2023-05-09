@@ -7,6 +7,7 @@ import { useWorkspaceContext } from "components/context/workspace-context";
 import { addToFavorite } from "lib/request-by-swr/page";
 import { toast } from "core/components/Toast";
 import { useKeyboardShortcut } from "core/hooks";
+import useStore from "lib/store";
 
 export default function FavoriteButton({ page }) {
   const { workspace, pagesFavorite, setReFetchNotebookId } = useWorkspaceContext()
@@ -14,6 +15,7 @@ export default function FavoriteButton({ page }) {
   const router = useRouter()
   const pageId = pathName && pathName.split('/')[3]
   const isFavorite = pagesFavorite?.some(p => p.id === pageId)
+  const shortcutOverrideSystem = useStore(state => state.shortcutOverrideSystem)
 
   async function handleAddToFavorite() {
     if (!workspace) return null
@@ -31,14 +33,14 @@ export default function FavoriteButton({ page }) {
     }
 
     setReFetchNotebookId?.(page.notebookId)
-    return router.refresh();
+    router.refresh();
   }
 
   const shortcutPinPage = ['Meta', 'P'];
   const handleShortcutPinPage = useCallback(() => {
     handleAddToFavorite()
   }, [handleAddToFavorite])
-  useKeyboardShortcut(shortcutPinPage, handleShortcutPinPage, { overrideSystem: true })
+  useKeyboardShortcut(shortcutPinPage, handleShortcutPinPage, { overrideSystem: shortcutOverrideSystem })
 
   return (
     <Tooltip>

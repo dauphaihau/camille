@@ -1,13 +1,16 @@
 'use client'
 import { useRouter } from "next/navigation";
 import { Box, Button, Row, Text } from "core/components";
+import Link from "next/link";
 
 export default function NotFound() {
   const router = useRouter()
   return (
-    <Box classes='mt-8 mx-auto px-6'>
-      <Row justify='start' classes='h-[80px]'>
-        <Text size={16} weight='semibold'>Camille</Text>
+    <Box classes='mx-auto px-6'>
+      <Row justify='start' align={'center'} classes='h-[80px]'>
+        <Link href={'/'} className={'text-base font-semibold'}>
+          Camille
+        </Link>
       </Row>
 
       <Box classes='max-w-md mx-auto mt-[15rem] space-y-4 h-full'>

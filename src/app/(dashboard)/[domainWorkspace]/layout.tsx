@@ -2,12 +2,14 @@ import React from "react";
 import { notFound, redirect } from "next/navigation";
 
 import { getInfoUserOnWorkspace } from "lib/request/user";
-import { getListWorkspaceByUser, getDetailWorkspace, getWorkspaceUserAreAvailable } from "lib/request/workspace";
+import { getDetailWorkspace } from "lib/request/workspace";
 import { getFavoritePages } from "lib/request/page";
 import { WorkspaceProvider } from "components/context/workspace-context";
 import { getCurrentUser } from "lib/session";
-import { PATH } from "config/const";
 import PermissionAccessWorkspace from "components/dashboard/permission-access-workspace";
+import PageShareToWeb from "components/share-page/page-share-to-web";
+import { db } from "lib/db";
+import { PATH } from "../../../config/const";
 
 interface DashboardLayoutProps {
   children?: React.ReactNode
@@ -19,28 +21,21 @@ interface DashboardLayoutProps {
 // export const revalidate = false
 
 export default async function DashboardLayout({
-  children, params,
+  children, params
 }: DashboardLayoutProps) {
   const user = await getCurrentUser()
 
   if (!user) {
+    if (params && params.domainWorkspace.includes('.camille.site')) {
+      return <PageShareToWeb/>
+    }
     // return notFound()
     redirect(PATH.HOME)
-    // redirect(PATH.LOGIN)
   }
 
-  console.log('dauphaihau debug: user at layout', user)
-
-  const workspaces = await getListWorkspaceByUser(user.id)
-
   const workspace = await getDetailWorkspace(params?.domainWorkspace ?? '', user.id)
-  // const workspace = await getDetailWorkspace(params?.domainWorkspace ?? '', undefined, user.id)
 
   if (!workspace) {
-    // const res = await getWorkspaceUserAreAvailable(user.id)
-    // if (res.workspace) {
-    //   return redirect(`/${res.workspace.domain}`)
-    // }
     return notFound()
   }
 
@@ -58,13 +53,11 @@ export default async function DashboardLayout({
 
   return (
     <WorkspaceProvider
-      workspace={workspace}
-      workspaces={workspaces}
-      pagesFavorite={pages}
-
       user={user}
+      workspace={workspace}
       userOnWorkspace={userOnWorkspace}
       notebooks={workspace?.notebooks}
+      pagesFavorite={pages}
     >
       {children}
     </WorkspaceProvider>

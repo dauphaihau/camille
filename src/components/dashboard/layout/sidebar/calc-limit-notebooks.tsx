@@ -22,7 +22,7 @@ export default function CalcLimitNotebooks() {
             className={cn('font-normal text-[#757470] text-[12px]',
               { 'text-[#c5564e] font-medium': workspace.totalNotebooks * (100 / freePlan.limitedNotebooks) >= 80 }
             )}
-          >This workspace has
+          >This workspace has {' '}
             {/*used {workspace.totalNotebooks} of its {freePlan.limitedNotebooks} block*/}
             used {workspace.totalNotebooks} of its {freePlan.limitedNotebooks} notebook
             storage limit ({totalNotebooksPercent >= 100 ? 100 : totalNotebooksPercent}%).

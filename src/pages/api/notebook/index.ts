@@ -7,8 +7,8 @@ import { withMethods } from "lib/api-middlewares/with-methods"
 import { getWorkspaceSubscriptionPlan } from "lib/request/subscription"
 import { RequiresStandardPlanError } from "lib/exceptions"
 import { authOptions } from "lib/auth"
-import { pagePatchSchema } from "lib/validations/page"
 import { freePlan } from "../../../config/subscriptions";
+import { withPlan } from "../../../lib/api-middlewares/with-plan";
 
 const notebookCreateSchema = z.object({
   workspaceId: z.string(),
@@ -23,32 +23,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).end()
   }
 
-  // if (req.method === "GET") {
-  //   try {
-  //     const notebooks = await db.notebook.findMany({
-  //       select: {
-  //         id: true,
-  //         title: true,
-  //         published: true,
-  //         createdAt: true,
-  //       },
-  //       where: {
-  //         authorId: user.id,
-  //       },
-  //     })
-  //
-  //     return res.json(notebooks)
-  //   } catch (error) {
-  //     return res.status(500).end()
-  //   }
-  // }
-
   // create notebook
   if (req.method === "POST") {
     try {
       const body = notebookCreateSchema.parse(req.body)
-      const subscriptionPlan = await getWorkspaceSubscriptionPlan(body.workspaceId)
 
+      const subscriptionPlan = await getWorkspaceSubscriptionPlan(body.workspaceId)
       if (!subscriptionPlan?.isStandard) {
         const totalMembers = await db.userOnWorkspace.count({
           where: { workspaceId: body.workspaceId }
@@ -92,4 +72,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withMethods(["GET", "POST"], handler)
+export default withMethods(["POST"], withPlan(handler))
+// export default withMethods(["POST"], handler)

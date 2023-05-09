@@ -13,17 +13,19 @@ import { cn, debounce, formatDate } from "core/helpers";
 import { useSearchPage } from "lib/request-by-swr/page";
 import Loading from "core/components/Loading";
 import { useKeyboardShortcut } from "core/hooks";
+import useStore from "../../lib/store";
 
 export default function SearchAllDialog() {
   const [searchValue, setSearchValue] = useState<string>('');
   const [open, setOpen] = useState(false);
   const { workspace } = useWorkspaceContext();
+  const shortcutOverrideSystem = useStore(state => state.shortcutOverrideSystem)
 
   const arrKeys = ['Meta', 'f']
   const handleKeyboardShortcut = useCallback(keys => {
     setOpen(prevState => !prevState)
   }, [setOpen])
-  useKeyboardShortcut(arrKeys, handleKeyboardShortcut, { overrideSystem: true })
+  useKeyboardShortcut(arrKeys, handleKeyboardShortcut, { overrideSystem: shortcutOverrideSystem })
 
   const debounceSearch = useCallback(
     debounce((value) => {

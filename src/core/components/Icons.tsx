@@ -10,7 +10,7 @@ import { AiOutlineSetting, AiOutlineSearch, AiOutlineGoogle } from "react-icons/
 import { TiArrowBack } from "react-icons/ti";
 import { HiOutlineTrash } from "react-icons/hi";
 import { GoCheck } from "react-icons/go";
-import { IoArrowForwardSharp, IoClose } from "react-icons/io5";
+import { IoArrowForwardSharp, IoClose, IoEarth } from "react-icons/io5";
 import { FiFile, FiFileText } from "react-icons/fi";
 
 export const Icons = {
@@ -56,4 +56,5 @@ export const Icons = {
   page: FiFile,
   pageText: FiFileText,
   notebook: GiBlackBook,
+  earth: IoEarth,
 }

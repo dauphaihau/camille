@@ -1,16 +1,16 @@
 import { Notebook, Teamspace } from "@prisma/client"
-import Link from "next/link"
 import { usePathname } from 'next/navigation';
 import * as React from "react";
 import { useState } from "react";
 
-import { Box, Icons } from "core/components";
+import { Box, Icons, Loading, Row } from "core/components";
 import { cn } from "core/helpers";
 import { useWorkspaceContext } from "components/context/workspace-context";
 import { useGetNotebooksInTeamspace } from "../../../../lib/request-by-swr/teamspace";
 import NotebookItemSidebar from "./notebook-item-sidebar";
 import { TeamspaceOperations } from "../../teamspace/teamspace-operations";
 import { NotebookCreateButton } from "./notebook-create-button";
+import NewNotebookDialog from "components/dialog/new-notebook-dialog";
 
 interface TeamspaceItemProps {
   teamspace: Pick<Teamspace, "id" | "name" |"isOrigin">
@@ -51,9 +51,7 @@ export default function TeamspaceItemSidebar({ teamspace }: TeamspaceItemProps) 
 
         <div className='flex gap-1'>
           <TeamspaceOperations teamspace={teamspace}/>
-          <NotebookCreateButton teamspaceId={teamspace.id}>
-            <Icons.plus size={15} className='btn-icon hidden group-hover/teamspace:block text-[#686662]'/>
-          </NotebookCreateButton>
+          <NewNotebookDialog mutateNotebooks={mutate} teamspaceId={teamspace.id}/>
         </div>
 
       </div>
@@ -61,14 +59,18 @@ export default function TeamspaceItemSidebar({ teamspace }: TeamspaceItemProps) 
         showNotebooks &&
         <div className='px-1'>
           {
-            !isLoading && notebooks.length > 0 ?
+            isLoading ?
+              <Row justify={'center'} classes={'mt-2'}>
+                <Loading/>
+              </Row> :
+              notebooks.length > 0 ?
               notebooks.map((notebook) => (
                 <NotebookItemSidebar
                   classes={'group-hover/notebook:pr-[4px]'}
                   key={notebook.id} notebook={notebook}
                 />
               ))
-              : <p className='font-semibold text-[14px] text-[#999895] pl-8'>No notebook inside</p>
+              : <p className='font-semibold text-[14px] text-[#999895] pl-8'>No teamspaces inside</p>
           }
         </div>
       }

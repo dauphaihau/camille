@@ -25,7 +25,7 @@ export default function PermissionAccessWorkspace({ workspace, user }) {
         <div className='border-t border-[#e9e9e8] mx-auto max-w-xs'/>
         <div className={'text-[#8d8c89] font-medium text-center text-xs mt-3 '}>
           <div>
-            You're currently logged in as {' '}
+            You&apos;re currently logged in as {' '}
             <span className='text-black'>
             {user.email}
               </span>
@@ -35,7 +35,7 @@ export default function PermissionAccessWorkspace({ workspace, user }) {
             onClick={() => router.back()}
             className={'text-link font-medium'}
           >log in</span> {' '}
-            with a different email, or contact the page's owner to request access to this page.
+            with a different email, or contact the page&apos;s owner to request access to this page.
           </div>
         </div>
       </div>

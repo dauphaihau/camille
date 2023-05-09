@@ -4,17 +4,8 @@ import { getServerSession } from 'next-auth/next'
 
 import { db } from 'lib/db'
 import { withMethods } from 'lib/api-middlewares/with-methods'
-import { getWorkspaceSubscriptionPlan } from 'lib/request/subscription'
 import { authOptions } from 'lib/auth'
-import { withNotebook } from "lib/api-middlewares/with-notebook";
-import { pagePatchSchema } from "../../../lib/validations/page";
-
-const notebookCreateSchema = z.object({
-  workspaceId: z.string(),
-  // domain: z.string(),
-  title: z.string(),
-  description: z.string().optional(),
-})
+import { pagePatchSchema } from "lib/validations/page";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions)
@@ -23,6 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).end()
   }
 
+  // get detail notebook + pages
   if (req.method === 'GET') {
     try {
       const { notebookId } = req.query
@@ -44,8 +36,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               title: true,
               updatedAt: true,
               updatedBy: true,
+              deletedAt: true,
               notebookId: true,
               content: true,
+              createdByUser: {
+                select: {
+                  email: true
+                }
+              },
               favorites: {
                 where: {
                   userId: session.user.id
@@ -58,7 +56,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               createdAt: 'desc',
             },
           },
-          published: true,
+          // published: true,
           createdAt: true,
         },
         orderBy: {
@@ -71,46 +69,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).end()
     }
   }
-
-  // if (req.method === 'POST') {
-  //   try {
-  //     const body = notebookCreateSchema.parse(req.body)
-  //     const subscriptionPlan = await getWorkspaceSubscriptionPlan(body.workspaceId)
-  //
-  //     // if (!subscriptionPlan?.isPro) {
-  //     //   const count = await db.notebook.count({
-  //     //     where: { workspaceId: body.workspaceId }
-  //     //   })
-  //     //
-  //     //   if (count >= 3) {
-  //     //     throw new RequiresProPlanError()
-  //     //   }
-  //     // }
-  //
-  //     const notebook = await db.notebook.create({
-  //       data: {
-  //         workspaceId: body.workspaceId,
-  //         title: body.title,
-  //         description: body.description as string,
-  //       },
-  //       select: {
-  //         id: true,
-  //       },
-  //     })
-  //
-  //     return res.json(notebook)
-  //   } catch (error) {
-  //     if (error instanceof z.ZodError) {
-  //       return res.status(422).json(error.issues)
-  //     }
-  //
-  //     if (error instanceof RequiresProPlanError) {
-  //       return res.status(402).end()
-  //     }
-  //
-  //     return res.status(500).end()
-  //   }
-  // }
 
   if (req.method === 'DELETE') {
     try {
@@ -148,8 +106,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         data: {
           title: body.title || page.title,
           content: body.content,
-          // updatedBy: session.user.id
-          updatedBy: session.user.email
+          updatedBy: session.user.id
         },
       })
 
@@ -165,5 +122,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withMethods(['DELETE', 'GET', 'POST', 'PATCH'], handler)
-// export default withMethods(['DELETE', 'GET', 'POST', 'PATCH'], withNotebook(handler))
+export default withMethods(['DELETE', 'GET', 'PATCH'], handler)

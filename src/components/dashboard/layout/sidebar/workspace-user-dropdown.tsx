@@ -5,31 +5,31 @@ import Link from "next/link";
 import React, { useReducer } from "react";
 import { useRouter } from "next/navigation";
 
-import { DropdownMenu, Icons, Row, Tooltip } from "core/components";
+import { DropdownMenu, Icons, Row, Skeleton, Tooltip } from "core/components";
 import { useWorkspaceContext } from "components/context/workspace-context";
 import { BASE_URL, PATH } from "config/const";
 import { cn } from "core/helpers";
 import LoadingDialog from "components/dialog/loading-dialog";
 import { toast } from "core/components/Toast";
-import useStore from "../../../../lib/store";
+import useStore from "lib/store";
+import { useGetWorkspacesByUser } from "lib/request-by-swr/workspace";
+import LoadingFullPage from "app/loading";
 
 const initialState: {[k: string]: boolean | string} = {
   isDropdownOpen: false,
   loadingDialog: false,
+  loadingFullPage: false,
   nameWorkspace: '',
 }
 
 export default function WorkspaceUserDropdown() {
   const router = useRouter();
-  const { workspaces, user, workspace } = useWorkspaceContext();
-  // const { setShowSidebar, workspaces, user, workspace } = useWorkspaceContext();
-
+  const { user, workspace } = useWorkspaceContext();
   const setShowSidebar = useStore(state => state.setShowSidebar)
-  // const showSidebar = useStore(state => state.showSidebar)
-
   const [event, setEvent] = useReducer((prev, next) => ({
     ...prev, ...next
   }), initialState)
+  const { isLoading, workspaces } = useGetWorkspacesByUser(event.isDropdownOpen)
 
   const changeWorkspace = async ({ id: workspaceId, domain }) => {
     if (!user) return
@@ -63,24 +63,28 @@ export default function WorkspaceUserDropdown() {
     router.push(`/${domain}`)
   }
 
-  // console.log('dauphaihau debug: show-sidebar', showSidebar)
+  // if (event.loadingFullPage) {
+  //   return (
+  //     <LoadingFullPage />
+  //   )
+  // }
 
   return (
     <>
       <LoadingDialog message={`Redirect to ${event.nameWorkspace}...`} open={event.loadingDialog}/>
+      <LoadingDialog message={`Logout...`} open={event.loadingFullPage}/>
+
       <DropdownMenu onOpenChange={(open) => setEvent({ isDropdownOpen: open })}>
-        {/*<DropdownMenu onOpenChange={(open) => setIsDropdownOpen(open)}>*/}
         <div className='relative w-full'>
           <DropdownMenu.Trigger className="mb-2 relative w-full">
             <Row
               align='center' justify='between'
-              // classes='hover:bg-[#ecebea] py-3 px-4 rounded-sm max-h-[45px] cursor-pointer'
-              classes={cn('hover:bg-[#ecebea] py-3 px-4 rounded-sm max-h-[45px] cursor-pointer relative',
+              classes={cn('group/iconWorkspace hover:bg-[#ecebea]  py-3 px-4 rounded-sm max-h-[45px] cursor-pointer relative',
                 { 'bg-[#ecebea]': event.isDropdownOpen }
               )}
             >
               <Row align='center' gap={3}>
-                <div className='avatar bg-[#ecebea] group-hover:bg-[#dcdbda] h-5 w-5 rounded text-sm text-[#777572] flex justify-center'>
+                <div className='avatar bg-[#ecebea] group-hover/iconWorkspace:bg-[#dcdbd9] h-5 w-5 rounded text-sm text-[#777572] flex justify-center'>
                   {workspace && workspace.name.charAt(0)}
                 </div>
                 <div className='flex flex-col'>
@@ -119,31 +123,60 @@ export default function WorkspaceUserDropdown() {
         </div>
 
         <DropdownMenu.Portal>
-          <DropdownMenu.Content className="mt-2 md:w-[240px] ml-4" align="end">
-            <div className='text-xs text-[#81807c] ml-2 my-2'>
-              {user?.email}
-            </div>
-            {/*<DropdownMenu.Item className='hover:bg-none'>*/}
-            {/*  <div className='text-xs text-[#81807c]'>*/}
-            {/*    {user?.email}*/}
-            {/*  </div>*/}
-            {/*</DropdownMenu.Item>*/}
-            {
-              workspaces && workspaces.length > 0 && workspaces.map((ws, index) => (
-                <DropdownMenu.Item className='flex justify-between cursor-pointer' key={index}>
-                  <p
-                    className="w-full"
+          <DropdownMenu.Content className="mt-2 md:w-[240px] max-h-[70vh] ml-4 flex flex-col " align="end">
+            <div
+              className={'min-h-0 flex-grow'}
+              style={{ overflow: 'hidden auto' }}
+            >
+              <div className='text-xs text-[#81807c] font-medium ml-2 my-2 text-ellipsis overflow-hidden'>
+                {user?.email}
+              </div>
+              {
+                isLoading ?
+                  <div className="p-4">
+                    <div className="space-y-3">
+                      <Skeleton className="h-5 w-full"/>
+                      <Skeleton className="h-5 w-full"/>
+                      <Skeleton className="h-5 w-full"/>
+                      <Skeleton className="h-5 w-full"/>
+                      <Skeleton className="h-5 w-full"/>
+                    </div>
+                  </div>
+                  : workspaces.length > 0 && workspaces.map((ws, index) => (
+                  <DropdownMenu.Item
                     onClick={async () => {
                       changeWorkspace(ws)
                       setEvent({ nameWorkspace: ws.name })
                       router.refresh()
                       await getSession()
                     }}
-                  >{ws.name}</p>
-                  {workspace && ws.domain === workspace.domain && <Icons.check className='text-lg'/>}
-                </DropdownMenu.Item>
-              ))
-            }
+                    className='flex justify-between cursor-pointer' key={index}
+                  >
+                    <div>
+                      <div
+                        className="w-full text-[14px] text-ellipsis overflow-hidden font-medium"
+                      >{ws.name}</div>
+
+                      <div
+                        className="w-full text-[#848380] text-[12px] text-ellipsis overflow-hidden"
+                      >{ws.isStandard ? 'Standard Plan' : 'Free Plan'} · {ws.totalMembers} members
+                      </div>
+                    </div>
+                    {/*<p*/}
+                    {/*  className="w-full"*/}
+                    {/*  onClick={async () => {*/}
+                    {/*    changeWorkspace(ws)*/}
+                    {/*    setEvent({ nameWorkspace: ws.name })*/}
+                    {/*    router.refresh()*/}
+                    {/*    await getSession()*/}
+                    {/*  }}*/}
+                    {/*>{ws.name}</p>*/}
+                    {workspace && ws.domain === workspace.domain && <Icons.check className='text-lg'/>}
+                  </DropdownMenu.Item>
+                ))
+              }
+            </div>
+
             <DropdownMenu.Separator/>
 
             <DropdownMenu.Item>
@@ -179,9 +212,11 @@ export default function WorkspaceUserDropdown() {
             <DropdownMenu.Item
               className="cursor-pointer"
               onSelect={(event) => {
+                // setEvent({ loadingDialog: true })
+                setEvent({ loadingFullPage: true })
                 event.preventDefault()
                 signOut({
-                  callbackUrl: `${window.location.origin}/login`,
+                  callbackUrl: `${window.location.origin}/`,
                 })
               }}
             >

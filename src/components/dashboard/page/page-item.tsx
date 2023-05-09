@@ -1,6 +1,6 @@
 'use client'
 
-import { Notebook, Page } from "@prisma/client"
+import { Favorite, Page } from "@prisma/client"
 import Link from "next/link"
 
 import { Skeleton } from "core/components/skeleton"
@@ -8,9 +8,15 @@ import { useWorkspaceContext } from "components/context/workspace-context";
 import { PageOperations } from "../page-operations"
 import { PATH } from "config/const";
 import { Row } from "core/components";
+import Title from "../Title";
 
 interface PageItemProps {
-  page: Pick<Page, "id" | "title" | "content" | "updatedAt" | "updatedBy" | "notebookId">
+  page: Pick<Page, "id" | "title" | "content" | "updatedAt" | "updatedBy" | "notebookId"> & {
+    favorites?: Favorite[]
+    createdByUser: {
+      email: string
+    }
+  }
 }
 
 export function PageItem({ page }: PageItemProps) {
@@ -19,17 +25,16 @@ export function PageItem({ page }: PageItemProps) {
   return (
     <Row align='center' justify='between'>
       <div className="grid gap-1">
-        <Link
-          href={workspace?.domain ? `/${workspace.domain}/${page.notebookId}/${page.id}` : PATH.HOME}
-          className="font-semibold hover:underline"
-        >
-          {pageContext?.id === page.id ? pageContext.title : page.title}
+        <Link href={workspace?.domain ? `/${workspace.domain}/${page.notebookId}/${page.id}` : PATH.HOME}>
+          <Title maxW={400} className={'font-semibold hover:underline'} classesText={' text-base'}>
+            {pageContext?.id === page.id ? pageContext.title : page.title}
+          </Title>
         </Link>
       </div>
 
-      <div className='flex'>
+      <Row>
         <PageOperations page={page}/>
-      </div>
+      </Row>
     </Row>
   )
 }

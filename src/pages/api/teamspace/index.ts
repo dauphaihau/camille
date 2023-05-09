@@ -4,10 +4,8 @@ import { getServerSession } from "next-auth/next"
 
 import { db } from "lib/db"
 import { withMethods } from "lib/api-middlewares/with-methods"
-import { getWorkspaceSubscriptionPlan } from "lib/request/subscription"
 import { RequiresStandardPlanError } from "lib/exceptions"
 import { authOptions } from "lib/auth"
-import { pagePatchSchema } from "lib/validations/page"
 
 const teamspaceCreateSchema = z.object({
   workspaceId: z.string(),

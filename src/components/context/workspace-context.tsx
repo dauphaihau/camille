@@ -11,19 +11,9 @@ import { useKeyboardShortcut } from "core/hooks";
 import Link from "next/link";
 import useStore from "lib/store";
 import { shallow } from "zustand/shallow";
+import Help from "components/dashboard/layout/Help";
 
 export interface WorkspaceState {
-  // event: {
-  //   page: Page,
-  //   setPage: (page) => void,
-  //   showSidebar: boolean,
-  //   setShowSidebar: (showSidebar) => void,
-  //   reFetchNotebookId: string,
-  //   setReFetchNotebookId: (notebookId) => void,
-  //   pageEditing: Page,
-  //   notebookEditing: Notebook
-  // }
-  // setEvent: (val) => void,
   page?: Partial<Page>,
   setPage: (page) => void,
   showSidebar: boolean,
@@ -31,8 +21,6 @@ export interface WorkspaceState {
   reFetchNotebookId: string,
   setReFetchNotebookId: (notebookId) => void,
   setShowLimitedNotebookBar: (notebookId) => void,
-  // pageEditing: Page,
-  // notebookEditing: Notebook
   stateRouter: object
 }
 
@@ -48,7 +36,6 @@ export interface WorkspaceProps {
     totalNotebooks: number
   },
   user: Partial<User>,
-  // usersOnWorkspace: UserOnWorkspace[]
   userOnWorkspace: {
     user: User
   } & UserOnWorkspace
@@ -58,23 +45,12 @@ export interface WorkspaceProps {
 type IWorkspace = WorkspaceProps & WorkspaceState
 
 const initialState = {
-  // event: {
-  //   workspaces: [],
-  //   notebooks: [],
-  //   workspace: undefined,
-  //   user: undefined,
-  //   showSidebar: true,
-  //   pageEditing: {},
-  //   notebookEditing: {}
-  // },
   workspaces: [],
   notebooks: [],
   workspace: undefined,
   user: undefined,
   userOnWorkspace: undefined,
   showSidebar: true,
-  // pageEditing: {},
-  // notebookEditing: {},
   stateRouter: {},
 };
 
@@ -84,7 +60,7 @@ export function useWorkspaceContext() {
   return useContext(WorkspaceContext);
 }
 
-export const WorkspaceProvider = ({ children, ...res }: Partial<WorkspaceProps>) => {
+export const WorkspaceProvider = ({ children, ...props }: Partial<WorkspaceProps>) => {
   const segments = useSelectedLayoutSegments();
   const router = useRouter();
 
@@ -99,32 +75,16 @@ export const WorkspaceProvider = ({ children, ...res }: Partial<WorkspaceProps>)
     setShowSidebar,
     showLimitedNotebookBar,
     setShowLimitedNotebookBar,
-  } = useStore(({
-      // showSidebar,
-      // setShowSidebar,
-      // showLimitedNotebookBar,
-      // setShowLimitedNotebookBar, setWorkspace, setUserOnWorkspace
-    ...res
-    }) => ({
-      // showSidebar,
-      // setShowSidebar,
-      // showLimitedNotebookBar,
-      // setShowLimitedNotebookBar,
-      // setWorkspace,
-      // setUserOnWorkspace
-    ...res
-    }),
-    shallow
-  )
+  } = useStore(({ ...props }) => ({ ...props }), shallow)
 
   const [page, setPage] = useState()
   const [reFetchNotebookId, setReFetchNotebookId] = useState('')
 
   useEffect(() => {
-    if (res?.workspace) setWorkspace(res.workspace)
-    if (res?.userOnWorkspace) setUserOnWorkspace(res.userOnWorkspace)
-  // }, [])
-  }, [res.workspace, res.userOnWorkspace])
+    if (props?.workspace) setWorkspace(props.workspace)
+    if (props?.userOnWorkspace) setUserOnWorkspace(props.userOnWorkspace)
+    // }, [])
+  }, [props.workspace, props.userOnWorkspace])
 
   const divReference = useRef(null);
 
@@ -139,7 +99,7 @@ export const WorkspaceProvider = ({ children, ...res }: Partial<WorkspaceProps>)
   const isSettingPage = segments.includes('settings')
 
   const paramsUpdateTracking = {
-    lastAccessWorkspaceId: res?.workspace && res.workspace.id,
+    lastAccessWorkspaceId: props?.workspace && props.workspace.id,
     lastAccessNotebookId: notebookId ?? '',
     lastAccessPageId: pageId ?? '',
   }
@@ -152,13 +112,13 @@ export const WorkspaceProvider = ({ children, ...res }: Partial<WorkspaceProps>)
       }
 
       (async () => {
-          if (!res?.user) return
+          if (!props?.user) return
           await fetcher(
-            `/api/user/tracking/${res.user.id}`,
+            `/api/user/tracking/${props.user.id}`,
             paramsUpdateTracking,
             'PATCH'
           )
-          router.refresh()
+          // router.refresh()
         }
       )()
     }
@@ -176,7 +136,7 @@ export const WorkspaceProvider = ({ children, ...res }: Partial<WorkspaceProps>)
   // }, [])
 
   const providerValues = {
-    ...res,
+    ...props,
     setPage, page,
     reFetchNotebookId,
     setReFetchNotebookId,
@@ -192,7 +152,7 @@ export const WorkspaceProvider = ({ children, ...res }: Partial<WorkspaceProps>)
           <div>You are over the notebook limit for the free plan</div>
           {/*<div>You are over the block limit for the free plan</div>*/}
           <Link
-            href={`/${res?.workspace?.domain}/settings/plans`}
+            href={`/${props?.workspace?.domain}/settings/plans`}
             className='border border-white text-white px-2.5 rounded-sm hover:bg-[#cd5e59] cursor-pointer'
           >
             Upgrade for unlimited
@@ -202,6 +162,7 @@ export const WorkspaceProvider = ({ children, ...res }: Partial<WorkspaceProps>)
     }
     return null
   }
+
 
   return (
     <WorkspaceContext.Provider value={providerValues}>

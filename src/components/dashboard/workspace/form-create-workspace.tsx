@@ -12,6 +12,7 @@ import { workspaceSchema } from "lib/validations/workspace";
 import { useEffect, useReducer, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingDialog from "../../dialog/loading-dialog";
+import { PATH } from "../../../config/const";
 
 type FormData = z.infer<typeof workspaceSchema>
 
@@ -54,6 +55,13 @@ export default function FormCreateWorkspace() {
 
   async function onSubmit(values) {
     setEvent({ isLoading: true })
+
+    // validate domain
+    if (values.domain && PATH[values.domain.toUpperCase()]) {
+      methods.setError('domain', { type: 'custom', message: 'Not allowed' })
+      setEvent({ isLoading: false })
+      return
+    }
 
     const response = await fetch('/api/settings/workspace', {
       method: 'POST',

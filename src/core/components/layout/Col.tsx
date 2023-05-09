@@ -62,15 +62,15 @@ type ColType = {
 } & ComponentPropsWithoutRef<'div'>
 
 const Col = ({
-  children, classes, gap, justify, align, content, wrap, reverse, self, ...others
+  children, classes, gap = 0, justify, align, content, wrap, reverse, self, ...others
 }: Partial<ColType>) => {
   return (
     <div
       className={cn('flex flex-col',
         GAP_MAPS[gap],
-        JUSTIFY_MAPS[justify],
-        ALIGN_ITEM_MAPS[align],
-        ALIGN_SELF_MAPS[self],
+        justify && JUSTIFY_MAPS[justify],
+        align && ALIGN_ITEM_MAPS[align],
+        self && ALIGN_SELF_MAPS[self],
         reverse && 'flex-col-reverse',
         cn(classes)
       )}

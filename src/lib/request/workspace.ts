@@ -78,52 +78,52 @@ export const getDetailWorkspace = cache(async (
   )))
 })
 
-export const getListWorkspaceByUser = cache(async (userId: User["id"]) => {
-  const res = await db.workspace.findMany({
-    where: {
-      userOnWorkspace: {
-        some: {
-          user: {
-            id: userId
-          }
-        },
-      }
-    },
-    // select: {
-    //   id: true,
-    //   name: true,
-    //   domain: true,
-    // }
-  })
-
-  // const res = await db.workspace.findMany({
-  //   where: {
-  //     // domain: domainWorkspace,
-  //     // id: workspaceId,
-  //     users: {
-  //       some: {
-  //         id: userId
-  //       }
-  //     }
-  //   },
-  //
-  //   // select: {
-  //   //   id: true,
-  //   //   name: true,
-  //   //   domain: true,
-  //   //   notebooks: true
-  //   //   // pages: true,
-  //   //   // published: true,
-  //   //   // createdAt: true,
-  //   // },
-  //   // orderBy: {
-  //   //   updatedAt: "desc",
-  //   // },
-  //   //
-  // })
-
-  return JSON.parse(JSON.stringify(res))
-})
+// export const getListWorkspaceByUser = cache(async (userId: User["id"]) => {
+//   const res = await db.workspace.findMany({
+//     where: {
+//       userOnWorkspace: {
+//         some: {
+//           user: {
+//             id: userId
+//           }
+//         },
+//       }
+//     },
+//     // select: {
+//     //   id: true,
+//     //   name: true,
+//     //   domain: true,
+//     // }
+//   })
+//
+//   // const res = await db.workspace.findMany({
+//   //   where: {
+//   //     // domain: domainWorkspace,
+//   //     // id: workspaceId,
+//   //     users: {
+//   //       some: {
+//   //         id: userId
+//   //       }
+//   //     }
+//   //   },
+//   //
+//   //   // select: {
+//   //   //   id: true,
+//   //   //   name: true,
+//   //   //   domain: true,
+//   //   //   notebooks: true
+//   //   //   // pages: true,
+//   //   //   // published: true,
+//   //   //   // createdAt: true,
+//   //   // },
+//   //   // orderBy: {
+//   //   //   updatedAt: "desc",
+//   //   // },
+//   //   //
+//   // })
+//
+//   return JSON.parse(JSON.stringify(res))
+// })
 
 export async function getWorkspaceUserAreAvailable(userId: User["id"]) {
   const res = await db.userOnWorkspace.findFirst({

@@ -4,7 +4,7 @@ export default function LoadingFullPage() {
   return (
     <>
       <div className='grid place-items-center h-screen'>
-        <Loading/>
+        <Loading className={'h-6 w-6'}/>
 
         {/*<svg*/}
         {/*  role="status"*/}

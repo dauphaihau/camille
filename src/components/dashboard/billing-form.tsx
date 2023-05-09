@@ -12,20 +12,19 @@ import { ROLE_USER_ON_WORKSPACE } from "config/const";
 import useStore from "lib/store";
 
 interface BillingFormProps extends React.HTMLAttributes<HTMLFormElement> {
-  workspace: Workspace,
   subscriptionPlan: WorkspaceSubscriptionPlan & {
     isCanceled: boolean
   }
 }
 
 export function BillingForm({
-  workspace,
   subscriptionPlan,
   className,
   ...props
 }: BillingFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const userOnWorkspace = useStore(state => state.userOnWorkspace)
+  const workspace = useStore(state => state.workspace)
   if (!userOnWorkspace) return null
 
   async function onSubmit(event) {
@@ -33,26 +32,27 @@ export function BillingForm({
     setIsLoading(!isLoading)
 
     // Get a Stripe session URL.
-    const response = await fetch("http://localhost:3000/api/settings/workspace/stripe?" + new URLSearchParams({
-      workspaceId: workspace.id,
-      domainWorkspace: workspace.domain,
-    }))
-    // const response = await fetch("/api/users/stripe")
+    if (workspace?.id && workspace?.domain) {
+      const response = await fetch("http://localhost:3000/api/settings/workspace/stripe?" + new URLSearchParams({
+        workspaceId: workspace.id,
+        domainWorkspace: workspace.domain,
+      }))
 
-    if (!response?.ok) {
-      return toast({
-        title: "Something went wrong.",
-        message: "Please refresh the page and try again.",
-        type: "error",
-      })
-    }
+      if (!response?.ok) {
+        return toast({
+          title: "Something went wrong.",
+          message: "Please refresh the page and try again.",
+          type: "error",
+        })
+      }
 
-    // Redirect to the Stripe session.
-    // This could be a checkout page for initial upgrade.
-    // Or portal to manage existing subscription.
-    const session = await response.json()
-    if (session) {
-      window.location.href = session.url
+      // Redirect to the Stripe session.
+      // This could be a checkout page for initial upgrade.
+      // Or portal to manage existing subscription.
+      const session = await response.json()
+      if (session) {
+        window.location.href = session.url
+      }
     }
   }
 
@@ -85,7 +85,7 @@ export function BillingForm({
               {subscriptionPlan.isCanceled
                 ? "Your plan will be canceled on "
                 : "Your plan renews on "}
-              {formatDate(subscriptionPlan.stripeCurrentPeriodEnd)}.
+              {formatDate(subscriptionPlan?.stripeCurrentPeriodEnd)}.
             </p>
           ) : null}
         </Card.Footer>

@@ -13,8 +13,7 @@ import { cn } from "core/helpers"
 import { Button, Col, Icons, Input } from "core/components"
 import { toast } from "core/components/Toast"
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
-}
+interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 type FormData = z.infer<typeof userAuthSchema>
 

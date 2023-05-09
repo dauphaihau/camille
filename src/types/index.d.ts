@@ -56,8 +56,8 @@ export type SubscriptionPlan = {
 
 export type WorkspaceSubscriptionPlan = SubscriptionPlan &
   Pick<Workspace, "stripeWorkspaceId" | "stripeSubscriptionId"> & {
+  // stripeCurrentPeriodEnd: number | undefined
   stripeCurrentPeriodEnd: number
   stripeCustomerId: string
-  isPro: boolean
   isStandard: boolean
 }

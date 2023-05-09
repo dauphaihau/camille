@@ -4,8 +4,7 @@ import { usePathname } from 'next/navigation';
 import * as React from "react";
 import { useState } from "react";
 
-import { Skeleton } from "core/components/skeleton"
-import { Icons, Loading, Row, Tooltip } from "core/components";
+import { Skeleton, Icons, Row, Tooltip, Loading } from "core/components";
 import { useGetPages } from "lib/request-by-swr/page";
 import { PageItem } from "./page-item-sidebar";
 import { cn } from "core/helpers";
@@ -13,6 +12,7 @@ import { useWorkspaceContext } from "components/context/workspace-context";
 import { PageCreateButton } from "../../page-create-button";
 import { NotebookOperations } from "../../notebook-operations";
 import { PATH } from "config/const";
+import useStore from "lib/store";
 
 interface NotebookItemProps {
   notebook: Pick<Notebook, "id" | "title">
@@ -22,13 +22,17 @@ interface NotebookItemProps {
 export default function NotebookItemSidebar({ notebook, classes }: NotebookItemProps) {
   const [showPages, setShowPages] = useState(false)
   const pathName = usePathname()
-  const { workspace, reFetchNotebookId, setReFetchNotebookId } = useWorkspaceContext()
+  // const { workspace, reFetchNotebookId, setReFetchNotebookId } = useWorkspaceContext()
   const { isLoading, pages, mutate } = useGetPages(showPages ? notebook.id : null)
+  const workspace = useStore(state => state.workspace)
+  const reFetchNotebookId = useStore(state => state.reFetchNotebookId)
+  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
   const arrPath = pathName && pathName.split('/')
 
   if (reFetchNotebookId && reFetchNotebookId === notebook.id) {
     mutate?.()
     setReFetchNotebookId?.('')
+    // setReFetchNotebookId?.('')
   }
 
   return (
@@ -61,8 +65,9 @@ export default function NotebookItemSidebar({ notebook, classes }: NotebookItemP
               </Tooltip.Content>
             </Tooltip>
           </Row>
+
           <Link
-            href={workspace?.domain ? `/${workspace.domain}/${notebook.id}` : PATH.HOME}
+            href={`/${workspace.domain}/${notebook.id}`}
             className={cn("font-semibold text-[14px] text-[#73726e] flex-auto min-w-0",
               'truncate overflow-hidden',
               { ['text-[#373530]']: arrPath && arrPath[2] === notebook.id && arrPath.length === 3 }
@@ -95,10 +100,13 @@ export default function NotebookItemSidebar({ notebook, classes }: NotebookItemP
         showPages &&
         <div>
           {
-            !isLoading && pages.length > 0 ? pages.map((page) => (
-                <PageItem key={page.id} page={page} notebook={notebook}/>
-              ))
-              : <p className='font-semibold text-[14px] text-[#999895] pl-8'>No page inside</p>
+            isLoading ?
+              <Row justify={'center'} classes={'mt-2'}>
+                <Loading/>
+              </Row>
+              :
+              pages.length > 0 ? pages.map((page) => (<PageItem key={page.id} page={page} notebook={notebook}/>)) :
+                <p className='font-semibold h-7 text-[14px] text-[#999895] pl-8'>No page inside</p>
           }
         </div>
       }

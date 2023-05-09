@@ -24,7 +24,12 @@ export async function getPage(pageId: Page["id"], userId: User["id"]) {
       // authorId: userId,
     },
     include: {
-      notebook: true
+      notebook: true,
+      createdByUser: {
+        select: {
+          email: true
+        }
+      }
     }
     // select: {
     //   favorites: [{}]

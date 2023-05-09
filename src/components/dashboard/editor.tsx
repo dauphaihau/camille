@@ -5,7 +5,6 @@ import EditorJS, { API } from "@editorjs/editorjs"
 import { Notebook, Page } from "@prisma/client"
 import TextareaAutosize from "react-textarea-autosize"
 import { useCallback, useEffect, useRef, useState } from "react"
-// import BreakLine from 'editorjs-break-line';
 import * as z from "zod"
 
 import { pagePatchSchema } from "lib/validations/page"
@@ -13,19 +12,23 @@ import { toast } from "core/components/Toast"
 import { debounce } from "core/helpers";
 import { useWorkspaceContext } from "components/context/workspace-context";
 import { updatePage } from "lib/request-by-swr/page";
-import useStore from "../../lib/store";
+import useStore from "lib/store";
 
 interface EditorProps {
-  page: Pick<Page, "id" | "title" | "content" | "published" | 'notebookId'> & {notebook: Notebook}
+  page: Pick<Page, "id" | "title" | "content" | "shareToWeb" | 'notebookId'> & {notebook: Notebook}
 }
 
 type FormData = z.infer<typeof pagePatchSchema>
 
+const EDITOR_HOLDER_ID = 'editor'
+
 export function Editor({ page }: EditorProps) {
-  const ref = useRef<EditorJS>()
+  const editorInstance = useRef<EditorJS>()
+  const [focused, setFocused] = React.useState(false)
   const [isMounted, setIsMounted] = useState<boolean>(false)
   const { setPage, page: pageContext, setReFetchNotebookId } = useWorkspaceContext()
   const setStatePageBreadcrumb = useStore(state => state.setStatePageBreadcrumb)
+  const setShortcutOverrideSystem = useStore(state => state.setShortcutOverrideSystem)
 
   async function initializeEditor() {
     const EditorJS = (await import("@editorjs/editorjs")).default
@@ -39,15 +42,15 @@ export function Editor({ page }: EditorProps) {
 
     const body = pagePatchSchema.parse(page)
 
-    if (!ref.current) {
+    if (!editorInstance.current) {
       const editor = new EditorJS({
-        holder: "editor",
+        holder: EDITOR_HOLDER_ID,
         onReady() {
-          ref.current = editor
+          editorInstance.current = editor
         },
         onChange: async (api: API, event: CustomEvent) => {
-          if (ref.current) {
-            const blocks = await ref.current.save()
+          if (editorInstance.current) {
+            const blocks = await editorInstance.current.save()
             await handleUpdatePage(page.id, { content: blocks })
           }
         },
@@ -86,12 +89,37 @@ export function Editor({ page }: EditorProps) {
       initializeEditor()
 
       return () => {
-        ref.current?.destroy()
-        ref.current = undefined
-        // ref.current = null
+        editorInstance.current?.destroy()
+        editorInstance.current = undefined
+        // editorInstance.current = null
       }
     }
   }, [isMounted])
+
+  useEffect(() => {
+    if (!editorInstance.current) return
+
+    const editorElement = document.getElementById(EDITOR_HOLDER_ID)
+
+    const onFocusIn = () => {
+      setShortcutOverrideSystem(false)
+      setFocused(true)
+    }
+    const onFocusOut = () => {
+      setShortcutOverrideSystem(true)
+      setFocused(false)
+    }
+
+    if (editorElement) {
+      editorElement.addEventListener("focusin", onFocusIn)
+      editorElement.addEventListener("focusout", onFocusOut)
+
+      return () => {
+        editorElement.removeEventListener("focusin", onFocusIn)
+        editorElement.removeEventListener("focusout", onFocusOut)
+      }
+    }
+  }, [editorInstance.current])
 
   async function handleUpdatePage(id, values: FormData) {
     const response = await updatePage(id, values)
@@ -99,7 +127,7 @@ export function Editor({ page }: EditorProps) {
     if (response.code !== '200') {
       return toast({
         title: "Something went wrong.",
-        message: "Your page was not saved. Please try again.",
+        message: "Your page has not been updated. Please try again.",
         type: "error",
       })
     }
@@ -120,7 +148,7 @@ export function Editor({ page }: EditorProps) {
   return (
     <div className="grid w-full gap-10">
       <div className="prose prose-stone mx-auto w-[800px] pb-[30vh]">
-        <div className={'h-[200px] flex flex-col justify-end'}>
+        <div className={'flex flex-col justify-end mt-16 mb-2'}>
           <TextareaAutosize
             autoFocus
             name="title"
@@ -129,16 +157,15 @@ export function Editor({ page }: EditorProps) {
             // defaultValue={pageContext?.title || page.title}
             placeholder="Page title"
             className="w-full resize-none appearance-none text-5xl font-bold focus:outline-none z-0"
-            // className="w-full resize-none appearance-none overflow-hidden text-5xl font-bold focus:outline-none z-0"
             onChange={(event) => {
               setPage?.({ ...page, title: event.target.value })
-              // setPage?.((prev) => ({ ...prev, title: event.target.value }))
               debounceTitle(event.target.value)
             }}
           />
         </div>
-        <div id="editor" className=""/>
-        {/*<div id="editor" className="min-h-[500px]"/>*/}
+
+        <div id={EDITOR_HOLDER_ID} className=""/>
+
         <p className="text-sm text-gray-500">
           Use{" "}
           <kbd className="rounded-md border bg-slate-50 px-1 text-xs uppercase">

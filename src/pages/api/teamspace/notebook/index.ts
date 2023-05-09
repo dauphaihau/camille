@@ -7,8 +7,7 @@ import { withMethods } from "lib/api-middlewares/with-methods"
 import { getWorkspaceSubscriptionPlan } from "lib/request/subscription"
 import { RequiresStandardPlanError } from "lib/exceptions"
 import { authOptions } from "lib/auth"
-import { pagePatchSchema } from "lib/validations/page"
-import { freePlan } from "../../../../config/subscriptions";
+import { freePlan } from "config/subscriptions";
 
 const notebookCreateSchema = z.object({
   workspaceId: z.string(),
@@ -24,41 +23,25 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).end()
   }
 
-  const { user } = session
-
-  if (req.method === "GET") {
-    try {
-      const notebooks = await db.notebook.findMany({
-        select: {
-          id: true,
-          title: true,
-          published: true,
-          createdAt: true,
-        },
-        where: {
-          authorId: user.id,
-        },
-      })
-
-      return res.json(notebooks)
-    } catch (error) {
-      return res.status(500).end()
-    }
-  }
-
-
-
+  // create notebook in teamspace's group
   if (req.method === "POST") {
     try {
       const body = notebookCreateSchema.parse(req.body)
       const subscriptionPlan = await getWorkspaceSubscriptionPlan(body.workspaceId)
 
       if (!subscriptionPlan?.isStandard) {
-        const count = await db.notebook.count({
-          where: { workspaceId: body.workspaceId, teamspaceId: { not: null } },
+        const totalMembers = await db.userOnWorkspace.count({
+          where: { workspaceId: body.workspaceId }
         })
-        if (count >= freePlan.limitedNotebooks) {
-          throw new RequiresStandardPlanError()
+
+        if (totalMembers > 1) {
+          const total = await db.notebook.count({
+            where: { workspace: { id: body.workspaceId } }
+          })
+
+          if (total >= freePlan.limitedNotebooks) {
+            throw new RequiresStandardPlanError()
+          }
         }
       }
 
@@ -67,7 +50,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           workspaceId: body.workspaceId,
           teamspaceId: body.teamspaceId,
           title: body.title,
-          // description: body.description,
+          createdBy: session.user.id,
         },
       })
       return res.send({ code: '200', message: 'create notebook success' })
@@ -81,11 +64,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(402).send({
           code: '402', message: 'This action requires a standard plan'
         })
-        // return res.status(402).end()
       }
       return res.status(500).end()
     }
   }
 }
 
-export default withMethods(["GET", "POST"], handler)
+export default withMethods(["POST"], handler)

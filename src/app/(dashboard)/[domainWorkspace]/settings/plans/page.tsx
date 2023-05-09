@@ -14,17 +14,12 @@ export default async function PlansPage({ params }) {
     redirect(PATH.LOGIN)
   }
 
-  const workspaceCurrent = user.workspaces.find((item) => item.domain === params.domainWorkspace)
-  if (!workspaceCurrent) return null
-  const subscriptionPlan = await getWorkspaceSubscriptionPlan(workspaceCurrent.id)
+  const subscriptionPlan = await getWorkspaceSubscriptionPlan({ domain: params.domainWorkspace })
 
   // If workspace has a standard plan, check cancel status on Stripe.
   let isCanceled = false
-
   if (subscriptionPlan?.isStandard && subscriptionPlan.stripeSubscriptionId) {
-    const stripePlan = await stripe.subscriptions.retrieve(
-      subscriptionPlan.stripeSubscriptionId
-    )
+    const stripePlan = await stripe.subscriptions.retrieve(subscriptionPlan.stripeSubscriptionId)
     isCanceled = stripePlan.cancel_at_period_end
   }
 
@@ -35,14 +30,8 @@ export default async function PlansPage({ params }) {
         text="Manage billing and your subscription plan."
       />
       <div className="grid gap-10">
-
-        <BillingForm
-          workspace={workspaceCurrent}
-          subscriptionPlan={{
-            ...subscriptionPlan,
-            isCanceled,
-          }}
-        />
+        {/*@ts-ignore*/}
+        <BillingForm subscriptionPlan={{ ...subscriptionPlan, isCanceled }}/>
 
         <div>
           <div className='text-xl font-semibold mb-2'>

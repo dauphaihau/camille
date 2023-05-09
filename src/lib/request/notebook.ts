@@ -49,7 +49,10 @@ export const getDetailNotebook = cache(async (notebookId: Notebook["id"], userId
           id: true,
           title: true,
           updatedAt: true,
-          updatedBy: true,
+          // updatedBy: true,
+          createdByUser: {
+            select: { email: true}
+          },
           notebookId: true,
           favorites: {
             // Favorite: {

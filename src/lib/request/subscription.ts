@@ -1,14 +1,14 @@
 import { WorkspaceSubscriptionPlan } from "types"
 import { freePlan, standardPlan } from "config/subscriptions"
 import { db } from "lib/db"
+import { Workspace } from "@prisma/client";
 
 export async function getWorkspaceSubscriptionPlan(
-  workspaceId: string
+  params: string | Partial<Workspace>
 ): Promise<WorkspaceSubscriptionPlan | null> {
+
   const workspace = await db.workspace.findFirst({
-    where: {
-      id: workspaceId,
-    },
+    where: typeof params === 'object' ? { domain: params.domain } : { id: params },
     select: {
       stripeSubscriptionId: true,
       stripeCurrentPeriodEnd: true,
@@ -17,18 +17,8 @@ export async function getWorkspaceSubscriptionPlan(
       stripePriceId: true,
     },
   })
-  // if (!workspace || !workspace?.stripeCurrentPeriodEnd) {
-  //   return null
-  // }
 
-  if (!workspace) {
-    return null
-  }
-
-  // Check if workspace is on a pro plan.
-  // const isPro =
-  //   workspace.stripePriceId &&
-  //   workspace.stripeCurrentPeriodEnd && workspace.stripeCurrentPeriodEnd?.getTime() + 86_400_000 > Date.now()
+  if (!workspace) return null
 
   let isStandard
   if (workspace?.stripeCurrentPeriodEnd) {
@@ -36,13 +26,12 @@ export async function getWorkspaceSubscriptionPlan(
   }
 
   const plan = isStandard ? standardPlan : freePlan
-  // const plan = isPro ? proPlan : freePlan
 
   return {
     ...plan,
     ...workspace,
+    // @ts-ignore
     stripeCurrentPeriodEnd: workspace.stripeCurrentPeriodEnd?.getTime(),
-    // isPro,
     isStandard
   }
 }

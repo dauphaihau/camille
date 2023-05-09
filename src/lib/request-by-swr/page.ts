@@ -12,7 +12,9 @@ export function useGetPages(notebookId) {
     error,
     mutate
   } = useSWR(notebookId ? `/api/notebook/${notebookId}` : null, fetcher, {
-    revalidateOnFocus: false
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
   })
   return {
     pageList: data?.pages,
@@ -27,10 +29,10 @@ export function useGetPagesDeleted(workspaceId) {
   const fetcher = (input, init) => fetch(input, init).then(res => res.json())
   const {
     data, error, mutate
-  } = useSWR(workspaceId ? `/api/notebook/page/deleted?workspaceId=${workspaceId}` : null, fetcher)
+  } = useSWR(workspaceId ? `/api/notebook/page/delete?workspaceId=${workspaceId}` : null, fetcher)
 
   return {
-    pages: data?.data,
+    pages: data?.pages,
     isLoading: !data,
     isError: !!error,
     mutate
@@ -38,7 +40,6 @@ export function useGetPagesDeleted(workspaceId) {
 }
 
 export function useSearchPage(params) {
-  console.log('dauphaihau debug: params', params)
   const fetcher = (input, init) => fetch(input, init).then(res => res.json())
   const {
     data, error, mutate
@@ -58,6 +59,33 @@ export function useSearchPage(params) {
   };
 }
 
+export function useGetDetailPageShareToWeb(pageId) {
+  const fetcher = (input, init) => fetch(input, init).then(res => res.json())
+  const {
+    data,
+    error,
+    mutate
+  } = useSWR(pageId ? `/api/notebook/page/share/${pageId}` : null, fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
+  })
+
+  return {
+    page: data?.data,
+    isLoading: !data,
+    isError: !!error,
+    mutate
+  };
+}
+
+export async function sharePageToWeb(id: string, body) {
+  return fetcher(`/api/notebook/page/share/${id}`,
+    body,
+    'PATCH'
+  )
+}
+
 export async function updatePage(id: string, values) {
   return fetcher(`/api/notebook/page/${id}`,
     values,
@@ -70,9 +98,8 @@ export function createPage(payload) {
 }
 
 export function deletePage(pageId: string, type = DELETE_PAGE_TYPE.SOFT_DELETE) {
-  return fetcher(`/api/notebook/page/${pageId}`,
-    { type },
-    'DELETE'
+  return fetcher(`/api/notebook/page/delete`,
+    { type, pageId },
   )
 }
 

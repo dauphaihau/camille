@@ -4,8 +4,7 @@ import { redirect } from "next/navigation"
 import { getCurrentUser } from "lib/session"
 import UpdateWorkspaceForm from "components/dashboard/settings/workspace/form-update-workspace";
 import { getDetailWorkspace } from "lib/request/workspace";
-import { DashboardSettingsHeader } from "components/dashboard/settings/header";
-import { DashboardSettingsShell } from "components/dashboard/settings/shell"
+import { DashboardSettingsHeader } from "components/dashboard/settings/header";import { DashboardSettingsShell } from "components/dashboard/settings/shell"
 import DeleteWorkspaceButton from "components/dashboard/settings/workspace/delete-workspace-button";
 import { Grid } from "core/components";
 import { PATH } from "config/const";
@@ -43,12 +42,12 @@ export default async function WorkspaceSettingPage({ params }) {
         <div className='border-gray-200 border-b'/>
 
         <div className='space-y-4'>
-          <div>Delete workspace</div>
+          <div>Danger zone</div>
           <div className='text-sm text-[#6b6f7c]'>If you want to permanently delete this workspace and all of its data,
             including but not limited to users,
             issues, and comments, you can do so below.
           </div>
-          <DeleteWorkspaceButton user={user} workspaceId={workspace.id}/>
+          <DeleteWorkspaceButton workspaceId={workspace.id}/>
         </div>
       </Grid>
     </DashboardSettingsShell>

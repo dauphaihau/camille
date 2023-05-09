@@ -7,11 +7,19 @@ import { useRouter } from "next/navigation";
 import { Input, Button, Dialog, Icons, Tooltip, Textarea, Col } from "core/components";
 import { useWorkspaceContext } from "components/context/workspace-context";
 import { toast } from "core/components/Toast";
-import { createNotebook } from "lib/request-by-swr/notebook";
+import { createNotebook, createNotebookOnTeamspace } from "lib/request-by-swr/notebook";
 import useStore from "lib/store";
 import { freePlan } from "config/subscriptions";
+import { cn } from "core/helpers";
 
-export default function NewNotebookDialog({ trigger }: {trigger?: ReactNode}) {
+interface NewNotebookDialogProps {
+  trigger?: ReactNode
+  teamspaceId?: string
+  createInTeamspace?: boolean
+  mutateNotebooks?: () => void
+}
+
+export default function NewNotebookDialog({ trigger, createInTeamspace, teamspaceId, mutateNotebooks }: NewNotebookDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false)
   const formHandler = useForm();
@@ -25,11 +33,23 @@ export default function NewNotebookDialog({ trigger }: {trigger?: ReactNode}) {
   async function onSubmit(data) {
     setIsLoading(true)
     if (!workspace) return
-    const response = await createNotebook({
-      workspaceId: workspace.id,
-      title: data.title,
-      description: data.description,
-    })
+
+    let response;
+
+    if (teamspaceId) {
+      response = await createNotebookOnTeamspace({
+        workspaceId: workspace.id,
+        teamspaceId,
+        title: data.title
+      })
+    } else {
+      response = await createNotebook({
+        workspaceId: workspace.id,
+        title: data.title,
+        description: data.description,
+      })
+    }
+
     setIsLoading(false)
 
     if (response.code !== '200') {
@@ -46,6 +66,7 @@ export default function NewNotebookDialog({ trigger }: {trigger?: ReactNode}) {
       })
     }
 
+    mutateNotebooks?.()
     router.refresh()
     setOpen(!open)
     formHandler.reset()
@@ -55,12 +76,15 @@ export default function NewNotebookDialog({ trigger }: {trigger?: ReactNode}) {
     return trigger ? <>{trigger}</> : <Tooltip>
       <Tooltip.Trigger asChild>
         <div>
-          <Icons.plus className='btn-icon invisible group-hover:visible'/>
+          <Icons.plus className={cn('btn-icon invisible ', teamspaceId ? 'group-hover/teamspace:visible' : 'group-hover:visible')}/>
         </div>
       </Tooltip.Trigger>
       <Tooltip.Content className='ml-2.5 mt-1'>
         <div>New notebook</div>
-        <div className='text-[#82817f]'>Notebook you created that are not in any teamspace.</div>
+        {
+          !teamspaceId &&
+          <div className='text-[#82817f]'>Notebook you created that are not in any teamspace.</div>
+        }
       </Tooltip.Content>
     </Tooltip>
   }

@@ -27,7 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(400)
       }
 
-      // The workspace is on the standard plan.
+      // ----  The workspace is on the standard plan.
       // Create a portal session to manage subscription.
       if (subscriptionPlan.isStandard) {
         const stripeSession = await stripe.billingPortal.sessions.create({
@@ -37,7 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.json({ url: stripeSession.url })
       }
 
-      // The workspace is on the free plan.
+      // ---- The workspace is on the free plan.
       // Create a checkout session to upgrade.
       const stripeSession = await stripe.checkout.sessions.create({
         success_url: settingsPlansUrl,
@@ -45,11 +45,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         payment_method_types: ["card"],
         mode: "subscription",
         billing_address_collection: "auto",
-        customer_email: user?.email ?? undefined,
+        customer_email: user.email as string ,
         line_items: [
           {
-            // price: proPlan?.stripePriceId ?? undefined,
-            price: standardPlan?.stripePriceId ?? undefined,
+            price: standardPlan.stripePriceId as string,
             quantity: 1,
           },
         ],
@@ -57,6 +56,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           userId: user.id,
           workspaceId: req.query.workspaceId as string,
         },
+        // customer_email: user?.email ?? undefined,
+        // line_items: [
+        //   {
+        //     price: standardPlan?.stripePriceId ?? undefined,
+        //     quantity: 1,
+        //   },
+        // ],
+        // metadata: {
+        //   userId: user.id,
+        //   workspaceId: req.query.workspaceId as string,
+        // },
       })
 
       return res.json({ url: stripeSession.url })

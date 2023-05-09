@@ -29,6 +29,10 @@ export interface StoreState {
 
   setShowSidebar: () => void,
   showSidebar: boolean,
+
+  setShortcutOverrideSystem: (val: boolean) => void,
+  shortcutOverrideSystem: boolean,
+
   setShowLimitedNotebookBar: (showLimitedNotebookBar?: boolean | undefined) => void,
   showLimitedNotebookBar: boolean,
 }
@@ -39,6 +43,9 @@ const useStore = create<StoreState>(set => ({
 
   showLimitedNotebookBar: false,
   setShowLimitedNotebookBar: (showLimitedNotebookBar) => set(state => ({ showLimitedNotebookBar: showLimitedNotebookBar ?? !state.showLimitedNotebookBar })),
+
+  shortcutOverrideSystem: true,
+  setShortcutOverrideSystem: (shortcutOverrideSystem) => set(() => ({ shortcutOverrideSystem })),
 
   reFetchNotebookId: '',
   setReFetchNotebookId: reFetchNotebookId => set({ reFetchNotebookId }),

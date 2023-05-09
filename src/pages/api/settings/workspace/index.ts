@@ -7,7 +7,7 @@ import { withMethods } from "lib/api-middlewares/with-methods"
 import { RequiresStandardPlanError } from "lib/exceptions"
 import { authOptions } from "lib/auth"
 import { omitFieldNullish } from "core/helpers";
-import { withPermission } from "lib/api-middlewares/with-permission";
+import { ROLE_USER_ON_WORKSPACE } from "config/const";
 
 const workspaceUpdateSchema = z.object({
   workspaceId: z.string(),
@@ -89,6 +89,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const body = workspaceUpdateSchema.parse(req.body)
 
+
+      const userRequest = await db.userOnWorkspace.findFirst({
+        where: {
+          AND: [
+            { userId: { equals: session.user.id } },
+            { workspaceId: { equals: req.body.workspaceId} }
+          ]
+        },
+      })
+
+      if (!userRequest || userRequest.role === ROLE_USER_ON_WORKSPACE.MEMBER) {
+        return res.status(403).send({ code: '403', message: `You don't have permission to perform this action` })
+      }
+
+
       if (body?.domain) {
         const domainExist = !!await db.workspace.findFirst({
           where: {
@@ -126,4 +141,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 }
 
-export default withMethods(["PATCH", "POST"], withPermission(handler))
+export default withMethods(["PATCH", "POST"], handler)
+// export default withMethods(["PATCH", "POST"], withPermission(handler))

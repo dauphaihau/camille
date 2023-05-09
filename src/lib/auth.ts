@@ -116,10 +116,9 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id
         session.user.name = token.name as string
         session.user.email = token.email as string
-        // session.user.avatar = token.avatar
         session.user.image = token.image
-        session.user.workspaces = token.workspaces
-        session.user.lastAccessWorkspace = token.workspaces.find(ws => ws.id === token.lastAccessWorkspaceId)
+        // session.user.avatar = token.avatar
+        session.user.workspaceLastVisited = token.workspaceLastVisited
       }
       return session
     },
@@ -129,38 +128,32 @@ export const authOptions: NextAuthOptions = {
         where: { email: token.email },
       })
 
-      const workspaces = await db.workspace.findMany({
-        where: {
-          userOnWorkspace: {
-            some: {
-              user: {
-                email: token.email
-              }
-            },
-          }
-        },
-        select: {
-          id: true,
-          name: true,
-          domain: true,
-        }
-      })
-
       if (!dbUser && user) {
         token.id = user.id
         return token
       }
 
       if (dbUser) {
+        let workspaceLastVisited
+        if (dbUser?.lastAccessWorkspaceId) {
+          workspaceLastVisited = await db.workspace.findFirst({
+            where: { id: dbUser.lastAccessWorkspaceId as string },
+            select: {
+              id: true,
+              name: true,
+              domain: true,
+            }
+          })
+        }
+
         return {
           id: dbUser.id,
-          name: dbUser?.name ?? '',
           email: dbUser.email,
-          lastAccessWorkspaceId: dbUser.lastAccessWorkspaceId,
+          name: dbUser?.name ?? '',
+          workspaceLastVisited,
           image: dbUser.image as string,
           // image: dbUser.avatar,
           // avatar: dbUser.avatar,
-          workspaces
         }
       }
       return token

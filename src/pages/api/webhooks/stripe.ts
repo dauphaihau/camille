@@ -28,14 +28,16 @@ export default async function handler(
   try {
     event = stripe.webhooks.constructEvent(
       body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET
+      signature as string,
+      process.env.STRIPE_WEBHOOK_SECRET as string
     )
   } catch (error) {
     return res.status(400).send(`Webhook Error: ${error.message}`)
   }
 
   const session = event.data.object as Stripe.Checkout.Session
+
+  console.log('dauphaihau debug: session', session)
 
   if (event.type === "checkout.session.completed") {
     // Retrieve the subscription details from Stripe.
@@ -46,14 +48,13 @@ export default async function handler(
     // Update the workspace stripe into in our database.
     // Since this is the initial subscription, we need to update
     // the subscription id and workspace id.
-    if (!session.metadata || !session.metadata?.workspaceId) {
-      return res.status(400).send({ message: 'metadata is null ' })
-    }
+
+    // if (!session.metadata || !session.metadata?.workspaceId) {
+    //   return res.status(400).send({ message: 'metadata is null ' })
+    // }
 
     await db.workspace.update({
-      where: {
-        id: session.metadata.workspaceId,
-      },
+      where: { id: session?.metadata?.workspaceId, },
       data: {
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: subscription.customer as string,
@@ -70,6 +71,8 @@ export default async function handler(
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     )
+
+    console.log('dauphaihau debug: subscription', subscription)
 
     await db.workspace.update({
       where: {

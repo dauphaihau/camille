@@ -7,14 +7,13 @@ import { useRouter } from "next/navigation";
 import { Button, Col, Input } from "core/components";
 import { toast } from "core/components/Toast";
 import { useWorkspaceContext } from "components/context/workspace-context";
-import { ROLE_USER_ON_WORKSPACE } from "config/const";
+import { PATH, ROLE_USER_ON_WORKSPACE } from "config/const";
 import { updateInfoGeneralWorkspace } from "lib/request-by-swr/workspace";
 
 export default function FormUpdateWorkspace({ workspace }) {
   const router = useRouter();
   const { userOnWorkspace } = useWorkspaceContext();
   const [isLoading, setIsLoading] = React.useState(false)
-  if (!userOnWorkspace) return null
 
   const methods = useForm({
     mode: 'onChange',
@@ -27,13 +26,21 @@ export default function FormUpdateWorkspace({ workspace }) {
   async function onSubmit(values) {
     setIsLoading(true)
 
+    // omit field not change
     Object.keys(values).forEach((key) => {
       if (workspace[key] === values[key]) {
         delete values[key]
       }
     })
+
+    // validate domain
+    if (values.domain && PATH[values.domain.toUpperCase()]) {
+      methods.setError('domain', { type: 'custom', message: 'Not allowed' })
+      setIsLoading(false)
+      return
+    }
+
     const response = await updateInfoGeneralWorkspace({ ...values, workspaceId: workspace.id })
-    console.log('dauphaihau debug: response', response)
 
     setIsLoading(false)
 
@@ -42,7 +49,6 @@ export default function FormUpdateWorkspace({ workspace }) {
         return methods.setError('domain', { type: 'custom', message: 'Used' });
       }
       return toast({
-        title: "Something went wrong.",
         message: "Your update settings request failed. Please try again.",
         type: "error",
       })
@@ -52,13 +58,12 @@ export default function FormUpdateWorkspace({ workspace }) {
     router.refresh()
 
     if (values?.domain) {
-      router.push(`/${values.domain}/settings/workspace/`)
+      router.push(`/${values.domain}${PATH.SETTINGS}${PATH.WORKSPACE}`)
     }
 
     methods.reset({}, { keepValues: true });
 
     return toast({
-      title: "Update settings",
       message: "Your settings was update success",
       type: "success",
     })
@@ -68,8 +73,8 @@ export default function FormUpdateWorkspace({ workspace }) {
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <Col gap={4}>
-          <Input disabled={userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER} id='name' label='Workspace name'/>
-          <Input disabled={userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER} id='domain' label='Workspace URL'/>
+          <Input disabled={userOnWorkspace?.role === ROLE_USER_ON_WORKSPACE.MEMBER} id='name' label='Workspace name'/>
+          <Input disabled={userOnWorkspace?.role === ROLE_USER_ON_WORKSPACE.MEMBER} id='domain' label='Workspace URL'/>
           <Button
             disabled={!methods.formState.isDirty}
             isLoading={isLoading} classes='mt-2' type='submit' width='fit'

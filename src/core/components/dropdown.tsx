@@ -29,7 +29,8 @@ DropdownMenu.Content = React.forwardRef<
       ref={ref}
       align="end"
       className={cn(
-        "overflow-hidden p-[5px] rounded-md border border-slate-50 bg-white shadow-lg drop-shadow-2xl animate-in slide-in-from-top-1 min-w-56",
+        "p-[5px] rounded-md border border-slate-50 bg-white shadow-lg drop-shadow-2xl animate-in slide-in-from-top-1 min-w-56",
+        // "overflow-hidden p-[5px] rounded-md border border-slate-50 bg-white shadow-lg drop-shadow-2xl animate-in slide-in-from-top-1 min-w-56",
         // "overflow-hidden rounded-md border border-slate-50 bg-white shadow-lg drop-shadow-2xl animate-in slide-in-from-top-1 md:w-32",
         className
       )}

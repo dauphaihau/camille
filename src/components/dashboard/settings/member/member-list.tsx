@@ -13,8 +13,6 @@ export default function MemberList({ members }) {
   const [membersFiltered, setMembersFiltered] = useState(members)
   const { user } = useWorkspaceContext();
 
-  if (!user) return null
-
   useEffect(() => {
     setMembersFiltered(members)
   }, [members])
@@ -32,7 +30,7 @@ export default function MemberList({ members }) {
     }
   }
 
-  const currentUserIsAdmin = members.find(m => m.user.id === user.id).role === ROLE_USER_ON_WORKSPACE.ADMIN
+  const currentUserIsAdmin = members.find(m => m.user.id === user?.id).role === ROLE_USER_ON_WORKSPACE.ADMIN
 
   return (
     <>
