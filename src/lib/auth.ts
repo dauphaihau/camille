@@ -55,7 +55,6 @@ export const authOptions: NextAuthOptions = {
 
         // NOTE: You are not required to use `nodemailer`, use whatever you want.
         const transport = createTransport(configEmail)
-        // const transport = createTransport(server)
         const result = await transport.sendMail({
           from,
           to: email,

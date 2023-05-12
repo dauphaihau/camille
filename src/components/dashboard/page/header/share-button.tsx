@@ -5,7 +5,7 @@ import { sharePageToWeb } from "lib/request-by-swr/page";
 import { Toast, toast } from "core/components/Toast";
 import { usePathname, useRouter } from "next/navigation";
 import hotToast from "react-hot-toast";
-import Title from "components/dashboard/Title";
+import Title from "components/common/title";
 
 export default function ShareButton({ page, triggerShortcutShare }) {
   const router = useRouter()

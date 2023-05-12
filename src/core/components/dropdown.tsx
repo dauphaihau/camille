@@ -3,7 +3,7 @@
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 
-import { cn } from "lib/utils"
+import { cn } from "core/helpers"
 
 type DropdownMenuProps = DropdownMenuPrimitive.DropdownMenuProps
 
@@ -29,7 +29,7 @@ DropdownMenu.Content = React.forwardRef<
       ref={ref}
       align="end"
       className={cn(
-        "p-[5px] rounded-md border border-slate-50 bg-white shadow-lg drop-shadow-2xl animate-in slide-in-from-top-1 min-w-56",
+        "relative z-10 p-[5px] rounded-md border border-slate-50 bg-white shadow-lg drop-shadow-2xl animate-in slide-in-from-top-1 min-w-56",
         // "overflow-hidden p-[5px] rounded-md border border-slate-50 bg-white shadow-lg drop-shadow-2xl animate-in slide-in-from-top-1 min-w-56",
         // "overflow-hidden rounded-md border border-slate-50 bg-white shadow-lg drop-shadow-2xl animate-in slide-in-from-top-1 md:w-32",
         className
@@ -49,7 +49,6 @@ DropdownMenu.Item = React.forwardRef<
       className={cn(
         "flex cursor-pointer select-none rounded-[3px] items-center py-2 px-3 text-sm text-[#373530] outline-none hover:bg-[#efefef] focus:text-black",
         // "flex cursor-default select-none rounded-[3px] items-center py-2 px-3 text-sm text-[#373530] outline-none hover:bg-[#efefef] focus:text-black",
-        // "flex cursor-default select-none items-center py-2 px-3 text-sm text-slate-600 outline-none focus:bg-slate-50 focus:text-black",
         className
       )}
       {...props}

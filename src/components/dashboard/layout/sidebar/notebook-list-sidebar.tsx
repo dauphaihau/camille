@@ -5,13 +5,12 @@ import { useState } from "react";
 import NotebookItemSidebar from "./notebook-item-sidebar";
 import { cn } from "core/helpers";
 import NewNotebookDialog from "components/dialog/new-notebook-dialog";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { Box, Row, Tooltip } from "core/components";
-import * as React from "react";
+import useStore from "lib/store";
 
 export default function NotebookListSidebar() {
   const [showNotebooks, setShowNotebooks] = useState(true)
-  const { workspace } = useWorkspaceContext();
+  const workspace = useStore(state => state.workspace)
 
   return (
     <Box classes={showNotebooks ? 'mb-2' : ''}>

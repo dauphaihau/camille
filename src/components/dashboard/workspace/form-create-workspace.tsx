@@ -1,18 +1,18 @@
 'use client'
 
+import { useEffect, useReducer } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import * as React from "react";
 import { useRouter } from "next/navigation";
 import { getSession } from "next-auth/react";
+import * as z from "zod";
 
 import { Button, Col, Input } from "core/components";
 import { toast } from "core/components/Toast";
-import * as z from "zod";
 import { workspaceSchema } from "lib/validations/workspace";
-import { useEffect, useReducer, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import LoadingDialog from "../../dialog/loading-dialog";
-import { PATH } from "../../../config/const";
+import LoadingDialog from "components/dialog/loading-dialog";
+import { PATH } from "config/const";
+import { createWorkspace } from "../../../lib/request-by-swr/workspace";
 
 type FormData = z.infer<typeof workspaceSchema>
 
@@ -63,29 +63,22 @@ export default function FormCreateWorkspace() {
       return
     }
 
-    const response = await fetch('/api/settings/workspace', {
-      method: 'POST',
-      headers: { "Content-Type": "application/json", },
-      body: JSON.stringify(values)
-    })
+    const response = await createWorkspace(values)
 
-    if (!response?.ok) {
+    if (response.code !== '200') {
       setEvent({ isLoading: false })
 
-      if (response.status === 409) {
+      if (response.code === '409') {
         return toast({
-          title: "Domain exists",
-          message: "Create workspace failed. Please try again.",
+          message: response.message,
           type: "error",
         })
       }
 
       // methods.setError('domain', { type: 'custom', message: 'Domain exists' })
-      // console.log('dauphaihau debug: methods-form-state-errors', methods.formState.errors)
 
       return toast({
-        title: "Something went wrong.",
-        message: "Create workspace failed. Please try again.",
+        message: "Something went wrong.",
         type: "error",
       })
     }
@@ -110,13 +103,14 @@ export default function FormCreateWorkspace() {
               autoFocus
               sizeInput='md'
               id='name'
-              label='Workspace name'
+              placeholder={'e.g. company name'}
+              label='Name'
             />
             <Input
               onFocus={() => setEvent({ isFocusDomainField: true })}
               labelLeft={window.location.host + '/'}
               classesLabelLeft='left-[-2%] text-[#6c6f75] font-medium text-[13px]'
-              classes='pl-[7rem]' sizeInput='md' id='domain' label='Workspace URL'
+              classes='pl-[7rem]' sizeInput='md' id='domain' label='Domain'
             />
           </Col>
           <div className='text-center'>

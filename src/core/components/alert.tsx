@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import * as AlertDialogPrimitives from "@radix-ui/react-alert-dialog"
-import { cn } from "lib/utils"
+import { cn } from "core/helpers"
 import { Button } from "./buttons";
 
 type AlertProps = AlertDialogPrimitives.AlertDialogProps

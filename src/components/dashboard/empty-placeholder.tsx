@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "lib/utils"
+import { cn } from "core/helpers"
 import { Icons } from "core/components"
 
 interface EmptyPlaceholderProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -13,7 +13,6 @@ export function EmptyPlaceholder({
   return (
     <div
       className={cn(
-        // "flex min-h-[400px] flex-col items-center justify-center rounded-md  p-8 text-center animate-in fade-in-50",
         "flex min-h-[400px] flex-col items-center justify-center rounded-md border border-dashed p-8 text-center animate-in fade-in-50",
         className
       )}

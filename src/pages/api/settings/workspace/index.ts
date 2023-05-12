@@ -120,7 +120,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         where: { id: body.workspaceId, },
         data: omitFieldNullish({
           name: body?.name,
-          domain: body?.domain,
+          domain: body?.domain?.toLowerCase(),
         })
       })
 

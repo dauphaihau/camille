@@ -6,7 +6,7 @@ export default function Head() {
       <meta name="viewport" content="width=device-width" />
       <meta
         name="description"
-        content="An open source application built using the new router, server components and everything new in Next.js 13."
+        content="This simplified Notion clone is built with Next.js 13, Tailwind, Prisma, NextAuth, PlanetScale"
       />
       <meta property="og:title" content="Camille" />
       <meta property="og:type" content="website" />

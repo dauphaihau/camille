@@ -131,7 +131,7 @@ export function PageOperations({
     const response = await createPage({
       notebookId: page.notebookId,
       title: pageTitle,
-      // content: page.content,
+      content: page.content,
     })
 
     if (response.code !== '200') {

@@ -13,7 +13,7 @@ export default async function CreateWorkspacePage() {
           <Text classes='text-xs text-[#6b6f7c]'>Logged is as:</Text>
           <Text size={13}>{user?.email}</Text>
         </Col>
-        <BackButton/>
+        {user?.workspaceLastVisited && user.workspaceLastVisited && <BackButton/>}
       </Row>
 
       <Box classes='max-w-md mx-auto mt-20 space-y-4'>

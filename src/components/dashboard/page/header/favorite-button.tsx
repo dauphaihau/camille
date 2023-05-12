@@ -10,12 +10,14 @@ import { useKeyboardShortcut } from "core/hooks";
 import useStore from "lib/store";
 
 export default function FavoriteButton({ page }) {
-  const { workspace, pagesFavorite, setReFetchNotebookId } = useWorkspaceContext()
+  const { pagesFavorite } = useWorkspaceContext()
   const pathName = usePathname()
   const router = useRouter()
   const pageId = pathName && pathName.split('/')[3]
   const isFavorite = pagesFavorite?.some(p => p.id === pageId)
+  const workspace = useStore(state => state.workspace)
   const shortcutOverrideSystem = useStore(state => state.shortcutOverrideSystem)
+  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
 
   async function handleAddToFavorite() {
     if (!workspace) return null

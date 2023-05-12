@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useWorkspaceContext } from "components/context/workspace-context";
 import { Row } from "core/components";
 import useStore from "lib/store";
-import Title from "components/dashboard/Title";
+import Title from "components/common/title";
 
 export default function PageBreadcrumb() {
   const { workspace, notebooks, page } = useWorkspaceContext();
@@ -28,7 +28,7 @@ export default function PageBreadcrumb() {
       {
         pageId === page?.id && page?.title && <>
           <p>/</p>
-          <Title maxW={240}>page.title</Title>
+          <Title maxW={240}>{page.title}</Title>
         </>
       }
     </Row>

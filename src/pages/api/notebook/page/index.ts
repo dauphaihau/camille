@@ -10,7 +10,7 @@ import { authOptions } from "lib/auth"
 const pageCreateSchema = z.object({
   notebookId: z.string(),
   title: z.string().optional(),
-  content: z.string().optional(),
+  content: z.any().optional(),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -51,6 +51,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
       const body = pageCreateSchema.parse(req.body)
+      console.log('dauphaihau debug: body', body)
       const page = await db.page.create({
         data: {
           title: body.title as string,

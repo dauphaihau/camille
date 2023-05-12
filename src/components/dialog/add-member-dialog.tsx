@@ -19,13 +19,13 @@ export default function AddMemberDialog() {
 
   if (!userOnWorkspace) return null
 
-  async function onSubmit(data) {
+  async function onSubmit({ email }) {
     setIsLoading(true)
     if (!workspace) return
 
     const response = await addMember({
       workspaceId: workspace.id,
-      email: data.email,
+      email,
     })
 
     setIsLoading(false)
@@ -65,12 +65,16 @@ export default function AddMemberDialog() {
             <Input
               // placeholder='Search name or emails'
               // placeholder='Search email'
+              disabled={isLoading}
               sizeInput='md'
               label='Email'
               id='email'
             />
             <div className='flex justify-end pt-5 gap-1'>
-              <Button type="submit" isLoading={isLoading}>
+              <Button
+                disabled={formHandler.watch('email') === userOnWorkspace.user.email || isLoading}
+                type="submit" isLoading={isLoading}
+              >
                 Invite
               </Button>
             </div>

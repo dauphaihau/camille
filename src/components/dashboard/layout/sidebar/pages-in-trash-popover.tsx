@@ -4,31 +4,33 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button, Col, Icons, Loading, Row, Tooltip } from "core/components";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { Popover } from "core/components/popover";
 import { deletePage, useGetPagesDeleted } from "lib/request-by-swr/page";
 import { toast } from "core/components/Toast";
 import { Alert } from "core/components/alert";
 import Input from "core/components/forms/Input-without-rhf";
 import { DELETE_PAGE_TYPE } from "config/const";
-import Title from "components/dashboard/Title";
+import Title from "components/common/title";
+import useStore from "lib/store";
 
 export default function PagesInTrashPopover() {
   const [state, setState] = useState({
     showPopover: false,
     showDeleteAlert: false,
     isDeleteLoading: false,
-    pageIdDelete: null,
+    pageDelete: null,
   })
 
-  const { workspace } = useWorkspaceContext();
+  const workspace = useStore(state => state.workspace)
+  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
   const router = useRouter();
   const { isLoading, pages, mutate } = useGetPagesDeleted(state.showPopover && workspace ? workspace.id : null)
 
-  const handleDelete = async (event, pageId, type = DELETE_PAGE_TYPE.HARD_DELETE) => {
+  const handleDelete = async (event, page, type = DELETE_PAGE_TYPE.HARD_DELETE) => {
     event.preventDefault()
+    const { id, notebookId } = page
     setState({ ...state, isDeleteLoading: true })
-    const response = await deletePage(pageId, type)
+    const response = await deletePage(id, type)
     setState({ ...state, isDeleteLoading: false })
 
     if (response.code !== '200') {
@@ -39,7 +41,10 @@ export default function PagesInTrashPopover() {
       })
     }
     setState({ ...state, showDeleteAlert: false })
-    router.refresh()
+    if (type === DELETE_PAGE_TYPE.RECOVER) {
+      setReFetchNotebookId(notebookId)
+    }
+    // router.refresh()
     await mutate()
   }
 
@@ -66,12 +71,12 @@ export default function PagesInTrashPopover() {
         <Row align='center' gap={1}>
           <Icons.arrowBack
             className='btn-icon'
-            onClick={(e) => handleDelete(e, page.id, 2)}
+            onClick={(e) => handleDelete(e, page, DELETE_PAGE_TYPE.RECOVER)}
           />
           <Icons.trash
             className='btn-icon'
             onClick={() => {
-              setState({ ...state, showDeleteAlert: true, pageIdDelete: page.id });
+              setState({ ...state, showDeleteAlert: true, pageDelete: page });
             }}
           />
         </Row>
@@ -123,7 +128,7 @@ export default function PagesInTrashPopover() {
             </Alert.Header>
             <Alert.Footer>
               <Alert.Cancel>Cancel</Alert.Cancel>
-              <Alert.Action onClick={(e) => handleDelete(e, state.pageIdDelete)}>
+              <Alert.Action onClick={(e) => handleDelete(e, state.pageDelete)}>
                 <Button color='red' isLoading={state.isDeleteLoading}>Yes, Delete it</Button>
               </Alert.Action>
             </Alert.Footer>

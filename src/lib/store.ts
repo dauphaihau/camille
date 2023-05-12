@@ -33,6 +33,9 @@ export interface StoreState {
   setShortcutOverrideSystem: (val: boolean) => void,
   shortcutOverrideSystem: boolean,
 
+  setShowPagesInTrashPopover: (val: boolean) => void,
+  showPagesInTrashPopover: boolean,
+
   setShowLimitedNotebookBar: (showLimitedNotebookBar?: boolean | undefined) => void,
   showLimitedNotebookBar: boolean,
 }
@@ -46,6 +49,9 @@ const useStore = create<StoreState>(set => ({
 
   shortcutOverrideSystem: true,
   setShortcutOverrideSystem: (shortcutOverrideSystem) => set(() => ({ shortcutOverrideSystem })),
+
+  showPagesInTrashPopover: false,
+  setShowPagesInTrashPopover: (showPagesInTrashPopover) => set(() => ({ showPagesInTrashPopover })),
 
   reFetchNotebookId: '',
   setReFetchNotebookId: reFetchNotebookId => set({ reFetchNotebookId }),

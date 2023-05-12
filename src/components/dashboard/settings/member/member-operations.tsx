@@ -11,9 +11,10 @@ import { Alert } from "core/components/alert"
 import { toast } from "core/components/Toast"
 import { useWorkspaceContext } from "components/context/workspace-context";
 import { cn } from "core/helpers";
-import { ROLE_USER_ON_WORKSPACE } from "config/const";
+import { PATH, ROLE_USER_ON_WORKSPACE } from "config/const";
 import { deleteMember, memberLeave, updateRoleMember } from "lib/request-by-swr/settings-member";
 import LoadingDialog from "../../../dialog/loading-dialog";
+import useStore from "../../../../lib/store";
 
 interface MemberOperationsProps {
   member: Pick<User, "id" | 'name'> & Pick<UserOnWorkspace, "role">,
@@ -33,7 +34,9 @@ const initialState: {[k: string]: boolean} = {
 
 export function MemberOperations({ member, members, currentUserIsAdmin }: MemberOperationsProps) {
   const router = useRouter()
-  const { workspace, userOnWorkspace, user } = useWorkspaceContext();
+  // const { workspace, userOnWorkspace, user } = useWorkspaceContext();
+  const { userOnWorkspace, user } = useWorkspaceContext();
+  const workspace = useStore((state) => state.workspace)
   const [event, setEvent] = useReducer((prev, next) => ({
     ...prev, ...next
   }), initialState)
@@ -47,12 +50,9 @@ export function MemberOperations({ member, members, currentUserIsAdmin }: Member
       setEvent({ isDeleteLoading: true })
       let response;
       if (event.userLeaveWorkspace && userOnWorkspace) {
-        response = await memberLeave({ workspaceId: workspace.id })
+        response = await memberLeave()
       } else {
-        response = await deleteMember({
-          userId: member.id,
-          workspaceId: workspace.id
-        })
+        response = await deleteMember(member.id)
       }
 
       setEvent({ isDeleteLoading: false })
@@ -74,9 +74,12 @@ export function MemberOperations({ member, members, currentUserIsAdmin }: Member
       setEvent({ showDeleteAlert: false })
 
       // // redirect first workspace in list workspaces user can access
-      if (event.userLeaveWorkspace && response?.data?.workspace?.domain) {
-        router.push(`/${response.data.workspace.domain}`)
+      if (event.userLeaveWorkspace) {
+        if (response?.data?.workspace?.domain) {
+          return router.push(`/${response.data.workspace.domain}`)
+        }
         // setEvent({ userLeaveWorkspace: false })
+        return router.push(PATH.WORKSPACE)
       }
 
       router.refresh()
@@ -220,7 +223,8 @@ export function MemberOperations({ member, members, currentUserIsAdmin }: Member
             <Alert.Content>
               <Alert.Header>
                 <Alert.Title>Oops!</Alert.Title>
-                <Alert.Description>You cannot remove the last admin.</Alert.Description>
+                <Alert.Description>A workspace must have at least 1 admin</Alert.Description>
+                {/*<Alert.Description>You cannot remove the last admin.</Alert.Description>*/}
               </Alert.Header>
               <Alert.Footer>
                 <Alert.Action onClick={() => setEvent({ showDeleteAlert: false })}>

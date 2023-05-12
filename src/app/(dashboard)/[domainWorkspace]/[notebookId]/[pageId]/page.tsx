@@ -28,9 +28,7 @@ export default async function EditorPage({ params }: EditorPageProps) {
       <OperationOnTopPage page={page}/>
       <div
         className='overflow-scroll max-h-full'
-        style={{
-          height: 'calc(100vh - 45px)'
-        }}
+        style={{ height: 'calc(100vh - 45px)' }}
       >
         <Editor page={page}/>
       </div>

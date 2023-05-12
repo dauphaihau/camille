@@ -19,7 +19,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(403).end()
   }
 
-  if (req.method === "DELETE") {
+  if (req.method === "POST") {
     try {
       const body = memberLeaveSchema.parse(req.body)
 
@@ -107,6 +107,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).end()
     }
   }
+
 }
 
-export default withMethods(['DELETE'], handler)
+export default withMethods(['POST'], handler)

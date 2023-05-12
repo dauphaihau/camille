@@ -24,8 +24,11 @@ export function useGetWorkspacesByUser(showDropdown) {
   };
 }
 
-
 export async function updateInfoGeneralWorkspace(payload) {
   return fetcher(`/api/settings/workspace`, payload, 'PATCH')
+}
+
+export async function createWorkspace(payload) {
+  return fetcher(`/api/settings/workspace`, payload,)
 }
 

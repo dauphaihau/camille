@@ -1,10 +1,12 @@
 'use client'
 
 import dayjs from "dayjs";
-import relativeTime from 'dayjs/plugin/relativeTime';
-import { Icons, Row } from "core/components";
-import Title from "components/dashboard/Title";
 import Link from "next/link";
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+import { Icons, Row } from "core/components";
+import Title from "components/common/title";
+import { PATH } from "config/const";
 
 dayjs.extend(relativeTime)
 
@@ -38,7 +40,7 @@ export default function OperationOnTopSharePage({ page }) {
 
           <Link
             className={'hover:bg-[#efefef] text-sm rounded p-1.5 h-7 flex justify-center items-center text-[#373530] cursor-pointer font-medium gap-1'}
-            href={'/'}
+            href={PATH.LOGIN}
           >
             Try Camille
           </Link>

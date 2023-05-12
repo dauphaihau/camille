@@ -8,7 +8,7 @@ import { useWorkspaceContext } from "components/context/workspace-context";
 import { PageOperations } from "../page-operations"
 import { PATH } from "config/const";
 import { Row } from "core/components";
-import Title from "../Title";
+import Title from "../../common/title";
 
 interface PageItemProps {
   page: Pick<Page, "id" | "title" | "content" | "updatedAt" | "updatedBy" | "notebookId"> & {

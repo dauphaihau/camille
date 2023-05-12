@@ -1,8 +1,7 @@
 # Camille
 A note-taking web application where you can think, write, and plan
 
-![Screenshot](./public/images/preview/screen1.png)
-![Screenshot](./public/images/preview/screen2.png)
+![Screenshot](./public/marketing/app.png)
 
 ## Technologies
 1. Next.js (React.js)
@@ -48,7 +47,7 @@ pnpm dev
 ```
 
 ## Deployed Version
-For some reason, bugs on production version, I have still fixing so u can quickly view via video I demo
+Currently, on the production version there is a login error, I have still fixing so u can quickly view project via <a href="https://www.youtube.com/watch?v=MZjKvX9FEjo">video</a> I demo
 
 [//]: # (## Deployed Version)
 [//]: # (<a href="">Visit the live app</a>)

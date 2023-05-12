@@ -7,7 +7,7 @@ import UpdateProfileForm from "components/dashboard/settings/account/profile/upd
 import { getInfoUserOnWorkspace } from "lib/request/user";
 import { getCurrentUser } from "lib/session";
 import { PATH } from "config/const";
-import UpdateAvatar from "../../../../../../components/dashboard/settings/account/profile/upload-avatar";
+import UpdateAvatar from "components/dashboard/settings/account/profile/upload-avatar";
 
 export default async function ProfilePage({ params }) {
   const user = await getCurrentUser()

@@ -18,8 +18,9 @@ import useStore from "../../lib/store";
 export default function SearchAllDialog() {
   const [searchValue, setSearchValue] = useState<string>('');
   const [open, setOpen] = useState(false);
-  const { workspace } = useWorkspaceContext();
   const shortcutOverrideSystem = useStore(state => state.shortcutOverrideSystem)
+  const workspace = useStore(state => state.workspace)
+  const setShowPagesInTrashPopover = useStore(state => state.setShowPagesInTrashPopover)
 
   const arrKeys = ['Meta', 'f']
   const handleKeyboardShortcut = useCallback(keys => {
@@ -48,7 +49,14 @@ export default function SearchAllDialog() {
     <Col className='text-center my-4' gap={1}>
       <div className='text-[14px] text-[#7d7c79] font-semibold'>No results</div>
       <div className='text-[14px] text-[#a6a5a3] font-medium'>Some results may be in your deleted pages</div>
-      <div className='text-[14px] text-[#4281db] font-medium'>Search deleted pages</div>
+      <div
+        className='text-[14px] text-[#4281db] font-medium cursor-pointer'
+        onClick={() => {
+          setShowPagesInTrashPopover(true)
+          setOpen(false)
+        }}
+      >Search deleted pages
+      </div>
     </Col>
   )
 
@@ -90,7 +98,6 @@ export default function SearchAllDialog() {
                 {isSearchByValue ? handle2Light(p.title) : p.title}
                 {
                   !isSearchByValue && !isPagesToday &&
-                  // <div className='text-[#9f9e9b] text-[12px] group-hover:hidden'>{
                   <div className='text-[#9f9e9b] text-[12px]'>{
                     formatDate(p.updatedAt, {
                       month: "long",

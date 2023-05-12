@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import { cn } from "core/helpers";
 import { Box, Col, Icons, Row } from "core/components";
@@ -10,7 +10,6 @@ import useStore from "lib/store";
 export default function SettingsSidebar({ urlBeforeNavigateSettingPage }) {
   const pathName = usePathname();
   const workspace = useStore(state => state.workspace)
-  const router = useRouter();
 
   const Title = ({ title }) => (
     <div className='flex justify-between items-center px-4 mb-1.5'>
@@ -42,7 +41,6 @@ export default function SettingsSidebar({ urlBeforeNavigateSettingPage }) {
             <Icons.arrowLeftSline
               size={12}
               className='btn-icon'
-              // onClick={() => router.push(urlBeforeNavigateSettingPage)}
             />
           </Link>
           <Box classes='text-base text-[#373530] font-medium tracking-wide'>Settings</Box>

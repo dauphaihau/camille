@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import * as DialogPrimitives from '@radix-ui/react-dialog';
-import { cn } from "lib/utils"
+import { cn } from "core/helpers"
 
 type DialogProps = DialogPrimitives.DialogProps
 

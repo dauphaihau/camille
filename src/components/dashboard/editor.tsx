@@ -13,20 +13,24 @@ import { debounce } from "core/helpers";
 import { useWorkspaceContext } from "components/context/workspace-context";
 import { updatePage } from "lib/request-by-swr/page";
 import useStore from "lib/store";
+import { useRouter } from "next/navigation";
 
 interface EditorProps {
   page: Pick<Page, "id" | "title" | "content" | "shareToWeb" | 'notebookId'> & {notebook: Notebook}
+  readOnly?: boolean
 }
 
 type FormData = z.infer<typeof pagePatchSchema>
 
 const EDITOR_HOLDER_ID = 'editor'
 
-export function Editor({ page }: EditorProps) {
+export function Editor({ page, readOnly = false }: EditorProps) {
+  const router = useRouter()
   const editorInstance = useRef<EditorJS>()
-  const [focused, setFocused] = React.useState(false)
+  const titleInstance = useRef<HTMLTextAreaElement>(null)
   const [isMounted, setIsMounted] = useState<boolean>(false)
-  const { setPage, page: pageContext, setReFetchNotebookId } = useWorkspaceContext()
+  const { setPage, page: pageContext } = useWorkspaceContext()
+  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
   const setStatePageBreadcrumb = useStore(state => state.setStatePageBreadcrumb)
   const setShortcutOverrideSystem = useStore(state => state.setShortcutOverrideSystem)
 
@@ -45,6 +49,7 @@ export function Editor({ page }: EditorProps) {
     if (!editorInstance.current) {
       const editor = new EditorJS({
         holder: EDITOR_HOLDER_ID,
+        readOnly,
         onReady() {
           editorInstance.current = editor
         },
@@ -52,9 +57,10 @@ export function Editor({ page }: EditorProps) {
           if (editorInstance.current) {
             const blocks = await editorInstance.current.save()
             await handleUpdatePage(page.id, { content: blocks })
+            router.refresh()
           }
         },
-        placeholder: "Type here to write your page...",
+        // placeholder: "Type here to write your page...",
         inlineToolbar: true,
         data: body.content,
         tools: {
@@ -87,6 +93,11 @@ export function Editor({ page }: EditorProps) {
     if (isMounted) {
       setPage?.(page)
       initializeEditor()
+      if (titleInstance.current) {
+        const end = page.title.length
+        titleInstance.current.setSelectionRange(end, end)
+        titleInstance.current.focus()
+      }
 
       return () => {
         editorInstance.current?.destroy()
@@ -103,11 +114,9 @@ export function Editor({ page }: EditorProps) {
 
     const onFocusIn = () => {
       setShortcutOverrideSystem(false)
-      setFocused(true)
     }
     const onFocusOut = () => {
       setShortcutOverrideSystem(true)
-      setFocused(false)
     }
 
     if (editorElement) {
@@ -131,6 +140,7 @@ export function Editor({ page }: EditorProps) {
         type: "error",
       })
     }
+    router.refresh()
     setReFetchNotebookId?.(page.notebookId)
   }
 
@@ -147,13 +157,17 @@ export function Editor({ page }: EditorProps) {
 
   return (
     <div className="grid w-full gap-10">
-      <div className="prose prose-stone mx-auto w-[800px] pb-[30vh]">
+      <div className="prose prose-stone max-w-[708px] mx-auto pb-[30vh]">
+      {/*<div className="prose prose-stone mx-auto w-[800px] pb-[30vh]">*/}
         <div className={'flex flex-col justify-end mt-16 mb-2'}>
           <TextareaAutosize
-            autoFocus
+            disabled={readOnly}
+            ref={titleInstance}
             name="title"
             id="title"
-            value={pageContext?.id === page.id && pageContext?.title || page.title}
+            defaultValue={page.title}
+            value={pageContext?.title}
+            // value={pageContext?.id === page.id && pageContext?.title || page.title}
             // defaultValue={pageContext?.title || page.title}
             placeholder="Page title"
             className="w-full resize-none appearance-none text-5xl font-bold focus:outline-none z-0"
@@ -166,13 +180,16 @@ export function Editor({ page }: EditorProps) {
 
         <div id={EDITOR_HOLDER_ID} className=""/>
 
-        <p className="text-sm text-gray-500">
-          Use{" "}
-          <kbd className="rounded-md border bg-slate-50 px-1 text-xs uppercase">
-            Tab
-          </kbd>{" "}
-          to open the command menu.
-        </p>
+        {
+          !readOnly &&
+          <p className="text-sm text-[#9b9a97]">
+            Use{" "}
+            <kbd className="rounded-md border bg-slate-50 px-1 text-xs uppercase">
+              Tab
+            </kbd>{" "}
+            to open the command menu.
+          </p>
+        }
       </div>
     </div>
   )

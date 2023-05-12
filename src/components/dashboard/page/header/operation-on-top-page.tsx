@@ -45,7 +45,6 @@ export default function OperationOnTopPage({ page }) {
               size={30}
               className='text-md text-[#54535f] hover:bg-[#efefef] rounded p-2'
               onClick={setShowSidebar}
-              // onClick={() => setShowSidebar?.(!showSidebar)}
             />
           }
           <PageBreadcrumb/>

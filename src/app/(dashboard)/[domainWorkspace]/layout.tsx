@@ -9,7 +9,7 @@ import { getCurrentUser } from "lib/session";
 import PermissionAccessWorkspace from "components/dashboard/permission-access-workspace";
 import PageShareToWeb from "components/share-page/page-share-to-web";
 import { db } from "lib/db";
-import { PATH } from "../../../config/const";
+import { PATH, SUFFIX_DOMAIN_SHARE_TO_WEB } from "config/const";
 
 interface DashboardLayoutProps {
   children?: React.ReactNode
@@ -26,11 +26,15 @@ export default async function DashboardLayout({
   const user = await getCurrentUser()
 
   if (!user) {
-    if (params && params.domainWorkspace.includes('.camille.site')) {
+    if (params && params.domainWorkspace.includes(SUFFIX_DOMAIN_SHARE_TO_WEB)) {
       return <PageShareToWeb/>
     }
     // return notFound()
     redirect(PATH.HOME)
+  }
+
+  if (params && params.domainWorkspace.includes(SUFFIX_DOMAIN_SHARE_TO_WEB)) {
+    return <PageShareToWeb/>
   }
 
   const workspace = await getDetailWorkspace(params?.domainWorkspace ?? '', user.id)

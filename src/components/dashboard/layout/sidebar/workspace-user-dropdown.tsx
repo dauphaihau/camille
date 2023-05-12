@@ -7,35 +7,39 @@ import { useRouter } from "next/navigation";
 
 import { DropdownMenu, Icons, Row, Skeleton, Tooltip } from "core/components";
 import { useWorkspaceContext } from "components/context/workspace-context";
-import { BASE_URL, PATH } from "config/const";
+import { PATH } from "config/const";
 import { cn } from "core/helpers";
 import LoadingDialog from "components/dialog/loading-dialog";
 import { toast } from "core/components/Toast";
 import useStore from "lib/store";
 import { useGetWorkspacesByUser } from "lib/request-by-swr/workspace";
-import LoadingFullPage from "app/loading";
 
 const initialState: {[k: string]: boolean | string} = {
   isDropdownOpen: false,
   loadingDialog: false,
-  loadingFullPage: false,
   nameWorkspace: '',
 }
 
 export default function WorkspaceUserDropdown() {
   const router = useRouter();
-  const { user, workspace } = useWorkspaceContext();
+  const { user } = useWorkspaceContext();
   const setShowSidebar = useStore(state => state.setShowSidebar)
+  const workspace = useStore(state => state.workspace)
   const [event, setEvent] = useReducer((prev, next) => ({
     ...prev, ...next
   }), initialState)
   const { isLoading, workspaces } = useGetWorkspacesByUser(event.isDropdownOpen)
 
-  const changeWorkspace = async ({ id: workspaceId, domain }) => {
-    if (!user) return
+  const changeWorkspace = async ({ id: workspaceId, domain, name }) => {
+    if (!user || domain === workspace?.domain) return
+
+    // router.refresh()
+    // await getSession()
+
+    setEvent({ nameWorkspace: name })
     setEvent({ loadingDialog: true })
 
-    const res = await fetch(`${BASE_URL}/api/user/tracking/${user.id}`, {
+    const res = await fetch(`/api/user/tracking/${user.id}`, {
       method: 'POST',
       body: JSON.stringify({ workspaceId })
     }).then((res) => res.json())
@@ -63,17 +67,9 @@ export default function WorkspaceUserDropdown() {
     router.push(`/${domain}`)
   }
 
-  // if (event.loadingFullPage) {
-  //   return (
-  //     <LoadingFullPage />
-  //   )
-  // }
-
   return (
     <>
       <LoadingDialog message={`Redirect to ${event.nameWorkspace}...`} open={event.loadingDialog}/>
-      <LoadingDialog message={`Logout...`} open={event.loadingFullPage}/>
-
       <DropdownMenu onOpenChange={(open) => setEvent({ isDropdownOpen: open })}>
         <div className='relative w-full'>
           <DropdownMenu.Trigger className="mb-2 relative w-full">
@@ -85,7 +81,7 @@ export default function WorkspaceUserDropdown() {
             >
               <Row align='center' gap={3}>
                 <div className='avatar bg-[#ecebea] group-hover/iconWorkspace:bg-[#dcdbd9] h-5 w-5 rounded text-sm text-[#777572] flex justify-center'>
-                  {workspace && workspace.name.charAt(0)}
+                  {workspace && workspace?.name?.charAt(0)}
                 </div>
                 <div className='flex flex-col'>
                   <p className='text-sm text-[#373530] font-semibold'>{workspace && workspace.name}</p>
@@ -144,13 +140,9 @@ export default function WorkspaceUserDropdown() {
                   </div>
                   : workspaces.length > 0 && workspaces.map((ws, index) => (
                   <DropdownMenu.Item
-                    onClick={async () => {
-                      changeWorkspace(ws)
-                      setEvent({ nameWorkspace: ws.name })
-                      router.refresh()
-                      await getSession()
-                    }}
-                    className='flex justify-between cursor-pointer' key={index}
+                    key={index}
+                    onClick={() => changeWorkspace(ws)}
+                    className='flex justify-between cursor-pointer'
                   >
                     <div>
                       <div
@@ -212,8 +204,6 @@ export default function WorkspaceUserDropdown() {
             <DropdownMenu.Item
               className="cursor-pointer"
               onSelect={(event) => {
-                // setEvent({ loadingDialog: true })
-                setEvent({ loadingFullPage: true })
                 event.preventDefault()
                 signOut({
                   callbackUrl: `${window.location.origin}/`,

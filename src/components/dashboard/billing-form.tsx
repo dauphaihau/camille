@@ -4,7 +4,7 @@ import * as React from "react"
 import { Workspace } from "@prisma/client";
 
 import { WorkspaceSubscriptionPlan } from "types"
-import { cn, formatDate } from "lib/utils"
+import { cn, formatDate } from "core/helpers"
 import { Card } from "core/components/card"
 import { toast } from "core/components/Toast"
 import { Button } from "core/components"

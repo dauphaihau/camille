@@ -32,7 +32,6 @@ export default function NotebookItemSidebar({ notebook, classes }: NotebookItemP
   if (reFetchNotebookId && reFetchNotebookId === notebook.id) {
     mutate?.()
     setReFetchNotebookId?.('')
-    // setReFetchNotebookId?.('')
   }
 
   return (
