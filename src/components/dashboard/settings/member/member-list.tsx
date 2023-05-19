@@ -7,11 +7,13 @@ import AddMemberDialog from "components/dialog/add-member-dialog";
 import { capitalizeEachWord } from "core/helpers";
 import { ROLE_USER_ON_WORKSPACE } from "config/const";
 import { MemberOperations } from "./member-operations";
-import { useWorkspaceContext } from "../../../context/workspace-context";
+import useStore from "lib/store";
 
 export default function MemberList({ members }) {
   const [membersFiltered, setMembersFiltered] = useState(members)
-  const { user } = useWorkspaceContext();
+  const user = useStore(state => state.user)
+
+  console.log('dauphaihau debug: user', user)
 
   useEffect(() => {
     setMembersFiltered(members)

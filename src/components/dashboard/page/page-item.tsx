@@ -4,11 +4,11 @@ import { Favorite, Page } from "@prisma/client"
 import Link from "next/link"
 
 import { Skeleton } from "core/components/skeleton"
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { PageOperations } from "../page-operations"
 import { PATH } from "config/const";
 import { Row } from "core/components";
 import Title from "../../common/title";
+import useStore from "lib/store";
 
 interface PageItemProps {
   page: Pick<Page, "id" | "title" | "content" | "updatedAt" | "updatedBy" | "notebookId"> & {
@@ -20,7 +20,8 @@ interface PageItemProps {
 }
 
 export function PageItem({ page }: PageItemProps) {
-  const { workspace, page: pageContext } = useWorkspaceContext()
+  const workspace = useStore(state => state.workspace)
+  const pageContext = useStore(state => state.page)
 
   return (
     <Row align='center' justify='between'>

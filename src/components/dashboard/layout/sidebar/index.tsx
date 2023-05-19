@@ -5,21 +5,21 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import { Box, Col, Icons, Row, Tooltip } from "core/components";
-import NotebooksPrivate from "./notebook-list-sidebar";
+import { PrivateNotebooksSidebar } from "./private-notebooks-sidebar";
 import { wordInString } from "core/helpers";
-import WorkspaceUserDropdown from "./workspace-user-dropdown";
-import PagesInTrashPopover from "./pages-in-trash-popover";
+import { WorkspaceUserDropdown } from "./workspace-user-dropdown";
+import { PagesInTrashPopover } from "./pages-in-trash-popover";
 import { PATH } from "config/const";
-import PagesFavoriteListSidebar from "./pages-favorite-list-sidebar";
-import SearchAllDialog from "../../../dialog/search-all-dialog";
-import TeamspaceListSidebar from "./teamspace-list-sidebar";
+import { FavoritePagesSidebar } from "./favorite-pages-sidebar";
+import { SearchAllDialog } from "components/dialog/search-all-dialog";
+import { TeamspaceListSidebar } from "./teamspace-list-sidebar";
 import { useKeyboardShortcut } from "core/hooks";
-import NewNotebookDialog from "../../../dialog/new-notebook-dialog";
-import CalcLimitNotebooks from "./calc-limit-notebooks";
-import SettingsSidebar from "./settings-sidebar";
+import { NewNotebookDialog } from "components/dialog/new-notebook-dialog";
+import { CalcLimitNotebooks } from "./calc-limit-notebooks";
+import { SettingsSidebar } from "./settings-sidebar";
 import useStore from "lib/store";
 
-export default function SidebarDashboard() {
+export function SidebarDashboard() {
   const [urlBeforeNavigateSettingPage, setUrlBeforeNavigateSettingPage] = useState<string>('')
   const [scrollTop, setScrollTop] = useState(0);
   const pathname = usePathname();
@@ -79,9 +79,9 @@ export default function SidebarDashboard() {
               className={'flex-1 overflow-y-scroll overflow-x-hidden'}
             >
               <Col gap={2}>
-                <PagesFavoriteListSidebar/>
+                <FavoritePagesSidebar/>
                 <TeamspaceListSidebar/>
-                <NotebooksPrivate/>
+                <PrivateNotebooksSidebar/>
               </Col>
             </nav>
 

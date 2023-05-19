@@ -1,36 +1,23 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
 
-import { Button, Icons, Loading, Tooltip } from "core/components"
+import { Button, Loading, Tooltip } from "core/components"
 import { toast } from "core/components/Toast"
-import { createPage } from "lib/request-by-swr/page";
-import { useWorkspaceContext } from "../../../context/workspace-context";
-import { createNotebookOnTeamspace } from "../../../../lib/request-by-swr/notebook";
+import { createNotebookOnTeamspace } from "lib/request-by-swr/notebook";
+import useStore from "lib/store";
 
 interface TeamspaceCreateButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   teamspaceId: string
 }
 
-export function NotebookCreateButton({
-  className, teamspaceId, children,
-  ...props
-}: TeamspaceCreateButtonProps) {
-  const router = useRouter()
-  const { workspace, setReFetchNotebookId } = useWorkspaceContext();
+export function NotebookCreateButton({ teamspaceId, children }: TeamspaceCreateButtonProps) {
+  const workspace = useStore(state => state.workspace)
+  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   async function onClick() {
-    if (!workspace) return
-
     setIsLoading(true)
-
-    console.log('dauphaihau debug: -workspace-id-workspace-id-teamspace-id-title-untitled-', {
-      workspaceId: workspace.id,
-      teamspaceId,
-      title: "Untitled",
-    })
 
     const response = await createNotebookOnTeamspace({
       workspaceId: workspace.id,
@@ -42,7 +29,6 @@ export function NotebookCreateButton({
 
     if (response.code !== '200') {
       return toast({
-        title: "Something went wrong.",
         message: "Your notebook was not created. Please try again.",
         type: "error",
       })
@@ -51,7 +37,7 @@ export function NotebookCreateButton({
     // This forces a cache invalidation.
     // router.refresh()
 
-    setReFetchNotebookId?.(teamspaceId)
+    setReFetchNotebookId(teamspaceId)
 
     // if (response?.data?.pageId && workspace) {
     //   router.push(`/${workspace.domain}/${teamspaceId}/${response.data.pageId}`)

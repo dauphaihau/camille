@@ -1,17 +1,16 @@
 'use client'
 
-import { getSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import React, { useReducer } from "react";
 import { useRouter } from "next/navigation";
 
 import { DropdownMenu, Icons, Row, Skeleton, Tooltip } from "core/components";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { PATH } from "config/const";
 import { cn } from "core/helpers";
 import LoadingDialog from "components/dialog/loading-dialog";
 import { toast } from "core/components/Toast";
-import useStore from "lib/store";
+import { useStoreMulti } from "lib/store";
 import { useGetWorkspacesByUser } from "lib/request-by-swr/workspace";
 
 const initialState: {[k: string]: boolean | string} = {
@@ -20,11 +19,9 @@ const initialState: {[k: string]: boolean | string} = {
   nameWorkspace: '',
 }
 
-export default function WorkspaceUserDropdown() {
+export function WorkspaceUserDropdown() {
   const router = useRouter();
-  const { user } = useWorkspaceContext();
-  const setShowSidebar = useStore(state => state.setShowSidebar)
-  const workspace = useStore(state => state.workspace)
+  const { user, workspace, setShowSidebar } = useStoreMulti('workspace', 'setShowSidebar')
   const [event, setEvent] = useReducer((prev, next) => ({
     ...prev, ...next
   }), initialState)
@@ -87,28 +84,18 @@ export default function WorkspaceUserDropdown() {
                   <p className='text-sm text-[#373530] font-semibold'>{workspace && workspace.name}</p>
                 </div>
               </Row>
-
-              {/*<Icons.doubleArrowLeft*/}
-              {/*  size={30}*/}
-              {/*  className='text-md group-hover:text-[#92918d] hover:bg-[#dedddb] rounded invisible group-hover:visible p-2'*/}
-              {/*  onClick={() => console.log('dauphaihau debug: logne')}*/}
-              {/*  // onClick={() => setShowSidebar?.((prevState) => !prevState)}*/}
-              {/*/>*/}
             </Row>
 
           </DropdownMenu.Trigger>
           <Tooltip>
             <Tooltip.Trigger>
               <div>
-
                 <Icons.doubleArrowLeft
                   size={30}
                   className='text-md group-hover:text-[#92918d] hover:bg-[#ecebea] rounded invisible group-hover:visible p-2 absolute top-[7px] right-[6%]'
                   // className='text-md group-hover:text-[#92918d] hover:bg-[#dedddb] rounded invisible group-hover:visible p-2'
                   onClick={setShowSidebar}
-                  // onClick={() => setShowSidebar?.((prevState) => !prevState)}
                 />
-
               </div>
             </Tooltip.Trigger>
             <Tooltip.Content className='mt-4 mr-4' side='bottom'>
@@ -154,15 +141,6 @@ export default function WorkspaceUserDropdown() {
                       >{ws.isStandard ? 'Standard Plan' : 'Free Plan'} · {ws.totalMembers} members
                       </div>
                     </div>
-                    {/*<p*/}
-                    {/*  className="w-full"*/}
-                    {/*  onClick={async () => {*/}
-                    {/*    changeWorkspace(ws)*/}
-                    {/*    setEvent({ nameWorkspace: ws.name })*/}
-                    {/*    router.refresh()*/}
-                    {/*    await getSession()*/}
-                    {/*  }}*/}
-                    {/*>{ws.name}</p>*/}
                     {workspace && ws.domain === workspace.domain && <Icons.check className='text-lg'/>}
                   </DropdownMenu.Item>
                 ))
@@ -184,22 +162,6 @@ export default function WorkspaceUserDropdown() {
                 Add an account
               </Link>
             </DropdownMenu.Item>
-
-            {/*<DropdownMenu.Item>*/}
-            {/*  <Link href="/docs" target="_blank" className="w-full">*/}
-            {/*    Documentation*/}
-            {/*  </Link>*/}
-            {/*</DropdownMenu.Item>*/}
-            {/*<DropdownMenu.Item>*/}
-            {/*  <Link*/}
-            {/*    href={siteConfig.links.github}*/}
-            {/*    className="w-full"*/}
-            {/*    target="_blank"*/}
-            {/*  >*/}
-            {/*    GitHub*/}
-            {/*  </Link>*/}
-            {/*</DropdownMenu.Item>*/}
-
             <DropdownMenu.Separator/>
             <DropdownMenu.Item
               className="cursor-pointer"

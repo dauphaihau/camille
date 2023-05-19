@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 
-import NotebookItemSidebar from "./notebook-item-sidebar";
+import { NotebookItemSidebar } from "./notebook-item-sidebar";
 import { cn } from "core/helpers";
-import NewNotebookDialog from "components/dialog/new-notebook-dialog";
+import { NewNotebookDialog } from "components/dialog/new-notebook-dialog";
 import { Box, Row, Tooltip } from "core/components";
 import useStore from "lib/store";
 
-export default function NotebookListSidebar() {
+export function PrivateNotebooksSidebar() {
   const [showNotebooks, setShowNotebooks] = useState(true)
   const workspace = useStore(state => state.workspace)
 
@@ -33,7 +33,6 @@ export default function NotebookListSidebar() {
             <div className='text-[#82817f]'>Notebook you created that are not in any teamspace.</div>
           </Tooltip.Content>
         </Tooltip>
-
 
         <NewNotebookDialog/>
       </Row>

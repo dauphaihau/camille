@@ -12,6 +12,20 @@ export async function getFavoritePages(userId: User["id"], workspaceId: Workspac
     where: {
       id: { in: arrPageId },
       deletedAt: null
+    },
+    include: {
+      notebook: {
+        select:{
+          id: true,
+          title: true
+        }
+      },
+      // notebook: true,
+      createdByUser: {
+        select: {
+          email: true
+        }
+      }
     }
   })
   return JSON.parse(JSON.stringify(res))

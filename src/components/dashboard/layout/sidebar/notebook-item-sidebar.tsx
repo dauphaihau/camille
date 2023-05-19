@@ -2,31 +2,35 @@ import { Notebook } from "@prisma/client"
 import Link from "next/link"
 import { usePathname } from 'next/navigation';
 import * as React from "react";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 import { Skeleton, Icons, Row, Tooltip, Loading } from "core/components";
 import { useGetPages } from "lib/request-by-swr/page";
 import { PageItem } from "./page-item-sidebar";
 import { cn } from "core/helpers";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { PageCreateButton } from "../../page-create-button";
 import { NotebookOperations } from "../../notebook-operations";
-import { PATH } from "config/const";
-import useStore from "lib/store";
+import { useStoreMulti } from "lib/store";
+import { PageOperations } from "../../page-operations";
 
 interface NotebookItemProps {
   notebook: Pick<Notebook, "id" | "title">
   classes?: string
+  children?: ReactNode
 }
 
-export default function NotebookItemSidebar({ notebook, classes }: NotebookItemProps) {
+export function NotebookItemSidebar({
+  notebook, classes, children
+}: NotebookItemProps) {
   const [showPages, setShowPages] = useState(false)
   const pathName = usePathname()
-  // const { workspace, reFetchNotebookId, setReFetchNotebookId } = useWorkspaceContext()
   const { isLoading, pages, mutate } = useGetPages(showPages ? notebook.id : null)
-  const workspace = useStore(state => state.workspace)
-  const reFetchNotebookId = useStore(state => state.reFetchNotebookId)
-  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
+  const {
+    reFetchNotebookId,
+    workspace,
+    setReFetchNotebookId
+  } = useStoreMulti('workspace', 'setReFetchNotebookId', 'reFetchNotebookId')
+
   const arrPath = pathName && pathName.split('/')
 
   if (reFetchNotebookId && reFetchNotebookId === notebook.id) {
@@ -77,12 +81,19 @@ export default function NotebookItemSidebar({ notebook, classes }: NotebookItemP
 
           <Row classes='flex-0 flex-shrink-0'>
             <Row gap={1} classes={'invisible w-0 group-hover/notebook:visible group-hover/notebook:w-auto'}>
-              <NotebookOperations placeOnSidebar notebook={{ id: notebook.id, title: notebook.title }}/>
+              {
+                children ||
+                <NotebookOperations
+                  placeOnSidebar
+                  notebook={{ id: notebook.id, title: notebook.title }}
+                />
+              }
+
               <PageCreateButton notebookId={notebook.id}>
                 <Tooltip>
                   <Tooltip.Trigger asChild>
                     <div>
-                      <Icons.plus size={15} className='btn-icon  text-[#686662]'/>
+                      <Icons.plus size={15} className='btn-icon text-[#686662]'/>
                     </div>
                   </Tooltip.Trigger>
                   <Tooltip.Content>
@@ -104,7 +115,11 @@ export default function NotebookItemSidebar({ notebook, classes }: NotebookItemP
                 <Loading/>
               </Row>
               :
-              pages.length > 0 ? pages.map((page) => (<PageItem key={page.id} page={page} notebook={notebook}/>)) :
+              pages.length > 0 ? pages.map((page) => (
+                  <PageItem key={page.id} page={page} notebook={notebook}>
+                    <PageOperations placeOnSidebar page={page}/>
+                  </PageItem>
+                )) :
                 <p className='font-semibold h-7 text-[14px] text-[#999895] pl-8'>No page inside</p>
           }
         </div>

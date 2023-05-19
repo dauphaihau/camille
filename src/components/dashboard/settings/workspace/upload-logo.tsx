@@ -1,21 +1,21 @@
 'use client'
 
 import { Tooltip } from "core/components";
-import { useWorkspaceContext } from "components/context/workspace-context";
+import useStore from "lib/store";
 
 export default function UpdateLogo() {
-  const { workspace } = useWorkspaceContext();
-  if (!workspace) return null
-
+  const workspace = useStore(state => state.workspace)
   return (
     <Tooltip>
       <Tooltip.Trigger>
-        <div className='avatar bg-[#ecebea] group-hover:bg-[#dcdbda] h-16 w-16
+        <div
+          className='avatar bg-[#ecebea] group-hover:bg-[#dcdbda] h-16 w-16
          rounded text-md text-[#777572] grid place-items-center
          select-none
 
-         '>
-          {workspace.name.charAt(0)}
+         '
+        >
+          {workspace.name && workspace.name.charAt(0)}
         </div>
       </Tooltip.Trigger>
       <Tooltip.Content>

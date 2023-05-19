@@ -7,15 +7,14 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime)
 
-import { Dialog, Icons, Row, InputWithoutRhf, Col, Tooltip } from "core/components";
-import { useWorkspaceContext } from "components/context/workspace-context";
+import { Dialog, Icons, Row, Col, Tooltip } from "core/components";
 import { cn, debounce, formatDate } from "core/helpers";
 import { useSearchPage } from "lib/request-by-swr/page";
 import Loading from "core/components/Loading";
 import { useKeyboardShortcut } from "core/hooks";
 import useStore from "../../lib/store";
 
-export default function SearchAllDialog() {
+export function SearchAllDialog() {
   const [searchValue, setSearchValue] = useState<string>('');
   const [open, setOpen] = useState(false);
   const shortcutOverrideSystem = useStore(state => state.shortcutOverrideSystem)

@@ -1,21 +1,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { Row } from "core/components";
-import useStore from "lib/store";
+import useStore, { useStoreMulti } from "lib/store";
 import Title from "components/common/title";
 
-export default function PageBreadcrumb() {
-  const { workspace, notebooks, page } = useWorkspaceContext();
+export function PageBreadcrumb() {
   const pathName = usePathname()?.split('/')
-  const statePageBreadcrumb = useStore(state => state.statePageBreadcrumb)
+  const page = useStore(state => state.page)
+  const { statePageBreadcrumb, workspace } = useStoreMulti('statePageBreadcrumb', 'workspace')
 
-  if (!pathName || !notebooks || notebooks.length === 0) {
-    return null
-  }
-
-  const pageId = pathName[3]
+  const pageId = pathName && pathName[3]
 
   return (
     <Row align='center' gap={2} classes={'min-w-0 flex-grow-0'}>

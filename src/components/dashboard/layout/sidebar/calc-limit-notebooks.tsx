@@ -1,20 +1,22 @@
+import Link from "next/link";
+
 import { Box } from "core/components";
 import { cn } from "core/helpers";
 import { freePlan } from "config/subscriptions";
-import { useWorkspaceContext } from "components/context/workspace-context";
-import Link from "next/link";
+import useStore from "lib/store";
 
-export default function CalcLimitNotebooks() {
-  const { workspace } = useWorkspaceContext()
+export function CalcLimitNotebooks() {
+  const workspace = useStore(state => state.workspace)
 
-  if (!workspace) return null
+  if (!workspace?.totalNotebooks || !workspace?.totalMembers) {
+    return null
+  }
 
   const totalNotebooksPercent = workspace.totalNotebooks * (100 / freePlan.limitedNotebooks)
 
   if (!workspace.isStandard && workspace.totalMembers > 1) {
     return (
       <div>
-        {/*!workspace.isStandard && <div>*/}
         <div className='border-t border-[#e9e9e8]'/>
         <Box classes='flex flex-col gap-y-1 px-4 py-3 hover:bg-[#ecebea] text-sm text-[#777572] cursor-pointer font-semibold'>
           <div className='font-semibold text-[12px]'>Upgrade to go unlimited</div>
@@ -26,23 +28,17 @@ export default function CalcLimitNotebooks() {
             {/*used {workspace.totalNotebooks} of its {freePlan.limitedNotebooks} block*/}
             used {workspace.totalNotebooks} of its {freePlan.limitedNotebooks} notebook
             storage limit ({totalNotebooksPercent >= 100 ? 100 : totalNotebooksPercent}%).
-            {/*storage limit (43%).*/}
           </div>
           <div className="w-full bg-[#eeeeec] rounded-sm h-1.5">
             <div
               className="bg-[#a1a09e] h-1.5 rounded-sm"
-              style={{
-                width: `${
-                  totalNotebooksPercent >= 100 ? 100 : totalNotebooksPercent
-                }%`
-              }}
+              style={{ width: `${totalNotebooksPercent >= 100 ? 100 : totalNotebooksPercent}%` }}
             />
           </div>
           <Link
             href={`/${workspace.domain}/settings/plans`}
             className='font-normal text-[12px] underline decoration-1'
           >Upgrade plan</Link>
-          {/*<div className='font-normal text-[12px] underline decoration-1'>Upgrade plan</div>*/}
         </Box>
       </div>
     )

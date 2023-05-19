@@ -6,14 +6,13 @@ import { Notebook, Page } from "@prisma/client"
 import TextareaAutosize from "react-textarea-autosize"
 import { useCallback, useEffect, useRef, useState } from "react"
 import * as z from "zod"
+import { useRouter } from "next/navigation";
 
 import { pagePatchSchema } from "lib/validations/page"
 import { toast } from "core/components/Toast"
 import { debounce } from "core/helpers";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { updatePage } from "lib/request-by-swr/page";
-import useStore from "lib/store";
-import { useRouter } from "next/navigation";
+import { useStoreMulti } from "lib/store";
 
 interface EditorProps {
   page: Pick<Page, "id" | "title" | "content" | "shareToWeb" | 'notebookId'> & {notebook: Notebook}
@@ -29,10 +28,12 @@ export function Editor({ page, readOnly = false }: EditorProps) {
   const editorInstance = useRef<EditorJS>()
   const titleInstance = useRef<HTMLTextAreaElement>(null)
   const [isMounted, setIsMounted] = useState<boolean>(false)
-  const { setPage, page: pageContext } = useWorkspaceContext()
-  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
-  const setStatePageBreadcrumb = useStore(state => state.setStatePageBreadcrumb)
-  const setShortcutOverrideSystem = useStore(state => state.setShortcutOverrideSystem)
+  const {
+    setReFetchNotebookId,
+    setStatePageBreadcrumb,
+    setShortcutOverrideSystem,
+    page: pageContext, setPage
+  } = useStoreMulti('setReFetchNotebookId', 'setStatePageBreadcrumb', 'setShortcutOverrideSystem', 'page', 'setPage')
 
   async function initializeEditor() {
     const EditorJS = (await import("@editorjs/editorjs")).default
@@ -158,7 +159,7 @@ export function Editor({ page, readOnly = false }: EditorProps) {
   return (
     <div className="grid w-full gap-10">
       <div className="prose prose-stone max-w-[708px] mx-auto pb-[30vh]">
-      {/*<div className="prose prose-stone mx-auto w-[800px] pb-[30vh]">*/}
+        {/*<div className="prose prose-stone mx-auto w-[800px] pb-[30vh]">*/}
         <div className={'flex flex-col justify-end mt-16 mb-2'}>
           <TextareaAutosize
             disabled={readOnly}

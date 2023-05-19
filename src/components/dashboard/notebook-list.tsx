@@ -4,7 +4,7 @@ import { NotebookItem } from "./notebooks/notebook-item";
 import { EmptyPlaceholder } from "./empty-placeholder";
 import useStore from "lib/store";
 
-export default function NotebookList() {
+export function NotebookList() {
   const workspace = useStore(state => state.workspace)
 
   return (

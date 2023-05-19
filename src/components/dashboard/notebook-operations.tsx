@@ -1,20 +1,21 @@
 "use client"
 
 import { Notebook } from "@prisma/client"
-import { useRouter, useSelectedLayoutSegment, useSelectedLayoutSegments } from "next/navigation"
+import { useRouter, useSelectedLayoutSegment } from "next/navigation"
 import { useCallback, useReducer } from "react"
 
-import { Alert, Button, Icons, Tooltip, DropdownMenu, InputWithoutRhf } from "core/components"
+import { Alert, Button, Icons, DropdownMenu, InputWithoutRhf } from "core/components"
 import { toast } from "core/components/Toast"
 import { deleteNotebook, updateNotebook } from "lib/request-by-swr/notebook";
 import { cn, debounce } from "core/helpers";
 import { PATH } from "config/const";
 import { Popover } from "core/components";
-import useStore from "lib/store";
+import { useStoreMulti } from "lib/store";
 
 interface NotebookOperationsProps {
   notebook: Pick<Notebook, "id" | 'title'>,
   placeOnSidebar?: boolean
+  teamspaceId?: string
 }
 
 const initialState: {[k: string]: boolean} = {
@@ -24,10 +25,10 @@ const initialState: {[k: string]: boolean} = {
   isDeleteLoading: false,
 }
 
-export function NotebookOperations({ notebook, placeOnSidebar = false }: NotebookOperationsProps) {
+export function NotebookOperations({ teamspaceId, notebook, placeOnSidebar = false }: NotebookOperationsProps) {
   const router = useRouter()
   const currentNotebookId = useSelectedLayoutSegment()
-  const workspace = useStore(state => state.workspace)
+  const { workspace, setReFetchTeamspaceId } = useStoreMulti('workspace', 'setReFetchTeamspaceId')
   const [event, setEvent] = useReducer((prev, next) => ({
     ...prev, ...next
   }), initialState)
@@ -55,6 +56,10 @@ export function NotebookOperations({ notebook, placeOnSidebar = false }: Noteboo
 
     if (currentNotebookId === notebook.id) {
       router.push(workspace?.domain ? `/${workspace.domain}` : PATH.HOME)
+    }
+
+    if (teamspaceId) {
+      setReFetchTeamspaceId(teamspaceId)
     }
     router.refresh()
   }

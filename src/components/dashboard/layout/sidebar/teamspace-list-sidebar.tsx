@@ -9,7 +9,7 @@ import TeamspaceItemSidebar from "./teamspace-item-sidebar";
 import * as React from "react";
 import useStore from "lib/store";
 
-export default function TeamspaceListSidebar() {
+export function TeamspaceListSidebar() {
   const [showTeamspaces, setShowTeamspaces] = useState(true)
   const workspace = useStore(state => state.workspace)
 

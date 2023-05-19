@@ -1,32 +1,31 @@
 import { Favorite, Notebook, Page } from "@prisma/client"
 import Link from "next/link"
+import { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 import { Skeleton } from "core/components/skeleton"
 import { Icons, Row, Tooltip } from "core/components";
 import { cn } from "core/helpers";
-import { usePathname } from "next/navigation";
-import { PageOperations } from "../../page-operations"
-import { useWorkspaceContext } from "components/context/workspace-context";
 import useStore from "lib/store";
 
 interface PageItemProps {
   page: Pick<Page, "id" | "title" | "content" | "updatedAt" | "updatedBy" | "notebookId"> & {
     favorites?: Favorite[]
-    createdByUser: {
+    createdByUser?: {
       email: string
     }
   }
-  notebook: Pick<Notebook, "id" | "title">
+  notebook?: Pick<Notebook, "id" | "title">
   favorite?: boolean
+  children: ReactNode
 }
 
-export function PageItem({ page, favorite, notebook }: PageItemProps) {
+export function PageItem({ page, favorite, notebook, children }: PageItemProps) {
+  const setStatePageBreadcrumb = useStore(state => state.setStatePageBreadcrumb)
+  const pageContext = useStore(state => state.page)
   const pathName = usePathname()
-  const { page: pageContext } = useWorkspaceContext()
   const domain = pathName && pathName.split('/')[1]
   const arrPath = pathName && pathName.split('/')
-
-  const setStatePageBreadcrumb = useStore(state => state.setStatePageBreadcrumb)
 
   return (
     <Row
@@ -38,7 +37,6 @@ export function PageItem({ page, favorite, notebook }: PageItemProps) {
       ]}
     >
       <Row align='center' gap={1} classes='w-full'>
-
         <Row classes='flex-0 flex-shrink-0'>
           <Tooltip>
             <Tooltip.Trigger>
@@ -54,6 +52,7 @@ export function PageItem({ page, favorite, notebook }: PageItemProps) {
             {page.content ? <Icons.pageText/> : <Icons.page/>}
           </div>
         </Row>
+
         <Link
           onClick={() => setStatePageBreadcrumb({ notebook, page })}
           href={`${domain}/${page.notebookId}/${page.id}`}
@@ -67,11 +66,10 @@ export function PageItem({ page, favorite, notebook }: PageItemProps) {
 
         <Row classes='flex-0 flex-shrink-0'>
           <Row gap={1} classes={'invisible w-0 group-hover/favorite:visible group-hover/favorite:w-auto'}>
-            <PageOperations favorite={favorite} placeOnSidebar page={page}/>
+            {children}
           </Row>
         </Row>
       </Row>
-
     </Row>
   )
 }

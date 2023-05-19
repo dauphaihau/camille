@@ -3,22 +3,21 @@
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { usePathname } from "next/navigation";
+import { useCallback, useState } from "react";
 
 import { Icons, Row } from "core/components";
-import PageBreadcrumb from "./page-breadcrumb";
-import { useWorkspaceContext } from "components/context/workspace-context";
+import { PageBreadcrumb } from "./page-breadcrumb";
 import { PageOperations } from "../../page-operations";
 import FavoriteButton from "./favorite-button";
 import ShareButton from "./share-button";
 import ViewAllUpdatesButton from "./view-all-updates-button";
 import useStore from "lib/store";
-import { useCallback, useState } from "react";
 import { useKeyboardShortcut } from "core/hooks";
 
 dayjs.extend(relativeTime)
 
 export default function OperationOnTopPage({ page }) {
-  const { pagesFavorite } = useWorkspaceContext()
+  const user = useStore(state => state.user)
   const [triggerShortcutShare, setTriggerShortcutShare] = useState(false)
 
   const showSidebar = useStore(state => state.showSidebar)
@@ -27,7 +26,7 @@ export default function OperationOnTopPage({ page }) {
 
   const pathName = usePathname()
   const pageId = pathName && pathName.split('/')[3]
-  const isFavorite = pagesFavorite?.some(p => p.id === pageId)
+  const isFavorite = user.favoritePages?.some(p => p.id === pageId)
 
   const shortcutSidebar = ['Meta', 's'];
   const handleShortcutSidebar = useCallback(() => {

@@ -1,46 +1,7 @@
 import { create } from "zustand";
-import { Notebook, Page, Teamspace, User, UserOnWorkspace, Workspace } from "@prisma/client";
+import { IStoreState } from "types/store";
 
-export interface StoreState {
-  page: Partial<Page>,
-  // page: Page,
-  setPage: (page) => void,
-
-  reFetchNotebookId: string,
-  setReFetchNotebookId: (notebookId: string) => void,
-
-  stateRouter: any
-  setStateRouter: (state: object) => void
-  statePageBreadcrumb: any
-  setStatePageBreadcrumb: (state: object) => void
-  setWorkspace: (state: Workspace) => void
-  workspace: Partial<Workspace & {
-    notebooks: Notebook[]
-    teamspaces: Teamspace[]
-    isStandard: boolean
-    totalMembers: number
-    totalNotebooks: number
-  }>,
-
-  userOnWorkspace: Partial<{
-    user: User
-  } & UserOnWorkspace>
-  setUserOnWorkspace: (userOnWorkspace: object) => void,
-
-  setShowSidebar: () => void,
-  showSidebar: boolean,
-
-  setShortcutOverrideSystem: (val: boolean) => void,
-  shortcutOverrideSystem: boolean,
-
-  setShowPagesInTrashPopover: (val: boolean) => void,
-  showPagesInTrashPopover: boolean,
-
-  setShowLimitedNotebookBar: (showLimitedNotebookBar?: boolean | undefined) => void,
-  showLimitedNotebookBar: boolean,
-}
-
-const useStore = create<StoreState>(set => ({
+const useStore = create<IStoreState>(set => ({
   showSidebar: true,
   setShowSidebar: () => set(state => ({ showSidebar: !state.showSidebar })),
 
@@ -56,6 +17,9 @@ const useStore = create<StoreState>(set => ({
   reFetchNotebookId: '',
   setReFetchNotebookId: reFetchNotebookId => set({ reFetchNotebookId }),
 
+  reFetchTeamspaceId: '',
+  setReFetchTeamspaceId: reFetchTeamspaceId => set({ reFetchTeamspaceId }),
+
   stateRouter: {},
   setStateRouter: stateRouter => set({ stateRouter }),
 
@@ -68,10 +32,21 @@ const useStore = create<StoreState>(set => ({
   statePageBreadcrumb: {},
   setStatePageBreadcrumb: statePageBreadcrumb => set({ statePageBreadcrumb }),
 
-  // workspace: null,
   workspace: {},
   setWorkspace: workspace => set({ workspace }),
 
+  user: {},
+  setUser: user => set({ user }),
 }));
+
+function useMulti(func, ...items) {
+  return items.reduce((carry, item) => ({
+    ...carry,
+    [item]: func(state => state[item]),
+  }), {})
+}
+
+export const useStoreMulti = (...items: string[]): IStoreState => useMulti(useStore, ...items)
+// export const useStoreMulti = (...items: (string | IStoreState)[]): IStoreState => useMulti(useStore, ...items)
 
 export default useStore;

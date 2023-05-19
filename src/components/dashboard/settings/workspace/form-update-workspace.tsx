@@ -1,19 +1,18 @@
 'use client'
 
 import { FormProvider, useForm } from "react-hook-form";
-import * as React from "react";
 import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
 
 import { Button, Col, Input } from "core/components";
 import { toast } from "core/components/Toast";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { PATH, ROLE_USER_ON_WORKSPACE } from "config/const";
 import { updateInfoGeneralWorkspace } from "lib/request-by-swr/workspace";
-import { useEffect } from "react";
+import useStore from "lib/store";
 
 export default function FormUpdateWorkspace({ workspace }) {
   const router = useRouter();
-  const { userOnWorkspace } = useWorkspaceContext();
+  const user = useStore(state => state.user)
   const [isLoading, setIsLoading] = React.useState(false)
 
   const methods = useForm({
@@ -90,8 +89,8 @@ export default function FormUpdateWorkspace({ workspace }) {
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <Col gap={4}>
-          <Input disabled={userOnWorkspace?.role === ROLE_USER_ON_WORKSPACE.MEMBER} id='name' label='Name'/>
-          <Input disabled={userOnWorkspace?.role === ROLE_USER_ON_WORKSPACE.MEMBER} id='domain' label='Domain'/>
+          <Input disabled={user.userOnWorkspace?.role === ROLE_USER_ON_WORKSPACE.MEMBER} id='name' label='Name'/>
+          <Input disabled={user.userOnWorkspace?.role === ROLE_USER_ON_WORKSPACE.MEMBER} id='domain' label='Domain'/>
           <Button
             disabled={!methods.formState.isDirty}
             isLoading={isLoading} classes='mt-2' type='submit' width='fit'

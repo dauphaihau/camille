@@ -5,19 +5,17 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { Input, Button, Dialog, Icons } from "core/components";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { toast } from "core/components/Toast";
 import { addMember } from "lib/request-by-swr/settings-member";
 import { ROLE_USER_ON_WORKSPACE } from "config/const";
+import { useStoreMulti } from "lib/store";
 
 export default function AddMemberDialog() {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false)
   const formHandler = useForm();
   const router = useRouter();
-  const { workspace, userOnWorkspace } = useWorkspaceContext();
-
-  if (!userOnWorkspace) return null
+  const { workspace, user } = useStoreMulti('workspace', 'user')
 
   async function onSubmit({ email }) {
     setIsLoading(true)
@@ -46,7 +44,7 @@ export default function AddMemberDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Dialog.Trigger>
-        <Button disabled={userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER}>Add members</Button>
+        <Button disabled={user.userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER}>Add members</Button>
       </Dialog.Trigger>
 
       <Dialog.Content>
@@ -72,7 +70,7 @@ export default function AddMemberDialog() {
             />
             <div className='flex justify-end pt-5 gap-1'>
               <Button
-                disabled={formHandler.watch('email') === userOnWorkspace.user.email || isLoading}
+                disabled={formHandler.watch('email') === user.email || isLoading}
                 type="submit" isLoading={isLoading}
               >
                 Invite

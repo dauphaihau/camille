@@ -3,23 +3,22 @@
 import * as z from "zod";
 import { useCallback, useReducer } from "react"
 import { useRouter, useSelectedLayoutSegments } from "next/navigation"
-import { Page, Favorite, User } from "@prisma/client"
+import { Page, Favorite } from "@prisma/client"
 import hotToast from "react-hot-toast";
 
 import { InputWithoutRhf, Popover, Col, Icons, Tooltip, DropdownMenu } from "core/components"
 import { Toast, toast } from "core/components/Toast"
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { addToFavorite, createPage, deletePage } from "lib/request-by-swr/page"
 import { cn, debounce, formatDate, getValueOfLastBracketInString } from "core/helpers";
 import { DELETE_PAGE_TYPE, PATH } from "config/const";
 import { updatePage } from "lib/request-by-swr/page";
 import { pagePatchSchema } from "lib/validations/page";
-import useStore from "../../lib/store";
+import { useStoreMulti } from "lib/store";
 
 interface PageOperationsProps {
   page: Pick<Page, "id" | "title" | "content" | "updatedAt" | "updatedBy" | "notebookId"> & {
     favorites?: Favorite[]
-    createdByUser: {
+    createdByUser?: {
       email: string
     }
   }
@@ -40,14 +39,16 @@ export function PageOperations({
   page,
   placeOnSidebar = false,
   favorite = false,
-  classesTrigger,
   classesContent,
 }: PageOperationsProps) {
   const router = useRouter()
   const segment = useSelectedLayoutSegments()
-  // const { setPage, workspace, setReFetchNotebookId } = useWorkspaceContext();
-  const { setPage, workspace } = useWorkspaceContext();
-  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
+  const {
+    setReFetchNotebookId,
+    workspace,
+    setPage,
+  } = useStoreMulti('setReFetchNotebookId', 'workspace', 'setPage')
+
   const [event, setEvent] = useReducer((prev, next) => ({
     ...prev, ...next
   }), initialState)
@@ -209,7 +210,7 @@ export function PageOperations({
 
   const debounceTitle = useCallback(
     debounce((value) => {
-      handleUpdatePage(page.id, { title: value })
+      handleUpdatePage?.(page.id, { title: value })
     }, 300),
     []
   )
@@ -281,7 +282,6 @@ export function PageOperations({
           <InputWithoutRhf
             id='pageTitle'
             defaultValue={page.title}
-            // value={pageContext?.title || page.title}
             onChange={(e) => {
               setPage?.({ ...page, title: e.target.value })
               debounceTitle(e.target.value)

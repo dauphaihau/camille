@@ -246,4 +246,3 @@ export const capitalizeEachWord = (text: string) => {
   const pattern = /(^\w|\s\w)(\S*)/g
   return text.replace(pattern, (_, m1, m2) => m1.toUpperCase() + m2.toLowerCase())
 }
-

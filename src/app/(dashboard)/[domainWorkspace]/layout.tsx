@@ -4,11 +4,10 @@ import { notFound, redirect } from "next/navigation";
 import { getInfoUserOnWorkspace } from "lib/request/user";
 import { getDetailWorkspace } from "lib/request/workspace";
 import { getFavoritePages } from "lib/request/page";
-import { WorkspaceProvider } from "components/context/workspace-context";
+import { WorkspaceWrapper } from "components/context/workspace-wrapper";
 import { getCurrentUser } from "lib/session";
 import PermissionAccessWorkspace from "components/dashboard/permission-access-workspace";
 import PageShareToWeb from "components/share-page/page-share-to-web";
-import { db } from "lib/db";
 import { PATH, SUFFIX_DOMAIN_SHARE_TO_WEB } from "config/const";
 
 interface DashboardLayoutProps {
@@ -25,16 +24,12 @@ export default async function DashboardLayout({
 }: DashboardLayoutProps) {
   const user = await getCurrentUser()
 
-  if (!user) {
-    if (params && params.domainWorkspace.includes(SUFFIX_DOMAIN_SHARE_TO_WEB)) {
-      return <PageShareToWeb/>
-    }
-    // return notFound()
-    redirect(PATH.HOME)
-  }
-
   if (params && params.domainWorkspace.includes(SUFFIX_DOMAIN_SHARE_TO_WEB)) {
     return <PageShareToWeb/>
+  }
+
+  if (!user) {
+    redirect(PATH.HOME)
   }
 
   const workspace = await getDetailWorkspace(params?.domainWorkspace ?? '', user.id)
@@ -43,7 +38,7 @@ export default async function DashboardLayout({
     return notFound()
   }
 
-  const pages = await getFavoritePages(user.id, workspace.id)
+  const favoritePages = await getFavoritePages(user.id, workspace.id)
 
   const userOnWorkspace = await getInfoUserOnWorkspace(user.id, { id: workspace.id })
 
@@ -51,19 +46,17 @@ export default async function DashboardLayout({
     return <PermissionAccessWorkspace workspace={workspace} user={user}/>
   }
 
-  if (!userOnWorkspace) {
-    return notFound()
-  }
-
   return (
-    <WorkspaceProvider
-      user={user}
+    <WorkspaceWrapper
       workspace={workspace}
-      userOnWorkspace={userOnWorkspace}
-      notebooks={workspace?.notebooks}
-      pagesFavorite={pages}
+      user={{
+        ...user,
+        userOnWorkspace,
+        privateNotebooks: workspace?.notebooks,
+        favoritePages
+      }}
     >
       {children}
-    </WorkspaceProvider>
+    </WorkspaceWrapper>
   )
 }

@@ -3,21 +3,24 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { Icons, Tooltip } from "core/components";
 import { cn } from "core/helpers";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { addToFavorite } from "lib/request-by-swr/page";
 import { toast } from "core/components/Toast";
 import { useKeyboardShortcut } from "core/hooks";
-import useStore from "lib/store";
+import useStore, { useStoreMulti } from "lib/store";
 
 export default function FavoriteButton({ page }) {
-  const { pagesFavorite } = useWorkspaceContext()
   const pathName = usePathname()
   const router = useRouter()
   const pageId = pathName && pathName.split('/')[3]
-  const isFavorite = pagesFavorite?.some(p => p.id === pageId)
-  const workspace = useStore(state => state.workspace)
-  const shortcutOverrideSystem = useStore(state => state.shortcutOverrideSystem)
-  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
+  const {
+    workspace,
+    shortcutOverrideSystem,
+    setReFetchNotebookId
+  } = useStoreMulti('workspace', 'shortcutOverrideSystem', 'setReFetchNotebookId')
+
+  const user = useStore(state => state.user)
+
+  const isFavorite = user.favoritePages?.some(p => p.id === pageId)
 
   async function handleAddToFavorite() {
     if (!workspace) return null

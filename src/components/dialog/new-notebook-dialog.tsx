@@ -5,28 +5,30 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { Input, Button, Dialog, Icons, Tooltip, Textarea, Col } from "core/components";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { toast } from "core/components/Toast";
 import { createNotebook, createNotebookOnTeamspace } from "lib/request-by-swr/notebook";
-import useStore from "lib/store";
+import { useStoreMulti } from "lib/store";
 import { freePlan } from "config/subscriptions";
 import { cn } from "core/helpers";
 
 interface NewNotebookDialogProps {
   trigger?: ReactNode
   teamspaceId?: string
-  createInTeamspace?: boolean
-  mutateNotebooks?: () => void
 }
 
-export default function NewNotebookDialog({ trigger, createInTeamspace, teamspaceId, mutateNotebooks }: NewNotebookDialogProps) {
+export function NewNotebookDialog({
+  trigger,
+  teamspaceId,
+}: NewNotebookDialogProps) {
+  const router = useRouter()
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false)
   const formHandler = useForm();
-  const router = useRouter();
-  const { workspace } = useWorkspaceContext();
-
-  const setShowLimitedNotebookBar = useStore(state => state.setShowLimitedNotebookBar)
+  const {
+    setShowLimitedNotebookBar,
+    workspace,
+    setReFetchTeamspaceId
+  } = useStoreMulti('workspace', 'setReFetchTeamspaceId', 'setShowLimitedNotebookBar')
 
   if (!workspace) return null
 
@@ -35,7 +37,6 @@ export default function NewNotebookDialog({ trigger, createInTeamspace, teamspac
     if (!workspace) return
 
     let response;
-
     if (teamspaceId) {
       response = await createNotebookOnTeamspace({
         workspaceId: workspace.id,
@@ -60,16 +61,18 @@ export default function NewNotebookDialog({ trigger, createInTeamspace, teamspac
       }
 
       return toast({
-        title: "Something went wrong.",
         message: "Your notebooks was not created. Please try again.",
         type: "error",
       })
     }
 
-    mutateNotebooks?.()
-    router.refresh()
     setOpen(!open)
     formHandler.reset()
+
+    if (teamspaceId) {
+      setReFetchTeamspaceId(teamspaceId)
+    }
+    router.refresh()
   }
 
   const Trigger = () => {
@@ -89,7 +92,10 @@ export default function NewNotebookDialog({ trigger, createInTeamspace, teamspac
     </Tooltip>
   }
 
-  if (!workspace.isStandard && workspace.totalMembers > 1 && workspace.totalNotebooks >= freePlan.limitedNotebooks) {
+  if (!workspace.isStandard &&
+    (workspace.totalMembers && workspace.totalMembers > 1) &&
+    (workspace.totalNotebooks && workspace.totalNotebooks >= freePlan.limitedNotebooks)
+  ) {
     return <div onClick={() => setShowLimitedNotebookBar(true)}>
       <Trigger/>
     </div>

@@ -9,12 +9,11 @@ import { DropdownMenu } from "core/components/dropdown"
 import { Button, Icons, Row } from "core/components"
 import { Alert } from "core/components/alert"
 import { toast } from "core/components/Toast"
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { cn } from "core/helpers";
 import { PATH, ROLE_USER_ON_WORKSPACE } from "config/const";
 import { deleteMember, memberLeave, updateRoleMember } from "lib/request-by-swr/settings-member";
 import LoadingDialog from "../../../dialog/loading-dialog";
-import useStore from "../../../../lib/store";
+import { useStoreMulti } from "lib/store";
 
 interface MemberOperationsProps {
   member: Pick<User, "id" | 'name'> & Pick<UserOnWorkspace, "role">,
@@ -34,14 +33,12 @@ const initialState: {[k: string]: boolean} = {
 
 export function MemberOperations({ member, members, currentUserIsAdmin }: MemberOperationsProps) {
   const router = useRouter()
-  // const { workspace, userOnWorkspace, user } = useWorkspaceContext();
-  const { userOnWorkspace, user } = useWorkspaceContext();
-  const workspace = useStore((state) => state.workspace)
+  const { user, workspace } = useStoreMulti('user', 'workspace')
   const [event, setEvent] = useReducer((prev, next) => ({
     ...prev, ...next
   }), initialState)
 
-  if (!userOnWorkspace || !workspace || !user) {
+  if (!user.userOnWorkspace || !workspace || !user) {
     return null
   }
 
@@ -49,7 +46,7 @@ export function MemberOperations({ member, members, currentUserIsAdmin }: Member
     if (workspace && member) {
       setEvent({ isDeleteLoading: true })
       let response;
-      if (event.userLeaveWorkspace && userOnWorkspace) {
+      if (event.userLeaveWorkspace && user.userOnWorkspace) {
         response = await memberLeave()
       } else {
         response = await deleteMember(member.id)

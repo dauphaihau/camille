@@ -7,7 +7,7 @@ import { cn } from "core/helpers";
 import { Box, Col, Icons, Row } from "core/components";
 import useStore from "lib/store";
 
-export default function SettingsSidebar({ urlBeforeNavigateSettingPage }) {
+export function SettingsSidebar({ urlBeforeNavigateSettingPage }) {
   const pathName = usePathname();
   const workspace = useStore(state => state.workspace)
 

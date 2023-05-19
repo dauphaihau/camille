@@ -1,16 +1,15 @@
 'use client'
 
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { Button, Col, Dialog, Icons, Input } from "core/components";
 import { toast } from "core/components/Toast";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { PATH, ROLE_USER_ON_WORKSPACE } from "config/const";
 import { deleteWorkspace } from "lib/request-by-swr/workspace";
-import useStore from "lib/store";
+import { useStoreMulti } from "lib/store";
 import LoadingDialog from "components/dialog/loading-dialog";
 
 export default function DeleteWorkspaceButton({ workspaceId }) {
@@ -18,14 +17,11 @@ export default function DeleteWorkspaceButton({ workspaceId }) {
   const formHandler = useForm();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false)
-  const { userOnWorkspace } = useWorkspaceContext();
-  const workspace = useStore(state => state.workspace)
+  const { user, workspace } = useStoreMulti('user', 'workspace')
 
   useEffect(() => {
     formHandler.reset()
   }, [open])
-
-  if (!userOnWorkspace) return null
 
   async function onSubmit() {
     setIsLoading(true)
@@ -62,7 +58,7 @@ export default function DeleteWorkspaceButton({ workspaceId }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <Dialog.Trigger asChild>
           <Button
-            disabled={userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER}
+            disabled={user.userOnWorkspace?.role === ROLE_USER_ON_WORKSPACE.MEMBER}
             color='red'
           >
             Delete this workspace

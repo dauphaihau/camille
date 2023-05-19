@@ -5,9 +5,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { Tooltip, Input, Button, Dialog, Icons, Textarea, Col } from "core/components";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { toast } from "core/components/Toast";
 import { createTeamspace } from "lib/request/teamspace";
+import useStore from "lib/store";
 
 export default function NewTeamspaceDialog() {
   const [open, setOpen] = useState(false);
@@ -18,7 +18,7 @@ export default function NewTeamspaceDialog() {
     formHandler.reset()
   }, [open])
   const router = useRouter();
-  const { workspace } = useWorkspaceContext();
+  const workspace = useStore(state => state.workspace)
 
   async function onSubmit(data) {
     setIsLoading(true)

@@ -1,18 +1,19 @@
 'use client'
 
+import * as React from "react";
 import { useState } from "react";
 
 import { cn } from "core/helpers";
-import { useWorkspaceContext } from "components/context/workspace-context";
 import { Box, Row } from "core/components";
 import { PageItem } from "./page-item-sidebar";
-import * as React from "react";
+import useStore from "lib/store";
+import { PageOperations } from "components/dashboard/page-operations";
 
-export default function PagesFavoriteListSidebar() {
+export function FavoritePagesSidebar() {
   const [showPages, setShowPages] = useState(true)
-  const { pagesFavorite } = useWorkspaceContext();
+  const user = useStore(state => state.user)
 
-  if (pagesFavorite && pagesFavorite.length === 0) {
+  if (user.favoritePages && user.favoritePages.length === 0) {
     return null
   }
 
@@ -28,9 +29,11 @@ export default function PagesFavoriteListSidebar() {
         showPages &&
         <div className='px-1'>
           {
-            pagesFavorite && pagesFavorite.length ?
-              pagesFavorite.map((page) => (
-                <PageItem favorite key={page.id} page={page}/>
+            user.favoritePages && user.favoritePages.length ?
+              user.favoritePages.map((page) => (
+                <PageItem key={page.id} page={page} notebook={page.notebook}>
+                  <PageOperations favorite placeOnSidebar page={page}/>
+                </PageItem>
               ))
               : null
           }

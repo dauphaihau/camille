@@ -13,7 +13,7 @@ import { DELETE_PAGE_TYPE } from "config/const";
 import Title from "components/common/title";
 import useStore from "lib/store";
 
-export default function PagesInTrashPopover() {
+export function PagesInTrashPopover() {
   const [state, setState] = useState({
     showPopover: false,
     showDeleteAlert: false,
