@@ -5,7 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { Tooltip, Input, Button, Dialog, Icons, Textarea, Col } from "core/components";
-import { toast } from "core/components/Toast";
+import { toast } from "core/components";
 import { createTeamspace } from "lib/request/teamspace";
 import useStore from "lib/store";
 

@@ -7,7 +7,7 @@ interface LoadingDialogProps {
   message: string
 }
 
-export default function LoadingDialog({ open, message }: LoadingDialogProps) {
+export function LoadingDialog({ open, message }: LoadingDialogProps) {
   return (
     <Dialog open={open}>
       <Dialog.Content

@@ -7,7 +7,7 @@ import { Teamspace } from "@prisma/client"
 import { DropdownMenu } from "core/components/dropdown"
 import { Button, Icons, Tooltip } from "core/components"
 import { Alert } from "core/components/alert"
-import { toast } from "core/components/Toast"
+import { toast } from "core/components"
 import { useState } from "react"
 import { cn } from "core/helpers";
 import { archived } from "lib/request/teamspace";

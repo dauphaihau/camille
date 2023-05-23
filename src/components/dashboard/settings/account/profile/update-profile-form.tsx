@@ -5,7 +5,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 
 import { Button, Col, Input } from "core/components";
-import { toast } from "core/components/Toast";
+import { toast } from "core/components";
 import { updateProfile } from "lib/request-by-swr/settings-account-profile";
 
 export default function UpdateProfileForm({ user }) {

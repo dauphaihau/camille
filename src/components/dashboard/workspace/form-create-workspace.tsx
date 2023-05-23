@@ -7,10 +7,10 @@ import { getSession } from "next-auth/react";
 import * as z from "zod";
 
 import { Button, Col, Input } from "core/components";
-import { toast } from "core/components/Toast";
+import { toast } from "core/components";
 import { workspaceSchema } from "lib/validations/workspace";
 import { zodResolver } from "@hookform/resolvers/zod";
-import LoadingDialog from "components/dialog/loading-dialog";
+import { LoadingDialog } from "components/dialog/loading-dialog";
 import { PATH } from "config/const";
 import { createWorkspace } from "../../../lib/request-by-swr/workspace";
 

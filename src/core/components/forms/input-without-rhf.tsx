@@ -2,15 +2,10 @@
 
 import { cn } from 'core/helpers';
 import * as React from 'react';
-import { RegisterOptions, useFormContext } from 'react-hook-form';
 
-export type InputProps = {
+export type InputWithoutRhfProps = {
   /** Input label */
   label?: string;
-  /**
-   * id to be initialized with React Hook Form,
-   * must be the same with the pre-defined types.
-   */
   id: string;
   /** Small text below input, useful for additional information */
   helperText?: string;
@@ -20,33 +15,18 @@ export type InputProps = {
    */
   type?: React.HTMLInputTypeAttribute;
   classes?: string
-  /** Disables the input and shows defaultValue (can be set from React Hook Form) */
-  readOnly?: boolean;
-  /** Disable error style (not disabling error validation) */
-  hideError?: boolean;
-  size?: 'xs' | 'sm' | 'md';
-  /** Manual validation using RHF, it is encouraged to use yup resolver instead */
-  validation?: RegisterOptions;
-// }
+  sizeInput?: 'xs' | 'sm' | 'md';
 } & React.ComponentPropsWithoutRef<'input'>;
 
-export default function Input({
+export function InputWithoutRhf({
   label,
   helperText,
   id,
   classes,
-  size = 'sm',
+  sizeInput = 'sm',
   type = 'text',
-  readOnly = false,
-  hideError = false,
-  validation,
   ...others
-}: InputProps) {
-
-  // const {
-  //   register,
-  //   formState: { errors },
-  // } = useFormContext();
+}: InputWithoutRhfProps) {
 
   return (
     <div className='w-full'>
@@ -60,11 +40,7 @@ export default function Input({
         {/*<Clear/>*/}
         <input
           autoFocus={false}
-          // ref={ref}
           type={type}
-          // value={value}
-          // name={name}
-          // onChange={handleOnChange}
           className={cn(
             `
           bg-[#f7f7f7] focus:bg-white
@@ -83,11 +59,10 @@ export default function Input({
           disabled:bg-[#e9ecef] 
           disabled:text-[#aeb5bc]
         `,
-
             [
-              size === 'xs' && ['px-[14px] h-[28px] text-xs'],
-              size === 'sm' && ['px-4 h-[34px] text-sm'],
-              size === 'md' && ['px-[22px] h-[42px] text-base'],
+              sizeInput === 'xs' && ['px-[14px] h-[28px] text-xs'],
+              sizeInput === 'sm' && ['px-4 h-[34px] text-sm'],
+              sizeInput === 'md' && ['px-[22px] h-[42px] text-base'],
             ],
             'p-2.5 md:pr-5',
             // { 'pl-10': contentLeft },
@@ -97,10 +72,8 @@ export default function Input({
         />
       </div>
       {helperText && <p className='text-red-500 text-sm mt-2'>{helperText}</p>}
-      {/*{errors[id] && <p className='text-red-500 text-sm mt-2'>{errors[id]?.message as unknown as string}</p>}*/}
-
     </div>
   );
 }
 
-Input.displayName = 'Input';
+InputWithoutRhf.displayName = 'Input';

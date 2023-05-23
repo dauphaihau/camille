@@ -9,7 +9,7 @@ import * as z from "zod"
 import { useRouter } from "next/navigation";
 
 import { pagePatchSchema } from "lib/validations/page"
-import { toast } from "core/components/Toast"
+import { toast } from "core/components"
 import { debounce } from "core/helpers";
 import { updatePage } from "lib/request-by-swr/page";
 import { useStoreMulti } from "lib/store";

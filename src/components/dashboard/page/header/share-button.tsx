@@ -1,8 +1,8 @@
 import { Button, Col, Icons, Popover, Row, Tooltip } from "core/components";
 import React, { useEffect, useState } from "react";
-import Switch from "core/components/forms/Switch";
+import Switch from "core/components/forms/switch";
 import { sharePageToWeb } from "lib/request-by-swr/page";
-import { Toast, toast } from "core/components/Toast";
+import { Toast, toast } from "core/components";
 import { usePathname, useRouter } from "next/navigation";
 import hotToast from "react-hot-toast";
 import Title from "components/common/title";

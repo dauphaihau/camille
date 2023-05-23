@@ -32,7 +32,7 @@ interface TextProps {
   noSelect: boolean
 }
 
-const Text = (props: Partial<TextProps>) => {
+export const Text = (props: Partial<TextProps>) => {
   const {
     children, classes, color, as, transforms = '', b, size, hideIf,
     noSelect,
@@ -63,5 +63,3 @@ const Text = (props: Partial<TextProps>) => {
   if (b) return <b style={{ fontSize: size }} className={className} {...others}>{children || text}</b>
   return (<p style={{ fontSize: size, display: "block" }} className={className} {...others}>{children || text}</p>);
 }
-
-export default Text;

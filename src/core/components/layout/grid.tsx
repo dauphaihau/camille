@@ -4,19 +4,19 @@ import { ClassValue } from "clsx";
 
 enum COL {
   FIRST = 1,
-  SECOND ,
-  THIRD ,
-  FOUR ,
-  FIVE ,
-  SIX ,
+  SECOND,
+  THIRD,
+  FOUR,
+  FIVE,
+  SIX,
   SEVEN
 }
 
 enum GAP {
   FIRST = 1,
-  SECOND ,
-  THIRD ,
-  FOUR ,
+  SECOND,
+  THIRD,
+  FOUR,
   EIGHT = 8,
 }
 
@@ -90,8 +90,8 @@ type GridProps = {
 } & ComponentPropsWithoutRef<'div'>
 
 const Grid = ({
-  gap, classes, children,
-  sx, md, lg, xl, gapx, gapy,
+  gap = 0, classes, children,
+  sx, md, lg, xl, gapx = 0, gapy = 0,
   ...others
 }: Partial<GridProps>) => {
 
@@ -99,10 +99,10 @@ const Grid = ({
     <div
       className={cn('grid',
         GAP_MAPS[gap],
-        COL_SX_MAPS[sx],
-        COL_MD_MAPS[md],
-        COL_LG_MAPS[lg],
-        COL_XL_MAPS[xl],
+        sx && COL_SX_MAPS[sx],
+        md && COL_MD_MAPS[md],
+        lg && COL_LG_MAPS[lg],
+        xl && COL_XL_MAPS[xl],
         GAP_X_MAPS[gapx],
         GAP_Y_MAPS[gapy],
         cn(classes)

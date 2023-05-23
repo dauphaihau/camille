@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import { Button, Loading, Tooltip } from "core/components"
-import { toast } from "core/components/Toast"
+import { toast } from "core/components"
 import { createNotebookOnTeamspace } from "lib/request-by-swr/notebook";
 import useStore from "lib/store";
 

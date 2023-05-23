@@ -6,7 +6,7 @@ import { Workspace } from "@prisma/client";
 import { WorkspaceSubscriptionPlan } from "types"
 import { cn, formatDate } from "core/helpers"
 import { Card } from "core/components/card"
-import { toast } from "core/components/Toast"
+import { toast } from "core/components"
 import { Button } from "core/components"
 import { ROLE_USER_ON_WORKSPACE } from "config/const";
 import useStore from "lib/store";

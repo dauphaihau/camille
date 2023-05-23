@@ -3,7 +3,7 @@
 import { Tooltip } from "core/components";
 import useStore from "lib/store";
 
-export default function UpdateLogo() {
+export function UpdateLogo() {
   const workspace = useStore(state => state.workspace)
   return (
     <Tooltip>

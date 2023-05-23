@@ -4,12 +4,10 @@ import { Notebook } from "@prisma/client"
 import { useRouter, useSelectedLayoutSegment } from "next/navigation"
 import { useCallback, useReducer } from "react"
 
-import { Alert, Button, Icons, DropdownMenu, InputWithoutRhf } from "core/components"
-import { toast } from "core/components/Toast"
+import { Popover, toast, Alert, Button, Icons, DropdownMenu, InputWithoutRhf } from "core/components"
 import { deleteNotebook, updateNotebook } from "lib/request-by-swr/notebook";
 import { cn, debounce } from "core/helpers";
 import { PATH } from "config/const";
-import { Popover } from "core/components";
 import { useStoreMulti } from "lib/store";
 
 interface NotebookOperationsProps {
@@ -150,9 +148,7 @@ export function NotebookOperations({ teamspaceId, notebook, placeOnSidebar = fal
           <InputWithoutRhf
             id='notebookTitle'
             defaultValue={notebook.title}
-            // value={notebookContext?.title || notebook.title}
             onChange={(e) => {
-              // setPage?.({ ...notebook, title: e.target.value })
               debounceTitle(e.target.value)
             }}
           />

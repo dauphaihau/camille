@@ -4,8 +4,8 @@ import { cn } from 'core/helpers';
 import * as React from 'react';
 import { RegisterOptions, useFormContext } from 'react-hook-form';
 
-export type InputProps = {
-  /** Input label */
+export type TextareaProps = {
+  /** Textarea label */
   label?: string;
   /**
    * id to be initialized with React Hook Form,
@@ -15,7 +15,7 @@ export type InputProps = {
   /** Small text below input, useful for additional information */
   helperText?: string;
   /**
-   * Input type
+   * Textarea type
    * @example text, email, password
    */
   type?: React.HTMLInputTypeAttribute;
@@ -27,26 +27,26 @@ export type InputProps = {
   /** Disable error style (not disabling error validation) */
   hideError?: boolean;
 
-  sizeInput?: 'xs' | 'sm' | 'md';
+  size?: 'xs' | 'sm' | 'md' | number;
 
   /** Manual validation using RHF, it is encouraged to use yup resolver instead */
   validation?: RegisterOptions;
-} & React.ComponentPropsWithoutRef<'input'>;
+} & React.ComponentPropsWithoutRef<'textarea'>;
 
-export default function Input({
+export function Textarea({
   label,
   helperText,
   id,
   classes,
   classesLabelLeft,
-  sizeInput = 'sm',
+  size = 'sm',
   type = 'text',
   readOnly = false,
   hideError = false,
   validation,
   labelLeft,
   ...others
-}: InputProps) {
+}: TextareaProps) {
 
   const {
     register,
@@ -54,9 +54,9 @@ export default function Input({
   } = useFormContext();
 
   const arrSize = [
-    sizeInput === 'xs' && ['px-[14px] h-[28px] text-xs'],
-    sizeInput === 'sm' && ['px-4 h-[34px] text-sm'],
-    sizeInput === 'md' && ['px-[22px] h-[42px] text-base'],
+    size === 'xs' && ['px-[14px] text-xs'],
+    size === 'sm' && ['px-4 text-sm'],
+    size === 'md' && ['px-[22px] text-base'],
   ]
 
   return (
@@ -75,10 +75,10 @@ export default function Input({
         >{labelLeft}</span>
         {/*<div className='input__contentRight'>{contentRight}</div>*/}
         {/*<Clear/>*/}
-        <input
+        <textarea
           // autoFocus={false}
           // ref={ref}
-          type={type}
+          // type={type}
           // value={value}
           // name={name}
           // onChange={handleOnChange}
@@ -118,4 +118,4 @@ export default function Input({
   );
 }
 
-Input.displayName = 'Input';
+Textarea.displayName = 'Textarea';

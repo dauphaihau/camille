@@ -6,8 +6,7 @@ import { useRouter, useSelectedLayoutSegments } from "next/navigation"
 import { Page, Favorite } from "@prisma/client"
 import hotToast from "react-hot-toast";
 
-import { InputWithoutRhf, Popover, Col, Icons, Tooltip, DropdownMenu } from "core/components"
-import { Toast, toast } from "core/components/Toast"
+import { Toast, toast, InputWithoutRhf, Popover, Col, Icons, Tooltip, DropdownMenu } from "core/components"
 import { addToFavorite, createPage, deletePage } from "lib/request-by-swr/page"
 import { cn, debounce, formatDate, getValueOfLastBracketInString } from "core/helpers";
 import { DELETE_PAGE_TYPE, PATH } from "config/const";

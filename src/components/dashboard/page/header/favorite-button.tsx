@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Icons, Tooltip } from "core/components";
 import { cn } from "core/helpers";
 import { addToFavorite } from "lib/request-by-swr/page";
-import { toast } from "core/components/Toast";
+import { toast } from "core/components";
 import { useKeyboardShortcut } from "core/hooks";
 import useStore, { useStoreMulti } from "lib/store";
 

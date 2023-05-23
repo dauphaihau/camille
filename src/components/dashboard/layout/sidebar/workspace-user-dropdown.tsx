@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 import { DropdownMenu, Icons, Row, Skeleton, Tooltip } from "core/components";
 import { PATH } from "config/const";
 import { cn } from "core/helpers";
-import LoadingDialog from "components/dialog/loading-dialog";
-import { toast } from "core/components/Toast";
+import { LoadingDialog } from "components/dialog/loading-dialog";
+import { toast } from "core/components";
 import { useStoreMulti } from "lib/store";
 import { useGetWorkspacesByUser } from "lib/request-by-swr/workspace";
 

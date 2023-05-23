@@ -11,7 +11,7 @@ import { useEffect, useState } from "react"
 import { userAuthSchema } from "lib/validations/auth";
 import { cn } from "core/helpers"
 import { Button, Col, Icons, Input } from "core/components"
-import { toast } from "core/components/Toast"
+import { toast } from "core/components"
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 

@@ -1,11 +1,5 @@
 import { Notebook, Page, Teamspace, User, UserOnWorkspace, Workspace } from "@prisma/client";
 
-// type StateUser = User & {
-//   userOnWorkspace: UserOnWorkspace
-//   privateNotebooks: Notebook[]
-//   favoritePages: Page[]
-// }
-
 type favoritePages = Page & {notebook: Notebook}
 
 type StateUser = Partial<User & {

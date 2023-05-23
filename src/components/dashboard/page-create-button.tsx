@@ -4,7 +4,7 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 
 import { Button, Loading } from "core/components"
-import { toast } from "core/components/Toast"
+import { toast } from "core/components"
 import { createPage } from "lib/request-by-swr/page";
 import useStore from "lib/store";
 

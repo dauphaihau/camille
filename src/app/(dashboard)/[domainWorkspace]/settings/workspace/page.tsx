@@ -2,13 +2,14 @@ import React from "react";
 import { redirect } from "next/navigation"
 
 import { getCurrentUser } from "lib/session"
-import UpdateWorkspaceForm from "components/dashboard/settings/workspace/form-update-workspace";
+import { FormUpdateWorkspace } from "components/dashboard/settings/workspace/form-update-workspace";
 import { getDetailWorkspace } from "lib/request/workspace";
-import { DashboardSettingsHeader } from "components/dashboard/settings/header";import { DashboardSettingsShell } from "components/dashboard/settings/shell"
-import DeleteWorkspaceButton from "components/dashboard/settings/workspace/delete-workspace-button";
+import { DashboardSettingsHeader } from "components/dashboard/settings/header";
+import { DashboardSettingsShell } from "components/dashboard/settings/shell"
+import { DeleteWorkspaceButton } from "components/dashboard/settings/workspace/delete-workspace-button";
 import { Grid } from "core/components";
 import { PATH } from "config/const";
-import UpdateLogo from "components/dashboard/settings/workspace/upload-logo";
+import { UpdateLogo } from "components/dashboard/settings/workspace/upload-logo";
 
 export default async function WorkspaceSettingPage({ params }) {
   const user = await getCurrentUser()
@@ -37,7 +38,7 @@ export default async function WorkspaceSettingPage({ params }) {
 
         <div className='space-y-3 w-1/2'>
           <div className='text-base'>General</div>
-          <UpdateWorkspaceForm workspace={workspace}/>
+          <FormUpdateWorkspace workspace={workspace}/>
         </div>
         <div className='border-gray-200 border-b'/>
 

@@ -3,12 +3,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Button, Col, Icons, Loading, Row, Tooltip } from "core/components";
-import { Popover } from "core/components/popover";
+import { Alert, toast, InputWithoutRhf, Popover, Button, Col, Icons, Loading, Row, Tooltip } from "core/components";
 import { deletePage, useGetPagesDeleted } from "lib/request-by-swr/page";
-import { toast } from "core/components/Toast";
-import { Alert } from "core/components/alert";
-import Input from "core/components/forms/Input-without-rhf";
 import { DELETE_PAGE_TYPE } from "config/const";
 import Title from "components/common/title";
 import useStore from "lib/store";
@@ -107,7 +103,7 @@ export function PagesInTrashPopover() {
       {/*<Popover.Content side='right' className='w-[414px] ml-3 absolute z-[1000px] '>*/}
       <Popover.Content side='right' className='w-[414px] ml-3 mt-32 z-[1000px] '>
         <div className='mb-2'>
-          <Input id='search' placeholder='Filter by page title ...'/>
+          <InputWithoutRhf id='search' placeholder='Filter by page title ...'/>
         </div>
         <div className='h-[380px] overflow-scroll '>
           <Col gap={2}>

@@ -1,15 +1,14 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
-import { Grid, Row, Text } from "core/components";
-import Input from "core/components/forms/Input-without-rhf";
+import { InputWithoutRhf, Grid, Row, Text } from "core/components";
 import AddMemberDialog from "components/dialog/add-member-dialog";
 import { capitalizeEachWord } from "core/helpers";
 import { ROLE_USER_ON_WORKSPACE } from "config/const";
 import { MemberOperations } from "./member-operations";
 import useStore from "lib/store";
 
-export default function MemberList({ members }) {
+export function MemberList({ members }) {
   const [membersFiltered, setMembersFiltered] = useState(members)
   const user = useStore(state => state.user)
 
@@ -38,7 +37,7 @@ export default function MemberList({ members }) {
     <>
       <Row justify='between'>
         <Row justify='between'>
-          <Input onChange={handleSearch} id='search' placeholder='Search by name or email'/>
+          <InputWithoutRhf onChange={handleSearch} id='search' placeholder='Search by name or email'/>
           {/*<Select/>*/}
         </Row>
         <AddMemberDialog/>

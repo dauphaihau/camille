@@ -4,7 +4,7 @@ import { ComponentPropsWithoutRef } from "react";
 
 type LoadingProps = ComponentPropsWithoutRef<'img'>
 
-export default function Loading (props: LoadingProps) {
+export function Loading (props: LoadingProps) {
   return (
     <img
       className={cn('loading-spinner', props.className)}

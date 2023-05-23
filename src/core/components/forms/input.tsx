@@ -27,19 +27,19 @@ export type InputProps = {
   /** Disable error style (not disabling error validation) */
   hideError?: boolean;
 
-  size?: 'xs' | 'sm' | 'md' | number;
+  sizeInput?: 'xs' | 'sm' | 'md';
 
   /** Manual validation using RHF, it is encouraged to use yup resolver instead */
   validation?: RegisterOptions;
-} & React.ComponentPropsWithoutRef<'textarea'>;
+} & React.ComponentPropsWithoutRef<'input'>;
 
-export default function Input({
+export function Input({
   label,
   helperText,
   id,
   classes,
   classesLabelLeft,
-  size = 'sm',
+  sizeInput = 'sm',
   type = 'text',
   readOnly = false,
   hideError = false,
@@ -54,9 +54,9 @@ export default function Input({
   } = useFormContext();
 
   const arrSize = [
-    size === 'xs' && ['px-[14px] text-xs'],
-    size === 'sm' && ['px-4 text-sm'],
-    size === 'md' && ['px-[22px] text-base'],
+    sizeInput === 'xs' && ['px-[14px] h-[28px] text-xs'],
+    sizeInput === 'sm' && ['px-4 h-[34px] text-sm'],
+    sizeInput === 'md' && ['px-[22px] h-[42px] text-base'],
   ]
 
   return (
@@ -75,10 +75,10 @@ export default function Input({
         >{labelLeft}</span>
         {/*<div className='input__contentRight'>{contentRight}</div>*/}
         {/*<Clear/>*/}
-        <textarea
+        <input
           // autoFocus={false}
           // ref={ref}
-          // type={type}
+          type={type}
           // value={value}
           // name={name}
           // onChange={handleOnChange}

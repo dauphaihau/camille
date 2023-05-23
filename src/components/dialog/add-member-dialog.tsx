@@ -5,7 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { Input, Button, Dialog, Icons } from "core/components";
-import { toast } from "core/components/Toast";
+import { toast } from "core/components";
 import { addMember } from "lib/request-by-swr/settings-member";
 import { ROLE_USER_ON_WORKSPACE } from "config/const";
 import { useStoreMulti } from "lib/store";
@@ -44,7 +44,7 @@ export default function AddMemberDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Dialog.Trigger>
-        <Button disabled={user.userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER}>Add members</Button>
+        <Button disabled={user?.userOnWorkspace && user?.userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER}>Add members</Button>
       </Dialog.Trigger>
 
       <Dialog.Content>

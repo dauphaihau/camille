@@ -5,14 +5,13 @@ import { getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 
-import { Button, Col, Dialog, Icons, Input } from "core/components";
-import { toast } from "core/components/Toast";
+import { toast, Button, Col, Dialog, Icons, Input } from "core/components";
 import { PATH, ROLE_USER_ON_WORKSPACE } from "config/const";
 import { deleteWorkspace } from "lib/request-by-swr/workspace";
 import { useStoreMulti } from "lib/store";
-import LoadingDialog from "components/dialog/loading-dialog";
+import { LoadingDialog } from "components/dialog/loading-dialog";
 
-export default function DeleteWorkspaceButton({ workspaceId }) {
+export function DeleteWorkspaceButton({ workspaceId }) {
   const router = useRouter();
   const formHandler = useForm();
   const [open, setOpen] = useState(false);

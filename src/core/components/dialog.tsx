@@ -6,7 +6,7 @@ import { cn } from "core/helpers"
 
 type DialogProps = DialogPrimitives.DialogProps
 
-export default function Dialog({ ...props }: DialogProps) {
+export function Dialog({ ...props }: DialogProps) {
   return <DialogPrimitives.Root {...props} />
 }
 

@@ -6,7 +6,7 @@ import { Col } from "core/components";
 import { getCurrentUser } from "lib/session";
 import { PATH } from "config/const";
 import { getListMembers } from "lib/request/settings";
-import MemberList from "components/dashboard/settings/member/member-list";
+import { MemberList } from "components/dashboard/settings/member/member-list";
 
 export default async function MembersPage({ params }) {
   const user = await getCurrentUser()

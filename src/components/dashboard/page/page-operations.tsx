@@ -8,7 +8,7 @@ import { Page } from "@prisma/client"
 import { DropdownMenu } from "core/components/dropdown"
 import { Button, Icons } from "core/components"
 import { Alert } from "core/components/alert"
-import { toast } from "core/components/Toast"
+import { toast } from "core/components"
 import { useState } from "react"
 
 async function deletePage(pageId: string) {

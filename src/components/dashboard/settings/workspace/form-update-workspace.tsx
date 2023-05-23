@@ -4,13 +4,12 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
-import { Button, Col, Input } from "core/components";
-import { toast } from "core/components/Toast";
+import { toast, Button, Col, Input } from "core/components";
 import { PATH, ROLE_USER_ON_WORKSPACE } from "config/const";
 import { updateInfoGeneralWorkspace } from "lib/request-by-swr/workspace";
 import useStore from "lib/store";
 
-export default function FormUpdateWorkspace({ workspace }) {
+export function FormUpdateWorkspace({ workspace }) {
   const router = useRouter();
   const user = useStore(state => state.user)
   const [isLoading, setIsLoading] = React.useState(false)

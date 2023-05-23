@@ -1,7 +1,7 @@
 import { forwardRef, ReactNode } from "react";
 import { cn } from "core/helpers";
 import { ClassValue } from "clsx";
-import Grid from "./Grid";
+import Grid from "./grid";
 
 interface BoxProps {
   classes: string | ClassValue[],

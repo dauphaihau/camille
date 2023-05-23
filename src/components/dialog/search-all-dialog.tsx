@@ -10,7 +10,7 @@ dayjs.extend(relativeTime)
 import { Dialog, Icons, Row, Col, Tooltip } from "core/components";
 import { cn, debounce, formatDate } from "core/helpers";
 import { useSearchPage } from "lib/request-by-swr/page";
-import Loading from "core/components/Loading";
+import Loading from "core/components/loading";
 import { useKeyboardShortcut } from "core/hooks";
 import useStore from "../../lib/store";
 
