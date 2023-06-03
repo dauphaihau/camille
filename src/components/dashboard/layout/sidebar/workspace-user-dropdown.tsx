@@ -21,7 +21,7 @@ const initialState: {[k: string]: boolean | string} = {
 
 export function WorkspaceUserDropdown() {
   const router = useRouter();
-  const { user, workspace, setShowSidebar } = useStoreMulti('workspace', 'setShowSidebar')
+  const { user, workspace, setShowSidebar } = useStoreMulti('workspace', 'setShowSidebar', 'user')
   const [event, setEvent] = useReducer((prev, next) => ({
     ...prev, ...next
   }), initialState)

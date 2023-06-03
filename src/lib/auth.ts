@@ -49,6 +49,7 @@ export const authOptions: NextAuthOptions = {
           where: { email },
           select: { emailVerified: true },
         })
+        console.log('dauphaihau debug: user', user)
 
         // const { identifier, url, provider, theme } = params
         const { host } = new URL(url)
@@ -157,9 +158,9 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
-    async redirect({ url, baseUrl }) {
-      return baseUrl
-    },
+    // async redirect({ url, baseUrl }) {
+    //   return baseUrl
+    // },
   },
   // events: {
   //   createUser: async (user) => {
