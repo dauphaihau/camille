@@ -33,7 +33,8 @@ export function BillingForm({
 
     // Get a Stripe session URL.
     if (workspace?.id && workspace?.domain) {
-      const response = await fetch("http://localhost:3000/api/settings/workspace/stripe?" + new URLSearchParams({
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/settings/workspace/stripe?` + new URLSearchParams({
+      // const response = await fetch("http://localhost:3000/api/settings/workspace/stripe?" + new URLSearchParams({
         workspaceId: workspace.id,
         domainWorkspace: workspace.domain,
       }))

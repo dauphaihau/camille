@@ -12,8 +12,6 @@ export function MemberList({ members }) {
   const [membersFiltered, setMembersFiltered] = useState(members)
   const user = useStore(state => state.user)
 
-  console.log('dauphaihau debug: user', user)
-
   useEffect(() => {
     setMembersFiltered(members)
   }, [members])
@@ -31,7 +29,7 @@ export function MemberList({ members }) {
     }
   }
 
-  const currentUserIsAdmin = members.find(m => m.user.id === user?.id).role === ROLE_USER_ON_WORKSPACE.ADMIN
+  const currentUserIsAdmin = members?.find(m => m.user.id === user?.id)?.role === ROLE_USER_ON_WORKSPACE.ADMIN
 
   return (
     <>

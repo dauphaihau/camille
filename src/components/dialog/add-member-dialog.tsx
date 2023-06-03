@@ -43,7 +43,7 @@ export default function AddMemberDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger>
+      <Dialog.Trigger asChild>
         <Button disabled={user?.userOnWorkspace && user?.userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER}>Add members</Button>
       </Dialog.Trigger>
 

@@ -5,14 +5,12 @@ import { useReducer } from "react"
 import * as React from "react";
 import { User, UserOnWorkspace } from "@prisma/client"
 
-import { DropdownMenu } from "core/components/dropdown"
-import { Button, Icons, Row } from "core/components"
+import { DropdownMenu, toast, Button, Icons, Row } from "core/components"
 import { Alert } from "core/components/alert"
-import { toast } from "core/components"
 import { cn } from "core/helpers";
 import { PATH, ROLE_USER_ON_WORKSPACE } from "config/const";
 import { deleteMember, memberLeave, updateRoleMember } from "lib/request-by-swr/settings-member";
-import LoadingDialog from "../../../dialog/loading-dialog";
+import { LoadingDialog } from "components/dialog/loading-dialog";
 import { useStoreMulti } from "lib/store";
 
 interface MemberOperationsProps {

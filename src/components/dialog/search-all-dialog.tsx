@@ -7,12 +7,11 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime)
 
-import { Dialog, Icons, Row, Col, Tooltip } from "core/components";
+import { Loading, Dialog, Icons, Row, Col, Tooltip } from "core/components";
 import { cn, debounce, formatDate } from "core/helpers";
 import { useSearchPage } from "lib/request-by-swr/page";
-import Loading from "core/components/loading";
 import { useKeyboardShortcut } from "core/hooks";
-import useStore from "../../lib/store";
+import useStore from "lib/store";
 
 export function SearchAllDialog() {
   const [searchValue, setSearchValue] = useState<string>('');
