@@ -54,6 +54,13 @@ export const authOptions: NextAuthOptions = {
         // const { identifier, url, provider, theme } = params
         const { host } = new URL(url)
 
+        console.log('dauphaihau debug: url', url)
+        console.log('dauphaihau debug: host', host)
+
+        if (process.env.NODE_ENV === 'production') {
+          url = url.replace('http://localhost:3000', 'https://camille-87b1.vercel.app')
+        }
+
         // NOTE: You are not required to use `nodemailer`, use whatever you want.
         return new Promise((resolve, reject) => {
           const transport = createTransport(configEmail)
