@@ -73,8 +73,9 @@ export const authOptions: NextAuthOptions = {
                 htmlActivation({ url, host, theme })
             ,
             headers: {
-              Name: "X-Entity-Ref-ID",
-              Value: new Date().getTime() + "",
+              'X-Entity-Ref-ID': new Date().getTime() + ""
+              // Name: "X-Entity-Ref-ID",
+              // Value: new Date().getTime() + "",
             }
           }, function (err, info) {
             if (err) {
