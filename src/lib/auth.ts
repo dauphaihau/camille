@@ -18,6 +18,7 @@ const configEmail = {
     pass: process.env.EMAIL_PASSWORD
   },
   secure: true,
+  port: 465,
   normalizeHeaderKey: key => key.toUpperCase()
 }
 
