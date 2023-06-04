@@ -18,6 +18,7 @@ const configEmail = {
     pass: process.env.EMAIL_PASSWORD
   },
   secure: true,
+  normalizeHeaderKey: key => key.toUpperCase()
 }
 
 export const authOptions: NextAuthOptions = {
@@ -57,12 +58,6 @@ export const authOptions: NextAuthOptions = {
         console.log('dauphaihau debug: url', url)
         console.log('dauphaihau debug: host', host)
 
-        // if (process.env.NODE_ENV === 'production') {
-        //   url = url.replace('http://localhost:3000', 'https://camille-87b1.vercel.app')
-        // }
-        //
-        // console.log('dauphaihau debug: url', url)
-
         // NOTE: You are not required to use `nodemailer`, use whatever you want.
         return new Promise((resolve, reject) => {
           const transport = createTransport(configEmail)
@@ -76,10 +71,16 @@ export const authOptions: NextAuthOptions = {
                 htmlSignIn({ url, host, theme }) :
                 htmlActivation({ url, host, theme })
             ,
-          }, (err, info) => {
+            headers: {
+              Name: "X-Entity-Ref-ID",
+              Value: new Date().getTime() + "",
+            }
+          }, function (err, info) {
             if (err) {
+              console.log('dauphaihau debug: err', err)
               reject(err)
             } else {
+              console.log('dauphaihau debug: info', info)
               resolve(info)
             }
           })
