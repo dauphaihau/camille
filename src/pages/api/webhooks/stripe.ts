@@ -17,9 +17,6 @@ export default async function handler(
   res: NextApiResponse
 ) {
 
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
-  console.log('dauphaihau debug: webhook-secret', webhookSecret)
-
   const body = await rawBody(req)
   const signature = req.headers["stripe-signature"]
 

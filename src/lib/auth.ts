@@ -50,65 +50,48 @@ export const authOptions: NextAuthOptions = {
           where: { email },
           select: { emailVerified: true },
         })
-        console.log('dauphaihau debug: user', user)
 
         // const { identifier, url, provider, theme } = params
         const { host } = new URL(url)
 
         // NOTE: You are not required to use `nodemailer`, use whatever you want.
-        const transport = createTransport(configEmail)
-        const result = await transport.sendMail({
-          from,
-          to: email,
-          subject: `Sign in to ${host}`,
-          text: text({ url, host }),
-          html:
-            user?.emailVerified ?
-              htmlSignIn({ url, host, theme }) :
-              htmlActivation({ url, host, theme })
-          ,
+        return new Promise((resolve, reject) => {
+          const transport = createTransport(configEmail)
+          transport.sendMail({
+            from,
+            to: email,
+            subject: `Sign in to ${host}`,
+            text: text({ url, host }),
+            html:
+              user?.emailVerified ?
+                htmlSignIn({ url, host, theme }) :
+                htmlActivation({ url, host, theme })
+            ,
+          }, (err, info) => {
+            if (err) {
+              reject(err)
+            } else {
+              resolve(info)
+            }
+          })
         })
-        const failed = result.rejected.concat(result.pending).filter(Boolean)
-        if (failed.length) {
-          throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`)
-        }
-      },
 
-      // sendVerificationRequest: async ({ identifier, url, provider }) => {
-      //   const user = await db.user.findUnique({
-      //     where: {
-      //       email: identifier,
-      //     },
-      //     select: {
-      //       emailVerified: true,
-      //     },
-      //   })
-      //
-      //   const templateId = user?.emailVerified
-      //     ? process.env.POSTMARK_SIGN_IN_TEMPLATE
-      //     : process.env.POSTMARK_ACTIVATION_TEMPLATE
-      //   const result = await postmarkClient.sendEmailWithTemplate({
-      //     TemplateId: parseInt(templateId),
-      //     To: identifier,
-      //     From: provider.from,
-      //     TemplateModel: {
-      //       action_url: url,
-      //       product_name: siteConfig.name,
-      //     },
-      //     Headers: [
-      //       {
-      //         // Set this to prevent Gmail from threading emails.
-      //         // See https://stackoverflow.com/questions/23434110/force-emails-not-to-be-grouped-into-conversations/25435722.
-      //         Name: "X-Entity-Ref-ID",
-      //         Value: new Date().getTime() + "",
-      //       },
-      //     ],
-      //   })
-      //
-      //   if (result.ErrorCode) {
-      //     throw new Error(result.Message)
-      //   }
-      // },
+        // const result = await transport.sendMail({
+        //   from,
+        //   to: email,
+        //   subject: `Sign in to ${host}`,
+        //   text: text({ url, host }),
+        //   html:
+        //     user?.emailVerified ?
+        //       htmlSignIn({ url, host, theme }) :
+        //       htmlActivation({ url, host, theme })
+        //   ,
+        // })
+        // const failed = result.rejected.concat(result.pending).filter(Boolean)
+        // if (failed.length) {
+        //   throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`)
+        // }
+      },
     }),
   ],
   callbacks: {
@@ -159,44 +142,13 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
-    // async redirect({ url, baseUrl }) {
-    //   return baseUrl
-    // },
   },
-  // events: {
-  //   createUser: async (user) => {
-  //     console.log('dauphaihau debug: create user')
-  //     console.log('dauphaihau debug: user at auth', user)
-  //     try {
-  //       const count = await prisma.admin.count({
-  //         where: {
-  //           email: user.email,
-  //         },
-  //       });
-  //
-  //       if (count > 0) {
-  //         await prisma.user.update({
-  //           where: {
-  //             id: user.id,
-  //           },
-  //           data: {
-  //             role: "admin",
-  //           },
-  //         });
-  //       }
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   },
-  // }
   secret: process.env.NEXTAUTH_SECRET,
   debug: true
 }
 
 function htmlSignIn(params: {url: string; host: string; theme}) {
   const { url, host, theme } = params
-  // console.log('dauphaihau debug: url sign in', url)
-
   const escapedHost = host.replace(/\./g, "&#8203;.")
 
   const brandColor = theme.brandColor || "#111111"

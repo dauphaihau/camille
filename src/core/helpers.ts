@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function absoluteUrl(path: string) {
-  return `${process.env.NEXTAUTH_URL}${path}`
+  return `${process.env.NEXT_PUBLIC_APP_URL}${path}`
 }
 
 export function formatDate(input: Date | string | number, options?: object): string {

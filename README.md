@@ -41,13 +41,10 @@ Install deps:
 pnpm install
 ```
 
-Copy .env.example to .env.local and update the variables.:
+Copy .env.example to .env and update the variables.:
 ```bash
 pnpm dev
 ```
 
 ## Deployed Version
-Currently, on the production version there is a login error, I have still fixing so u can quickly view project via <a href="https://www.youtube.com/watch?v=MZjKvX9FEjo">video</a> I demo
-
-[//]: # (## Deployed Version)
-[//]: # (<a href="">Visit the live app</a>)
+<a href="https://camille-87b1.vercel.app">Visit the live app</a>
