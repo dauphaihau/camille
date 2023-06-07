@@ -227,7 +227,7 @@ export function PageOperations({
                 <Icons.ellipsisHorizontal
                   size={12} className={cn('btn-icon text-[#686662]',
 
-                  !placeOnSidebar && 'hover:bg-[#efefef]'
+                  !placeOnSidebar && 'hover:bg-accent-light'
                 )}
                 />
               </div>

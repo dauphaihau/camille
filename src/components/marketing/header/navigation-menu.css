@@ -29,7 +29,8 @@
   line-height: 1;
   border-radius: 4px;
   font-size: 15px;
-  color: #878e95;
+  color: #73726e;
+  /*color: #878e95;*/
   /*color: var(--violet11);*/
 }
 
@@ -46,7 +47,8 @@
 }
 .NavigationMenuTrigger:hover,
 .NavigationMenuLink:hover {
-  background-color: #f8f9f5;
+  background-color: #ecebea;
+  /*background-color: #f8f9f5;*/
   /*background-color: var(--violet3);*/
 }
 

@@ -9,8 +9,8 @@ export function UpdateLogo() {
     <Tooltip>
       <Tooltip.Trigger>
         <div
-          className='avatar bg-[#ecebea] group-hover:bg-[#dcdbda] h-16 w-16
-         rounded text-md text-[#777572] grid place-items-center
+          className='avatar bg-accent group-hover:bg-[#dcdbda] h-16 w-16
+         rounded text-md text-primary-medium grid place-items-center
          select-none
 
          '

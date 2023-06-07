@@ -68,8 +68,8 @@ export function DeleteWorkspaceButton({ workspaceId }) {
           <div
             onClick={() => setOpen(false)}
             className='
-          absolute top-[14px] right-[14px] cursor-pointer
-          btn-icon bg-[#efefef] rounded-full text-xs flex justify-center items-center'
+          absolute top-3.5 right-[14px] cursor-pointer
+          btn-icon bg-accent-light rounded-full text-xs flex justify-center items-center'
           >
             <Icons.close/>
           </div>

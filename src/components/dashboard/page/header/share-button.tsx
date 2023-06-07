@@ -78,7 +78,7 @@ export default function ShareButton({ page, triggerShortcutShare }) {
             </Tooltip.Trigger>
             <Tooltip.Content className='ml-2.5 mr-2 mt-1'>
               <div>Share or publish to web</div>
-              <div className='text-[#82817f] text-center'>⌘ + S</div>
+              <div className='text-primary-tooltip text-center'>⌘ + S</div>
             </Tooltip.Content>
           </Tooltip>
         </div>

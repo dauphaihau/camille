@@ -9,7 +9,7 @@ export default function PermissionAccessWorkspace({ workspace, user }) {
   return (
     <Grid classes={'h-screen place-items-center'}>
       <div className='mx-auto space-y-4 max-w-2xl'>
-        <div className='avatar bg-[#ecebea] group-hover:bg-[#dcdbda] h-[57px] w-[57px] rounded text-2xl text-[#777572] flex justify-center items-center mx-auto font-medium'>
+        <div className='avatar bg-accent group-hover:bg-[#dcdbda] h-[57px] w-[57px] rounded text-2xl text-primary-medium flex justify-center items-center mx-auto font-medium'>
           {workspace && workspace.name.charAt(0)}
         </div>
         <div className='text-center space-y-4 text-[20px]'>
@@ -22,7 +22,7 @@ export default function PermissionAccessWorkspace({ workspace, user }) {
             <Button onClick={() => router.back()}>Back to my content</Button>
           </div>
         </div>
-        <div className='border-t border-[#e9e9e8] mx-auto max-w-xs'/>
+        <div className='border-t border-primary-light mx-auto max-w-xs'/>
         <div className={'text-[#8d8c89] font-medium text-center text-xs mt-3 '}>
           <div>
             You&apos;re currently logged in as {' '}

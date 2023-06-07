@@ -1,7 +1,6 @@
 import { Notebook } from "@prisma/client"
 import Link from "next/link"
 import { usePathname } from 'next/navigation';
-import * as React from "react";
 import { ReactNode, useState } from "react";
 
 import { Skeleton, Icons, Row, Tooltip, Loading } from "core/components";
@@ -44,8 +43,9 @@ export function NotebookItemSidebar({
         align='center'
         justify='between'
         classes={[
-          `hover:bg-[#ecebea] py-[2px] pr-0 group-hover/notebook:pr-[8px] pl-[5px] rounded-sm max-h-[27px] cursor-pointer`,
-          { ['bg-[#f1f1f0]']: arrPath && arrPath[2] === notebook.id && arrPath.length === 3 },
+          'item-sidebar pr-0 group-hover/notebook:pr-2 pl-[5px]',
+          // `item-sidebar hover:bg-accent py-0.5 pr-0 group-hover/notebook:pr-2 pl-[5px] rounded-sm max-h-[28px] cursor-pointer`,
+          { ['bg-accent-light-active']: arrPath && arrPath[2] === notebook.id && arrPath.length === 3 },
           classes
         ]}
       >
@@ -71,9 +71,9 @@ export function NotebookItemSidebar({
 
           <Link
             href={`/${workspace.domain}/${notebook.id}`}
-            className={cn("font-semibold text-[14px] text-[#73726e] flex-auto min-w-0",
+            className={cn("font-semibold text-sm text-primary flex-auto min-w-0",
               'truncate overflow-hidden',
-              { ['text-[#373530]']: arrPath && arrPath[2] === notebook.id && arrPath.length === 3 }
+              { ['text-secondary']: arrPath && arrPath[2] === notebook.id && arrPath.length === 3 }
             )}
           >
             {notebook.title}
@@ -120,7 +120,7 @@ export function NotebookItemSidebar({
                     <PageOperations placeOnSidebar page={page}/>
                   </PageItem>
                 )) :
-                <p className='font-semibold h-7 text-[14px] text-[#999895] pl-8'>No page inside</p>
+                <p className='font-semibold h-7 text-sm text-[#999895] pl-8'>No page inside</p>
           }
         </div>
       }

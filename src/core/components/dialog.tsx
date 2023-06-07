@@ -33,11 +33,15 @@ Dialog.Content = React.forwardRef<HTMLDivElement,
     <Dialog.Portal>
       <DialogPrimitives.Overlay className={cn('fixed inset-0 z-40 bg-black/50 opacity-100 transition-opacity animate-in fade-in', classesOverlay)}>
         {/*<div className="fixed inset-0 z-40 flex items-center justify-center" style={{top: '-22rem'}}>*/}
-        <div className={cn('fixed inset-0 z-50 flex items-center justify-center', classesWrapperContent)} style={{ top: 0 }}>
+        <div
+          className={cn('fixed inset-0 z-50 flex items-center justify-center', classesWrapperContent)}
+          style={{ top: 0 }}
+        >
           <DialogPrimitives.Content
             ref={ref}
             className={cn(
               "fixed z-50 grid w-[95vw] max-w-md scale-100 gap-4 rounded-lg bg-white p-6 opacity-100 animate-in fade-in-90 zoom-in-90 focus:outline-none md:w-full",
+              // 'top-20',
               className
             )}
             {...props}

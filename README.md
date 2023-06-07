@@ -47,4 +47,4 @@ pnpm dev
 ```
 
 ## Deployed Version
-<a href="https://camille-87b1.vercel.app">Visit the live app</a>
+<a href="https://camillee.vercel.app">Visit the live app</a>

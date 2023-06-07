@@ -15,7 +15,7 @@ export default function OperationOnTopSharePage({ page }) {
     <div className="sticky top-0 z-40 bg-white px-4">
       <Row align='center' justify='between' classes="h-11">
         <Row align='center' gap={2}>
-          <div className={'hover:bg-[#efefef] rounded p-1.5 h-7 flex justify-center items-center text-[#373530] cursor-pointer font-medium'}>
+          <div className={'hover:bg-accent-light rounded p-1.5 h-7 flex justify-center items-center text-secondary cursor-pointer font-medium'}>
             <Title maxW={240}>
               {page.title}
             </Title>
@@ -23,13 +23,13 @@ export default function OperationOnTopSharePage({ page }) {
         </Row>
 
         <Row align='center' gap={3}>
-          <div className={'hover:bg-[#efefef] text-sm rounded p-1.5 h-7 flex justify-center items-center text-[#373530] cursor-pointer font-medium gap-1'}>
+          <div className={'hover:bg-accent-light text-sm rounded p-1.5 h-7 flex justify-center items-center text-secondary cursor-pointer font-medium gap-1'}>
             <Icons.search className={'text-lg'}/> <span>Search</span>
           </div>
-          <div className={'hover:bg-[#efefef] text-sm rounded p-1.5 h-7 flex justify-center items-center text-[#373530] cursor-pointer font-medium gap-1'}>
+          <div className={'hover:bg-accent-light text-sm rounded p-1.5 h-7 flex justify-center items-center text-secondary cursor-pointer font-medium gap-1'}>
             Duplicate
           </div>
-          <div className={'hover:bg-[#efefef] text-sm rounded p-1.5 h-7 flex justify-center items-center text-[#373530] cursor-pointer font-medium gap-1'}>
+          <div className={'hover:bg-accent-light text-sm rounded p-1.5 h-7 flex justify-center items-center text-secondary cursor-pointer font-medium gap-1'}>
             <Icons.ellipsisHorizontal className={'text-lg'}/>
           </div>
 
@@ -39,7 +39,7 @@ export default function OperationOnTopSharePage({ page }) {
           />
 
           <Link
-            className={'hover:bg-[#efefef] text-sm rounded p-1.5 h-7 flex justify-center items-center text-[#373530] cursor-pointer font-medium gap-1'}
+            className={'hover:bg-accent-light text-sm rounded p-1.5 h-7 flex justify-center items-center text-secondary cursor-pointer font-medium gap-1'}
             href={PATH.LOGIN}
           >
             Try Camille

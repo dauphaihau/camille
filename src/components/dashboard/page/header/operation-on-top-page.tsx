@@ -41,8 +41,8 @@ export default function OperationOnTopPage({ page }) {
           {
             !showSidebar &&
             <Icons.doubleArrowRight
-              size={30}
-              className='text-md text-[#54535f] hover:bg-[#efefef] rounded p-2'
+              size={25}
+              className='text-md text-[#54535f] hover:bg-accent-light rounded p-[2px] cursor-pointer'
               onClick={setShowSidebar}
             />
           }
@@ -59,7 +59,7 @@ export default function OperationOnTopPage({ page }) {
           <div className='btn-icon-header'>
             <PageOperations
               page={page}
-              classesTrigger='hover:bg-[#efefef]'
+              classesTrigger='hover:bg-accent-light'
               classesContent='top-4'
               favorite={isFavorite}
             />

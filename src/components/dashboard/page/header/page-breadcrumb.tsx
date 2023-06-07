@@ -16,7 +16,7 @@ export function PageBreadcrumb() {
     <Row align='center' gap={2} classes={'min-w-0 flex-grow-0'}>
       <Link
         href={`/${workspace?.domain}/${statePageBreadcrumb?.notebook?.id}`}
-        className='hover:bg-[#efefef] p-[2px] px-1 rounded'
+        className='hover:bg-accent-light p-[2px] px-1.5 rounded'
       >
         <Title maxW={160}>{statePageBreadcrumb?.notebook?.title}</Title>
       </Link>

@@ -153,7 +153,7 @@ export function MemberOperations({ member, members, currentUserIsAdmin }: Member
                         {
                           !workspace.isStandard &&
                           <div>
-                            <div className="bg-[#e6e6e4] text-[#71706c] text-[9px] py-[2px] px-[6px] rounded-sm leading-none uppercase font-medium">
+                            <div className="bg-[#e6e6e4] text-[#71706c] text-[9px] py-0.5 px-[6px] rounded-sm leading-none uppercase font-medium">
                               Standard plan
                             </div>
                           </div>

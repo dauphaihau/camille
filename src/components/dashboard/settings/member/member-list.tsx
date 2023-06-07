@@ -54,7 +54,7 @@ export function MemberList({ members }) {
               }}
             >
               <Row align='center' gap={3}>
-                <div className='avatar bg-[#ecebea] group-hover:bg-[#dcdbda] h-8 w-8 rounded-full text-sm text-[#777572] flex justify-center items-center'>
+                <div className='avatar bg-accent group-hover:bg-[#dcdbda] h-8 w-8 rounded-full text-sm text-primary-medium flex justify-center items-center'>
                   {
                     detailUser.name ?
                       detailUser.name.charAt(0).toUpperCase()
@@ -63,8 +63,8 @@ export function MemberList({ members }) {
                   }
                 </div>
                 <div className='flex flex-col'>
-                  <p className='text-sm text-[#373530] font-semibold'>{detailUser?.name}</p>
-                  <p className='text-sm text-[#373530]'>{detailUser?.email}</p>
+                  <p className='text-sm text-secondary font-semibold'>{detailUser?.name}</p>
+                  <p className='text-sm text-secondary'>{detailUser?.email}</p>
                 </div>
               </Row>
               <Text size={13}>{capitalizeEachWord(ROLE_USER_ON_WORKSPACE[member.role])}</Text>

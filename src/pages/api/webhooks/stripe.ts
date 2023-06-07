@@ -34,8 +34,6 @@ export default async function handler(
 
   const session = event.data.object as Stripe.Checkout.Session
 
-  console.log('dauphaihau debug: session', session)
-
   if (event.type === "checkout.session.completed") {
     // Retrieve the subscription details from Stripe.
     const subscription = await stripe.subscriptions.retrieve(

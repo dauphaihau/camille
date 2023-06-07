@@ -16,7 +16,7 @@ export default function UpdateAvatar({ user }) {
             // <Image alt='avatar' src={user.image} width={80} height={80}/>
             <img alt='avatar' src={user.image} className={'rounded-full'} width={80} height={80}/>
             :
-            <div className='avatar bg-[#ecebea] group-hover:bg-[#dcdbda] h-20 w-20 rounded-full text-md text-[#777572] grid place-items-center'>
+            <div className='avatar bg-accent group-hover:bg-[#dcdbda] h-20 w-20 rounded-full text-md text-primary-medium grid place-items-center'>
               {
                 user.name ?
                   user.name.charAt(0).toUpperCase()

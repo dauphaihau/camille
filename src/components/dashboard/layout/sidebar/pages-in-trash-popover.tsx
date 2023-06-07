@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 
-import { Alert, toast, InputWithoutRhf, Popover, Button, Col, Icons, Loading, Row, Tooltip } from "core/components";
+import { Alert, toast, InputWithoutRhf, Popover, Button, Col, Icons, Loading, Row } from "core/components";
 import { deletePage, useGetPagesDeleted } from "lib/request-by-swr/page";
 import { DELETE_PAGE_TYPE } from "config/const";
 import Title from "components/common/title";
 import useStore from "lib/store";
+import { ItemSidebar } from "./item-sidebar";
 
 export function PagesInTrashPopover() {
   const [state, setState] = useState({
@@ -19,7 +19,6 @@ export function PagesInTrashPopover() {
 
   const workspace = useStore(state => state.workspace)
   const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
-  const router = useRouter();
   const { isLoading, pages, mutate } = useGetPagesDeleted(state.showPopover && workspace ? workspace.id : null)
 
   const handleDelete = async (event, page, type = DELETE_PAGE_TYPE.HARD_DELETE) => {
@@ -58,7 +57,7 @@ export function PagesInTrashPopover() {
     return pages.map((page, index) => (
       <Row
         justify='between' align='center' key={index}
-        classes='hover:bg-[#ecebea] py-[2px] px-2 rounded-sm cursor-pointer'
+        classes='hover:bg-accent py-0.5 px-2 rounded-sm cursor-pointer'
       >
         <Col gap={1}>
           <Title maxW={200} classesText={'text-sm'}>{page.title}</Title>
@@ -86,19 +85,11 @@ export function PagesInTrashPopover() {
       onOpenChange={(open) => setState({ ...state, showPopover: open })}
     >
       <Popover.Trigger className='w-full relative'>
-
-        <Tooltip>
-          <Tooltip.Trigger asChild>
-            <Row align='center' gap={2} classes='hover:bg-[#ecebea] rounded px-3 py-2 cursor-pointer'>
-              <Icons.basket className='h-5 w-5 font-semibold rounded text-sm text-[#777572] flex justify-center'/>
-              <p className='text-sm font-semibold text-[#73726e] tracking-wider'>Trash</p>
-            </Row>
-          </Tooltip.Trigger>
-          <Tooltip.Content side='right'>
-            Restore deleted pages.
-          </Tooltip.Content>
-        </Tooltip>
-
+        <ItemSidebar
+          title='Trash'
+          icon={'trash'}
+          titleTooltip={'Restore deleted pages.'}
+        />
       </Popover.Trigger>
       {/*<Popover.Content side='right' className='w-[414px] ml-3 absolute z-[1000px] '>*/}
       <Popover.Content side='right' className='w-[414px] ml-3 mt-32 z-[1000px] '>

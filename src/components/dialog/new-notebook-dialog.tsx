@@ -4,7 +4,7 @@ import { ReactNode, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-import { Input, Button, Dialog, Icons, Tooltip, Textarea, Col } from "core/components";
+import { Input, Button, Dialog, Icons, Tooltip, Textarea, Col, Row } from "core/components";
 import { toast } from "core/components";
 import { createNotebook, createNotebookOnTeamspace } from "lib/request-by-swr/notebook";
 import { useStoreMulti } from "lib/store";
@@ -78,15 +78,15 @@ export function NewNotebookDialog({
   const Trigger = () => {
     return trigger ? <>{trigger}</> : <Tooltip>
       <Tooltip.Trigger asChild>
-        <div>
+        <Row justify={'end'}>
           <Icons.plus className={cn('btn-icon invisible ', teamspaceId ? 'group-hover/teamspace:visible' : 'group-hover:visible')}/>
-        </div>
+        </Row>
       </Tooltip.Trigger>
       <Tooltip.Content className='ml-2.5 mt-1'>
         <div>New notebook</div>
         {
           !teamspaceId &&
-          <div className='text-[#82817f]'>Notebook you created that are not in any teamspace.</div>
+          <div className='text-primary-tooltip'>Notebook you created that are not in any teamspace.</div>
         }
       </Tooltip.Content>
     </Tooltip>
@@ -103,15 +103,16 @@ export function NewNotebookDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger>
+      <Dialog.Trigger className={'w-full'}>
+      {/*<Dialog.Trigger>*/}
         <Trigger/>
       </Dialog.Trigger>
-      <Dialog.Content>
+      <Dialog.Content className={'top-20'}>
         <div
           onClick={() => setOpen(false)}
           className='
-          absolute top-[14px] right-[14px] cursor-pointer
-          btn-icon bg-[#efefef] rounded-full text-xs flex justify-center items-center'
+          absolute top-3.5 right-[14px] cursor-pointer
+          btn-icon bg-accent-light rounded-full text-xs flex justify-center items-center'
         >
           <Icons.close/>
         </div>

@@ -1,17 +1,18 @@
 'use client'
 
-import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import Link from "next/link";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime)
 
-import { Loading, Dialog, Icons, Row, Col, Tooltip } from "core/components";
+import { Loading, Dialog, Icons, Row, Col } from "core/components";
 import { cn, debounce, formatDate } from "core/helpers";
 import { useSearchPage } from "lib/request-by-swr/page";
 import { useKeyboardShortcut } from "core/hooks";
 import useStore from "lib/store";
+import { ItemSidebar } from "../dashboard/layout/sidebar/item-sidebar";
 
 export function SearchAllDialog() {
   const [searchValue, setSearchValue] = useState<string>('');
@@ -21,7 +22,7 @@ export function SearchAllDialog() {
   const setShowPagesInTrashPopover = useStore(state => state.setShowPagesInTrashPopover)
 
   const arrKeys = ['Meta', 'f']
-  const handleKeyboardShortcut = useCallback(keys => {
+  const handleKeyboardShortcut = useCallback(() => {
     setOpen(prevState => !prevState)
   }, [setOpen])
   useKeyboardShortcut(arrKeys, handleKeyboardShortcut, { overrideSystem: shortcutOverrideSystem })
@@ -44,11 +45,11 @@ export function SearchAllDialog() {
   }
 
   const NoResult = () => (
-    <Col className='text-center my-4' gap={1}>
-      <div className='text-[14px] text-[#7d7c79] font-semibold'>No results</div>
-      <div className='text-[14px] text-[#a6a5a3] font-medium'>Some results may be in your deleted pages</div>
+    <Col className='text-center my-4'>
+      <div className='text-sm text-primary font-semibold'>No results</div>
+      <div className='text-sm text-[#a6a5a3] font-medium'>Some results may be in your deleted pages</div>
       <div
-        className='text-[14px] text-[#4281db] font-medium cursor-pointer'
+        className='text-sm text-[#4281db] font-medium cursor-pointer'
         onClick={() => {
           setShowPagesInTrashPopover(true)
           setOpen(false)
@@ -71,7 +72,7 @@ export function SearchAllDialog() {
           parts.map((part, i) => <span
               key={i}
               className={cn(
-                part.toLowerCase() !== searchValue.toLowerCase() ? 'text-[#7d7c78]' : 'text-[#373530]'
+                part.toLowerCase() !== searchValue.toLowerCase() ? 'text-[#7d7c78]' : 'text-secondary'
               )}
             >
             {part}
@@ -90,7 +91,7 @@ export function SearchAllDialog() {
               key={idx}
               onClick={() => setOpen(false)}
               href={`/${workspace?.domain}/${p.notebookId}/${p.id}`}
-              className='font-semibold block text-[14px] hover:bg-[#efefef] py-1.5 rounded-[3px] px-2 mx-1 cursor-pointer group relative'
+              className='font-semibold block text-[14px] hover:bg-accent-light py-1.5 rounded-[3px] px-2 mx-1 cursor-pointer group relative'
             >
               <Row justify='between' align='center'>
                 {isSearchByValue ? handle2Light(p.title) : p.title}
@@ -102,19 +103,6 @@ export function SearchAllDialog() {
                       day: "numeric",
                     })}</div>
                 }
-                {/*ok */}
-                {/*<div className='hidden group-hover:block absolute right-[-30%] top-[-20%] bg-black text-white py-1 px-2 rounded-[3px] text-[#7a7977] text-[12px]'>*/}
-                {/*  <div>Edited by <span className='text-white'>aaa</span> 1 days ago</div>*/}
-                {/*  <div>Created by <span className='text-white'>aaaa</span> 1 days ago</div>*/}
-                {/*</div>*/}
-
-                {/* bug*/}
-                {/*<div className='hidden group-hover:block absolute right-[-30%] top-[-20%] bg-black text-white py-1 px-2 rounded-[3px] text-[#7a7977] text-[12px]'>*/}
-                {/*  <div>Edited by <span className='text-white'>{p.updatedBy}</span> {dayjs(p.updatedAt).fromNow()}</div>*/}
-                {/*  <div>Created by <span className='text-white'>aaaaa</span> {dayjs(p.createdAt).fromNow()}</div>*/}
-                {/*</div>*/}
-
-                {/*<Icons.enter className='hidden group-hover:flex text-[#9f9e9b] text-[12px]'/>*/}
               </Row>
             </Link>
           ))
@@ -158,29 +146,23 @@ export function SearchAllDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Dialog.Trigger className='w-full'>
-        <Tooltip>
-          <Tooltip.Trigger asChild>
-            <Row align='center' gap={2} classes='hover:bg-[#ecebea] rounded px-3 py-2 cursor-pointer'>
-              <Icons.search className='h-5 w-5 font-semibold rounded text-sm text-[#777572] flex justify-center'/>
-              <p className='text-sm font-semibold text-[#73726e] tracking-wider'>Search</p>
-            </Row>
-          </Tooltip.Trigger>
-          <Tooltip.Content side='right'>
-            <div>Search and quickly jump to a page</div>
-            <div className='text-[#82817f]'>⌘ + F</div>
-          </Tooltip.Content>
-        </Tooltip>
+        <ItemSidebar
+          icon='search'
+          title={'Search'}
+          titleTooltip={'Search and quickly jump to a page'}
+          subTitleTooltip={'⌘ + F'}
+        />
       </Dialog.Trigger>
-      <Dialog.Content className='p-0 gap-0 max-h-[80vh] max-w-[660px] overflow-hidden'>
-        <div className='w-full h-[48px] flex items-center px-2 gap-x-2'>
-          <Icons.search className='h-5 w-5 font-semibold rounded text-sm text-[#777572] flex justify-center'/>
+      <Dialog.Content className='p-0 gap-0 max-h-[80vh] max-w-[660px] overflow-hidden top-20'>
+        <div className='w-full h-12 flex items-center px-2 gap-x-2'>
+          <Icons.search className='h-5 w-5 rounded text-sm text-primary-medium flex justify-center'/>
           <input
             autoFocus={false}
             onChange={handleSearch}
             className='outline-none w-full' type="text" placeholder={`Search ${workspace?.name}...`}
           />
         </div>
-        <div className='border-b border-[#efefef]'/>
+        <div className='border-b border-accent-light'/>
         <div className='my-2 max-h-[730px] overflow-y-scroll'>
           {/*<div className='my-2 overflow-y-scroll'>*/}
           <Pages/>

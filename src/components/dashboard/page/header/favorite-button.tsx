@@ -64,7 +64,7 @@ export default function FavoriteButton({ page }) {
       </Tooltip.Trigger>
       <Tooltip.Content>
         <div>Pin this page in your sidebar</div>
-        <div className='text-[#82817f] text-center'>⌘ + P</div>
+        <div className='text-primary-tooltip text-center'>⌘ + P</div>
       </Tooltip.Content>
     </Tooltip>
   );

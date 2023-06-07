@@ -27,25 +27,28 @@ export default function TeamspaceItemSidebar({ teamspace }: TeamspaceItemProps) 
 
   return (
     <div className='group/teamspace'>
-      <div className={cn(`flex items-center justify-between hover:bg-[#ecebea] py-[2px] pr-0 pr-[8px] pl-[5px] rounded-sm max-h-[27px] cursor-pointer`,)}>
-
+      <Row
+        align={'center'}
+        justify={'center'}
+        classes={cn(`item-sidebar pr-2 pl-[5px]`,)}
+      >
         <div
           className='flex flex-1 gap-1 items-center pl-1.5'
           onClick={() => setShowPages(!showNotebooks)}
         >
           <Box
-            classes={['avatar h-5 w-5 rounded-[0.25em] text-sm text-[#777572] flex justify-center font-medium',
-              teamspace.isOrigin ? 'text-[#cc782f] bg-[#f5dfcc]' : 'bg-[#dcdbda] text-[#777572]'
+            classes={['avatar h-5 w-5 rounded-[0.25em] text-sm text-primary-medium flex justify-center font-medium',
+              teamspace.isOrigin ? 'text-[#cc782f] bg-[#f5dfcc]' : 'bg-[#dcdbda] text-primary-medium'
             ]}
           >
             {teamspace && teamspace.name.charAt(0)}
           </Box>
-          <div className={cn("font-semibold text-[14px] text-[#73726e] truncate w-fit",)}>
+          <div className={cn("font-semibold text-sm text-primary truncate w-fit",)}>
             {teamspace.name}
           </div>
           <Icons.arrowRightSline
             size={12}
-            className={`btn-icon hover:bg-[#ecebea] invisible group-hover/teamspace:visible ${showNotebooks ? 'rotate-90' : 'rotate-0'}`}
+            className={`btn-icon hover:bg-accent invisible group-hover/teamspace:visible ${showNotebooks ? 'rotate-90' : 'rotate-0'}`}
           />
         </div>
 
@@ -54,7 +57,7 @@ export default function TeamspaceItemSidebar({ teamspace }: TeamspaceItemProps) 
           <NewNotebookDialog teamspaceId={teamspace.id}/>
         </div>
 
-      </div>
+      </Row>
       {
         showNotebooks &&
         <div className='px-1'>
@@ -76,7 +79,7 @@ export default function TeamspaceItemSidebar({ teamspace }: TeamspaceItemProps) 
                     />
                   </NotebookItemSidebar>
                 ))
-                : <p className='font-semibold text-[14px] text-[#999895] pl-8'>No teamspaces inside</p>
+                : <p className='font-semibold text-sm text-[#999895] pl-8'>No teamspaces inside</p>
           }
         </div>
       }

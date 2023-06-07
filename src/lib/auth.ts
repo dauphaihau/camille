@@ -5,9 +5,6 @@ import EmailProvider from "next-auth/providers/email"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { createTransport } from "nodemailer"
 
-// import { Client } from "postmark"
-// const postmarkClient = new Client(process.env.POSTMARK_API_TOKEN)
-
 import { db } from "lib/db"
 import { siteConfig } from "config/site"
 
@@ -56,9 +53,6 @@ export const authOptions: NextAuthOptions = {
         // const { identifier, url, provider, theme } = params
         const { host } = new URL(url)
 
-        console.log('dauphaihau debug: url', url)
-        console.log('dauphaihau debug: host', host)
-
         // NOTE: You are not required to use `nodemailer`, use whatever you want.
         return new Promise((resolve, reject) => {
           const transport = createTransport(configEmail)
@@ -73,9 +67,8 @@ export const authOptions: NextAuthOptions = {
                 htmlActivation({ url, host, theme })
             ,
             headers: {
+              // Set this to prevent Gmail from threading emails.
               'X-Entity-Ref-ID': new Date().getTime() + ""
-              // Name: "X-Entity-Ref-ID",
-              // Value: new Date().getTime() + "",
             }
           }, function (err, info) {
             if (err) {
@@ -87,22 +80,6 @@ export const authOptions: NextAuthOptions = {
             }
           })
         })
-
-        // const result = await transport.sendMail({
-        //   from,
-        //   to: email,
-        //   subject: `Sign in to ${host}`,
-        //   text: text({ url, host }),
-        //   html:
-        //     user?.emailVerified ?
-        //       htmlSignIn({ url, host, theme }) :
-        //       htmlActivation({ url, host, theme })
-        //   ,
-        // })
-        // const failed = result.rejected.concat(result.pending).filter(Boolean)
-        // if (failed.length) {
-        //   throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`)
-        // }
       },
     }),
   ],

@@ -31,9 +31,9 @@ export function PageItem({ page, favorite, notebook, children }: PageItemProps) 
     <Row
       align='center'
       justify='between'
-      classes={['group/favorite hover:bg-[#ecebea] rounded-sm py-[2px] pr-[8px] mb-0.5',
+      classes={['group/favorite item-sidebar pr-[8px] mb-0.5',
         favorite ? 'pl-[6px]' : 'pl-[20px]',
-        { ['bg-[#f1f1f0]']: arrPath && arrPath[3] === page.id },
+        { ['bg-accent-light-active']: arrPath && arrPath[3] === page.id },
       ]}
     >
       <Row align='center' gap={1} classes='w-full'>
@@ -56,9 +56,9 @@ export function PageItem({ page, favorite, notebook, children }: PageItemProps) 
         <Link
           onClick={() => setStatePageBreadcrumb({ notebook, page })}
           href={`${domain}/${page.notebookId}/${page.id}`}
-          className={cn("font-semibold text-[14px] text-[#73726e] flex-auto min-w-0",
+          className={cn("font-semibold text-sm text-primary flex-auto min-w-0",
             'truncate overflow-hidden',
-            { ['text-[#373530]']: arrPath && arrPath[3] === page.id }
+            { ['text-secondary']: arrPath && arrPath[3] === page.id }
           )}
         >
           {pageContext?.id === page.id ? pageContext.title : page.title}

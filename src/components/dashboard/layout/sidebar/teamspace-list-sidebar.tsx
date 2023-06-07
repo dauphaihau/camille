@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 
-import { cn } from "core/helpers";
 import NewTeamspaceDialog from "components/dialog/new-teamspace-dialog";
-import { Box, Row, Tooltip } from "core/components";
+import { Box, Row } from "core/components";
 import TeamspaceItemSidebar from "./teamspace-item-sidebar";
 import * as React from "react";
 import useStore from "lib/store";
+import { TitleOfItemsSidebar } from "./title-of-items-sidebar";
 
 export function TeamspaceListSidebar() {
   const [showTeamspaces, setShowTeamspaces] = useState(true)
@@ -20,20 +20,11 @@ export function TeamspaceListSidebar() {
   return (
     <Box classes={showTeamspaces ? 'mb-2' : ''}>
       <Row justify='between' align='center' classes='px-3 min-h-[24px] my-[2px]'>
-        <Tooltip>
-          <Tooltip.Trigger>
-            <div
-              className={cn('text-xs font-bold tracking-wider text-[#a3a39f] hover:bg-[#dedddb] hover:text-[#5b5954] rounded-sm px-1 cursor-pointer select-none')}
-              onClick={() => setShowTeamspaces(!showTeamspaces)}
-            >Teamspaces
-            </div>
-          </Tooltip.Trigger>
-          <Tooltip.Content side='top' className='ml-2.5 mt-1'>
-            <div>Click to hide section</div>
-            <div className='text-[#82817f]'>Teamspaces you have joined.</div>
-          </Tooltip.Content>
-        </Tooltip>
-
+        <TitleOfItemsSidebar
+          title={'Teamspaces'}
+          subTitleTooltip={'Teamspaces you have joined.'}
+          onClick={() => setShowTeamspaces(!showTeamspaces)}
+        />
         <NewTeamspaceDialog/>
       </Row>
       {

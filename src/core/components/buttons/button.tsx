@@ -68,7 +68,7 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
             { 'bg-black text-white hover:opacity-80': variant === 'filled' },
             { 'bg-white text-black hover:bg-[#e9eaeb]': variant === 'outline' },
 
-            { 'bg-transparent text-primary-black hover:text-primary-black hover:bg-[#efefef]': variant === 'text' },
+            { 'bg-transparent text-primary-black hover:text-primary-black hover:bg-accent-light': variant === 'text' },
             // { 'bg-transparent text-primary-black hover:text-primary-black hover:bg-zinc-100': variant === 'text' },
 
             // 'border-2 border-black dark:border-white',
@@ -99,8 +99,8 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
           ],
 
           color === 'gray' && !disabled && [
-            { 'bg-white text-[#37352f] hover:bg-[#efefef]:': variant === 'text' },
-            'hover:bg-[#efefef]'
+            { 'bg-white text-[#37352f] hover:bg-accent-light:': variant === 'text' },
+            'hover:bg-accent-light'
           ],
 
           variant === 'default' && [

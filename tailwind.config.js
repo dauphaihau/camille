@@ -1,4 +1,3 @@
-const { colors } = require("tailwindcss/colors")
 const { fontFamily } = require("tailwindcss/defaultTheme")
 
 /** @type {import('tailwindcss').Config} */
@@ -12,31 +11,26 @@ module.exports = {
   darkMode: true,
   // darkMode: 'class',
   theme: {
-    container: {
-      center: true,
-      padding: "1.5rem",
-      screens: {
-        "2xl": "1440px",
-      },
-    },
     extend: {
       fontFamily: {
         sans: ["var(--font-inter)", ...fontFamily.sans],
       },
       colors: {
-        ...colors,
-        brand: {
-          50: "#f3f3f3",
-          100: "#e7e7e7",
-          200: "#c4c4c4",
-          300: "#a0a0a0",
-          400: "#585858",
-          500: "#111111",
-          600: "#0f0f0f",
-          700: "#0d0d0d",
-          800: "#0a0a0a",
-          900: "#080808",
-          DEFAULT: "#111111",
+        primary: {
+          DEFAULT: "hsl(var(--primary))", // #73726e
+          light: "hsl(var(--border))", // #e9e9e8
+          medium: "hsl(var(--primary-medium))", // #777572
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))", // #373530
+        },
+        'primary-tooltip': {
+          DEFAULT: "hsl(var(--primary-tooltip))", // #82817f
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))", // #ecebea
+          light: "hsl(var(--accent-light))", // #efefef
+          'light-active': "hsl(var(--accent-light-active))", // #f1f1f0
         },
       },
     },

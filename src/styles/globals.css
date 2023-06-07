@@ -10,6 +10,22 @@
 
 @layer base {
 
+  :root {
+    --background: 0 0% 100%;
+    --primary: 48, 4%, 45%;
+    --primary-medium: 48, 4%, 45%;
+    --secondary: 43, 13%, 20%;
+    --accent: 30, 1%, 92%;
+    --accent-light: 0, 0%, 94%;
+    --accent-light-active: 60, 0%, 94%;
+
+    /*--border: 60, 1%, 86%;*/
+
+    --primary-tooltip: 40, 2%, 50%;
+    --primary-title-items: 40, 2%, 50%;
+  }
+
+
   /* #region  /**=========== Default Typography =========== */
   h1,
   .h1 {
@@ -43,8 +59,13 @@
   }
 
   /* #endregion  /**======== Default Typography =========== */
+
+  .item-sidebar {
+    @apply hover:bg-accent py-0.5 rounded-sm h-[28px] max-h-[28px] cursor-pointer;
+  }
+
   .btn-icon {
-    @apply text-[#73726e] text-base hover:bg-[#dedddb] rounded-sm w-[20px] h-[20px];
+    @apply text-primary text-base hover:bg-[#dedddb] rounded-sm w-[20px] h-[20px];
   }
 
   .btn-icon-sidebar {
@@ -52,7 +73,7 @@
   }
 
   .btn-icon-header {
-    @apply cursor-pointer inline-flex justify-center items-center text-[#73726e] text-base hover:bg-[#efefef] rounded-[3px] w-[32px] h-[28px];
+    @apply cursor-pointer inline-flex justify-center items-center text-primary text-base hover:bg-accent-light rounded-[3px] w-[32px] h-[28px];
   }
 
   .text-link {
@@ -93,21 +114,3 @@ p {
 .ce-toolbar__content {
   max-width: 708px !important;
 }
-
-
-
-/*.initial-loading-spinner {*/
-/*  animation: rotate 1s linear infinite;*/
-/*  transform-origin: center center;*/
-/*  transform-box: fill-box;*/
-/*  opacity: .5;*/
-/*}*/
-
-/*@keyframes rotate {*/
-/*  from {*/
-/*    opacity: 1;*/
-/*  }*/
-/*  to {*/
-/*    opacity: 0;*/
-/*  }*/
-/*}*/

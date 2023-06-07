@@ -2,7 +2,7 @@
 
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import React, { useReducer } from "react";
+import { useReducer } from "react";
 import { useRouter } from "next/navigation";
 
 import { DropdownMenu, Icons, Row, Skeleton, Tooltip } from "core/components";
@@ -72,16 +72,16 @@ export function WorkspaceUserDropdown() {
           <DropdownMenu.Trigger className="mb-2 relative w-full">
             <Row
               align='center' justify='between'
-              classes={cn('group/iconWorkspace hover:bg-[#ecebea]  py-3 px-4 rounded-sm max-h-[45px] cursor-pointer relative',
-                { 'bg-[#ecebea]': event.isDropdownOpen }
+              classes={cn('group/iconWorkspace hover:bg-accent py-3 px-4 rounded-sm max-h-[45px] cursor-pointer relative',
+                { 'bg-accent': event.isDropdownOpen }
               )}
             >
               <Row align='center' gap={3}>
-                <div className='avatar bg-[#ecebea] group-hover/iconWorkspace:bg-[#dcdbd9] h-5 w-5 rounded text-sm text-[#777572] flex justify-center'>
+                <div className='avatar bg-accent group-hover/iconWorkspace:bg-[#dcdbd9] h-5 w-5 rounded text-sm text-primary-medium flex justify-center'>
                   {workspace && workspace?.name?.charAt(0)}
                 </div>
-                <div className='flex flex-col'>
-                  <p className='text-sm text-[#373530] font-semibold'>{workspace && workspace.name}</p>
+                <div>
+                  <p className='text-sm text-secondary font-semibold'>{workspace && workspace.name}</p>
                 </div>
               </Row>
             </Row>
@@ -91,16 +91,15 @@ export function WorkspaceUserDropdown() {
             <Tooltip.Trigger>
               <div>
                 <Icons.doubleArrowLeft
-                  size={30}
-                  className='text-md group-hover:text-[#92918d] hover:bg-[#ecebea] rounded invisible group-hover:visible p-2 absolute top-[7px] right-[6%]'
-                  // className='text-md group-hover:text-[#92918d] hover:bg-[#dedddb] rounded invisible group-hover:visible p-2'
+                  size={25}
+                  className='text-[#92918d] hover:bg-accent rounded invisible group-hover:visible p-[2px] absolute top-[10px] right-[6%] cursor-pointer'
                   onClick={setShowSidebar}
                 />
               </div>
             </Tooltip.Trigger>
             <Tooltip.Content className='mt-4 mr-4' side='bottom'>
               <div>Close sidebar</div>
-              <div className='text-[#82817f]'>⌘ + \</div>
+              <div className='text-primary-tooltip'>⌘ + \</div>
             </Tooltip.Content>
           </Tooltip>
         </div>
@@ -133,11 +132,11 @@ export function WorkspaceUserDropdown() {
                   >
                     <div>
                       <div
-                        className="w-full text-[14px] text-ellipsis overflow-hidden font-medium"
+                        className="w-full text-sm text-ellipsis overflow-hidden font-medium"
                       >{ws.name}</div>
 
                       <div
-                        className="w-full text-[#848380] text-[12px] text-ellipsis overflow-hidden"
+                        className="w-full text-[#848380] text-xs text-ellipsis overflow-hidden"
                       >{ws.isStandard ? 'Standard Plan' : 'Free Plan'} · {ws.totalMembers} members
                       </div>
                     </div>
@@ -148,17 +147,13 @@ export function WorkspaceUserDropdown() {
             </div>
 
             <DropdownMenu.Separator/>
-
             <DropdownMenu.Item>
               <Link href={PATH.WORKSPACE} className="w-full">
                 Join or create workspace
               </Link>
             </DropdownMenu.Item>
             <DropdownMenu.Item>
-              <Link
-                href='#'
-                className="w-full pointer-events-none"
-              >
+              <Link href='#' className="w-full pointer-events-none">
                 Add an account
               </Link>
             </DropdownMenu.Item>
