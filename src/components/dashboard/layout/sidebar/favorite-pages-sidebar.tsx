@@ -32,7 +32,7 @@ export function FavoritePagesSidebar() {
           {
             user.favoritePages && user.favoritePages.length ?
               user.favoritePages.map((page) => (
-                <PageItem key={page.id} page={page} notebook={page.notebook}>
+                <PageItem favorite key={page.id} page={page} notebook={page.notebook}>
                   <PageOperations favorite placeOnSidebar page={page}/>
                 </PageItem>
               ))
