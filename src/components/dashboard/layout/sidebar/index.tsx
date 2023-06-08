@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-import { Box, Col, Tooltip } from "core/components";
+import { Box, Col } from "core/components";
 import { PrivateNotebooksSidebar } from "./private-notebooks-sidebar";
 import { wordInString } from "core/helpers";
 import { WorkspaceUserDropdown } from "./workspace-user-dropdown";
@@ -44,14 +44,15 @@ export function SidebarDashboard() {
 
   return (
     <aside
-      style={{boxShadow: 'rgba(0, 0, 0, 0.025) -1px 0px 0px 0px inset'}}
-      className="group w-[240px] flex-col flex-grow-0 flex-shrink-0 md:flex bg-[#fafafa] h-screen overflow-hidden">
+      style={{ boxShadow: 'rgba(0, 0, 0, 0.025) -1px 0px 0px 0px inset' }}
+      className="group w-[240px] flex-col flex-grow-0 flex-shrink-0 md:flex bg-[#fafafa] h-screen overflow-hidden"
+    >
       {
         isSettingPage ?
           <SettingsSidebar urlBeforeNavigateSettingPage={urlBeforeNavigateSettingPage}/> :
+
           <>
             <WorkspaceUserDropdown/>
-
             <Box classes='px-1 mb-3'>
               <SearchAllDialog/>
               <ItemSidebar
@@ -89,16 +90,6 @@ export function SidebarDashboard() {
             </nav>
 
             <CalcLimitNotebooks/>
-
-            {/*<div className='border-t border-primary-light'/>*/}
-            {/*<NewNotebookDialog*/}
-            {/*  trigger={*/}
-            {/*    <Box classes='flex-shrink px-4 py-3 inline-flex items-center hover:bg-accent text-sm text-primary cursor-pointer font-semibold w-full'>*/}
-            {/*      <Icons.plus className='mr-2 h-5 w-5'/>*/}
-            {/*      New notebook*/}
-            {/*    </Box>*/}
-            {/*  }*/}
-            {/*/>*/}
           </>
       }
     </aside>

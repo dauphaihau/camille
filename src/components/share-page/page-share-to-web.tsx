@@ -2,7 +2,7 @@
 
 import { notFound, usePathname } from "next/navigation";
 import { useGetDetailPageShareToWeb } from "../../lib/request-by-swr/page";
-import LoadingFullPage from "../../app/loading";
+import LoadingFullPage from "../../app/(marketing)/loading";
 import { Editor } from "../dashboard/editor";
 import OperationOnTopSharePage from "./operation-on-top-share-page";
 

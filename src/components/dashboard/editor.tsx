@@ -152,15 +152,11 @@ export function Editor({ page, readOnly = false }: EditorProps) {
     []
   );
 
-  if (!isMounted) {
-    return null
-  }
-
   return (
     <div className="grid w-full gap-10">
       <div className="prose prose-stone max-w-[708px] mx-auto pb-[30vh]">
         {/*<div className="prose prose-stone mx-auto w-[800px] pb-[30vh]">*/}
-        <div className={'flex flex-col justify-end mt-16 mb-2'}>
+        <div className={'flex flex-col justify-end mt-28 mb-2'}>
           <TextareaAutosize
             disabled={readOnly}
             ref={titleInstance}
@@ -168,19 +164,15 @@ export function Editor({ page, readOnly = false }: EditorProps) {
             id="title"
             defaultValue={page.title}
             value={pageContext?.title}
-            // value={pageContext?.id === page.id && pageContext?.title || page.title}
-            // defaultValue={pageContext?.title || page.title}
             placeholder="Page title"
-            className="w-full resize-none appearance-none text-5xl font-bold focus:outline-none z-0"
+            className="w-full resize-none appearance-none text-4xl font-bold focus:outline-none z-0"
             onChange={(event) => {
               setPage?.({ ...page, title: event.target.value })
               debounceTitle(event.target.value)
             }}
           />
         </div>
-
         <div id={EDITOR_HOLDER_ID} className=""/>
-
         {
           !readOnly &&
           <p className="text-sm text-[#9b9a97]">

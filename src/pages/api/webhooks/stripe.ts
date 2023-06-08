@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import Stripe from "stripe"
+import Stripe from "pages/api/webhooks/stripe"
 import rawBody from "raw-body"
 
 import { stripe } from "lib/stripe"

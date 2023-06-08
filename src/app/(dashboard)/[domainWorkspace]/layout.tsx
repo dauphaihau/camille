@@ -11,7 +11,7 @@ import PageShareToWeb from "components/share-page/page-share-to-web";
 import { PATH, SUFFIX_DOMAIN_SHARE_TO_WEB } from "config/const";
 
 interface DashboardLayoutProps {
-  children?: React.ReactNode
+  children: React.ReactNode
   params?: {domainWorkspace: string}
 }
 

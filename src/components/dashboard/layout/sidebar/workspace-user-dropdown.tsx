@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useReducer } from "react";
 import { useRouter } from "next/navigation";
 
-import { DropdownMenu, Icons, Row, Skeleton, Tooltip } from "core/components";
+import { Col, DropdownMenu, Icons, Row, Skeleton, Tooltip } from "core/components";
 import { PATH } from "config/const";
-import { cn } from "core/helpers";
+import { cn, getRandomInt } from "core/helpers";
 import { LoadingDialog } from "components/dialog/loading-dialog";
 import { toast } from "core/components";
 import { useStoreMulti } from "lib/store";
@@ -117,31 +117,34 @@ export function WorkspaceUserDropdown() {
                 isLoading ?
                   <div className="p-4">
                     <div className="space-y-3">
-                      <Skeleton className="h-5 w-full"/>
-                      <Skeleton className="h-5 w-full"/>
-                      <Skeleton className="h-5 w-full"/>
-                      <Skeleton className="h-5 w-full"/>
-                      <Skeleton className="h-5 w-full"/>
+                      {new Array(getRandomInt(1, 4)).fill("").map((_, i) => (
+                        <Col key={i} gap={2}>
+                          <Skeleton className="h-4 w-1/3"/>
+                          <Skeleton className="h-5 w-full"/>
+                        </Col>
+                      ))}
                     </div>
                   </div>
                   : workspaces.length > 0 && workspaces.map((ws, index) => (
-                  <DropdownMenu.Item
-                    key={index}
-                    onClick={() => changeWorkspace(ws)}
-                    className='flex justify-between cursor-pointer'
-                  >
-                    <div>
-                      <div
-                        className="w-full text-sm text-ellipsis overflow-hidden font-medium"
-                      >{ws.name}</div>
+                  <>
+                    <DropdownMenu.Item
+                      key={index}
+                      onClick={() => changeWorkspace(ws)}
+                      className='flex justify-between cursor-pointer'
+                    >
+                      <div>
+                        <div
+                          className="w-full text-sm text-ellipsis overflow-hidden font-medium"
+                        >{ws.name}</div>
 
-                      <div
-                        className="w-full text-[#848380] text-xs text-ellipsis overflow-hidden"
-                      >{ws.isStandard ? 'Standard Plan' : 'Free Plan'} · {ws.totalMembers} members
+                        <div
+                          className="w-full text-[#848380] text-xs text-ellipsis overflow-hidden"
+                        >{ws.isStandard ? 'Standard Plan' : 'Free Plan'} · {ws.totalMembers} members
+                        </div>
                       </div>
-                    </div>
-                    {workspace && ws.domain === workspace.domain && <Icons.check className='text-lg'/>}
-                  </DropdownMenu.Item>
+                      {workspace && ws.domain === workspace.domain && <Icons.check className='text-lg'/>}
+                    </DropdownMenu.Item>
+                  </>
                 ))
               }
             </div>

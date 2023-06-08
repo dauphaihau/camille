@@ -88,6 +88,7 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
           onClick={(e) => {
             e.preventDefault();
             signIn("github")
+            setIsLoading(true)
           }}
           variant='default'
           disabled={isLoading}
@@ -101,6 +102,7 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
           onClick={(e) => {
             e.preventDefault();
             signIn("google")
+            setIsLoading(true)
           }}
           variant='default'
           disabled={isLoading}

@@ -4,8 +4,8 @@ import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
 import { Skeleton } from "core/components/skeleton"
-import { Icons, Row, Tooltip } from "core/components";
-import { cn } from "core/helpers";
+import { Col, Icons, Row, Tooltip } from "core/components";
+import { cn, getRandomInt } from "core/helpers";
 import useStore from "lib/store";
 
 interface PageItemProps {
@@ -20,7 +20,7 @@ interface PageItemProps {
   children: ReactNode
 }
 
-export function PageItem({ page, favorite, notebook, children }: PageItemProps) {
+export function PageItemSidebar({ page, favorite, notebook, children }: PageItemProps) {
   const setStatePageBreadcrumb = useStore(state => state.setStatePageBreadcrumb)
   const pageContext = useStore(state => state.page)
   const pathName = usePathname()
@@ -48,8 +48,16 @@ export function PageItem({ page, favorite, notebook, children }: PageItemProps) 
               Nested page not available
             </Tooltip.Content>
           </Tooltip>
+
           <div className='btn-icon-sidebar'>
-            {page.content ? <Icons.pageText/> : <Icons.page/>}
+            <Tooltip>
+              <Tooltip.Trigger>
+                {page.content ? <Icons.pageText/> : <Icons.page/>}
+              </Tooltip.Trigger>
+              <Tooltip.Content className={'ml-1.5'}>
+                Change icon are developing
+              </Tooltip.Content>
+            </Tooltip>
           </div>
         </Row>
 
@@ -74,15 +82,27 @@ export function PageItem({ page, favorite, notebook, children }: PageItemProps) 
   )
 }
 
-PageItem.Skeleton = function PageItemSkeleton() {
+PageItemSidebar.Skeleton = function PageItemSkeleton({ notebook }: {notebook?: boolean}) {
   return (
-    <div className="p-4">
-      <div className="space-y-1">
-        <Skeleton className="h-4 w-full"/>
-        {/*<Skeleton className="h-4 w-full"/>*/}
-        {/*<Skeleton className="h-4 w-full"/>*/}
-        {/*<Skeleton className="h-4 w-full"/>*/}
-      </div>
-    </div>
+    <Col gap={1} classes={'my-1.5'}>
+      {
+        new Array(getRandomInt(1, 3)).fill("").map((_, i) => (
+            <Row
+              key={i}
+              align={'center'}
+              classes={notebook ? 'pl-[5px]' : 'pl-[20px]'}
+            >
+              <div className={'w-[20px] h-[20px] flex justify-center items-center'}>
+                <Icons.arrowRightSline
+                  size={25}
+                  className={`animate-pulse fill-[#efefed] rounded`}
+                />
+              </div>
+              <Skeleton className="h-5 w-5 mr-2"/>
+              <Skeleton width={Math.floor(Math.random() * 40) + 60} className='h-2.5'/>
+            </Row>
+          )
+        )}
+    </Col>
   )
 }

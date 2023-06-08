@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useCallback, useEffect, useRef } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useSelectedLayoutSegments } from "next/navigation";
 
 import { SidebarDashboard } from "components/dashboard/layout/sidebar";
@@ -87,7 +87,6 @@ export const WorkspaceWrapper = ({ children, ...props }: Partial<WorkspaceProps>
         <div className='w-full'>
           <LimitedNotebookBar/>
           <main
-            // className={cn('flex mx-auto flex-1 flex-col overflow-hidden',
             className={cn('flex mx-auto flex-1 flex-col',
               { 'max-w-[708px] mt-[60px]': isSettingPage || !pageId },
             )}

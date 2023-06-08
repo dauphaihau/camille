@@ -82,7 +82,7 @@ export function NewNotebookDialog({
           <Icons.plus className={cn('btn-icon invisible ', teamspaceId ? 'group-hover/teamspace:visible' : 'group-hover:visible')}/>
         </Row>
       </Tooltip.Trigger>
-      <Tooltip.Content className='ml-2.5 mt-1'>
+      <Tooltip.Content  className='ml-14 mt-1'>
         <div>New notebook</div>
         {
           !teamspaceId &&
@@ -104,7 +104,6 @@ export function NewNotebookDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Dialog.Trigger className={'w-full'}>
-      {/*<Dialog.Trigger>*/}
         <Trigger/>
       </Dialog.Trigger>
       <Dialog.Content className={'top-20'}>

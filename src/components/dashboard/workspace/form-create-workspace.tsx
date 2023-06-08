@@ -5,14 +5,14 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { getSession } from "next-auth/react";
 import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button, Col, Input } from "core/components";
 import { toast } from "core/components";
 import { workspaceSchema } from "lib/validations/workspace";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { LoadingDialog } from "components/dialog/loading-dialog";
 import { PATH } from "config/const";
-import { createWorkspace } from "../../../lib/request-by-swr/workspace";
+import { createWorkspace } from "lib/request-by-swr/workspace";
 
 type FormData = z.infer<typeof workspaceSchema>
 
@@ -110,7 +110,8 @@ export default function FormCreateWorkspace() {
               onFocus={() => setEvent({ isFocusDomainField: true })}
               labelLeft={window.location.host + '/'}
               classesLabelLeft='left-[-2%] text-[#6c6f75] font-medium text-[13px]'
-              classes='pl-[7rem]' sizeInput='md' id='domain' label='Domain'
+              classes={process.env.NODE_ENV === 'production' ? 'pl-[8.6rem]' : 'pl-[7rem]'}
+              sizeInput='md' id='domain' label='Domain'
             />
           </Col>
           <div className='text-center'>

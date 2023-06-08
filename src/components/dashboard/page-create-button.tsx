@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 
-import { Button, Loading } from "core/components"
+import { Button, Loading, Row } from "core/components"
 import { toast } from "core/components"
 import { createPage } from "lib/request-by-swr/page";
 import useStore from "lib/store";
@@ -52,11 +52,16 @@ export function PageCreateButton({
 
   if (children) {
     return <div onClick={onClick}>
-      {isLoading ?
-        <div className='btn-icon hidden group-hover/notebook:flex text-[#686662] !flex justify-center items-center'>
-          <Loading/>
-        </div>
-        : children}
+      {
+        isLoading ?
+          <Row
+            justify={'center'}
+            align={'center'}
+            classes='btn-icon hidden group-hover/notebook:flex text-[#686662] p-[3px]'>
+            <Loading/>
+          </Row>
+          : children
+      }
     </div>
 
   }

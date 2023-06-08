@@ -13,11 +13,11 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   return (
     <div className="flex justify-between">
-      <div className="grid gap-1">
+      <div>
         <h1 className="text-2xl font-bold tracking-wide text-slate-900">
           {heading}
         </h1>
-        {text && <p className="text-neutral-500">{text}</p>}
+        {text && <div className="text-primary">{text}</div>}
       </div>
       {children}
     </div>

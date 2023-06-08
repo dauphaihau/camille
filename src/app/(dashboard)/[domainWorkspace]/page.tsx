@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   return (
     <DashboardShell>
       <DashboardHeader heading="Notebooks" text="Create and manage notebooks.">
-        <NewNotebookDialog/>
+        {/*<NewNotebookDialog/>*/}
       </DashboardHeader>
       <NotebookList/>
     </DashboardShell>

@@ -3,9 +3,9 @@ import Link from "next/link"
 import { usePathname } from 'next/navigation';
 import { ReactNode, useState } from "react";
 
-import { Skeleton, Icons, Row, Tooltip, Loading } from "core/components";
+import { Icons, Row, Tooltip } from "core/components";
 import { useGetPages } from "lib/request-by-swr/page";
-import { PageItem } from "./page-item-sidebar";
+import { PageItemSidebar } from "./page-item-sidebar";
 import { cn } from "core/helpers";
 import { PageCreateButton } from "../../page-create-button";
 import { NotebookOperations } from "../../notebook-operations";
@@ -44,7 +44,6 @@ export function NotebookItemSidebar({
         justify='between'
         classes={[
           'item-sidebar pr-0 group-hover/notebook:pr-2 pl-[5px]',
-          // `item-sidebar hover:bg-accent py-0.5 pr-0 group-hover/notebook:pr-2 pl-[5px] rounded-sm max-h-[28px] cursor-pointer`,
           { ['bg-accent-light-active']: arrPath && arrPath[2] === notebook.id && arrPath.length === 3 },
           classes
         ]}
@@ -110,31 +109,18 @@ export function NotebookItemSidebar({
         showPages &&
         <div>
           {
-            isLoading ?
-              <Row justify={'center'} classes={'mt-2'}>
-                <Loading/>
-              </Row>
-              :
+            isLoading ? <PageItemSidebar.Skeleton/> :
               pages.length > 0 ? pages.map((page) => (
-                  <PageItem key={page.id} page={page} notebook={notebook}>
-                    <PageOperations placeOnSidebar page={page}/>
-                  </PageItem>
+                  <>
+                    <PageItemSidebar key={page.id} page={page} notebook={notebook}>
+                      <PageOperations placeOnSidebar page={page}/>
+                    </PageItemSidebar>
+                  </>
                 )) :
                 <p className='font-semibold h-7 text-sm text-[#999895] pl-8'>No page inside</p>
           }
         </div>
       }
-    </div>
-  )
-}
-
-NotebookItemSidebar.Skeleton = function NotebookItemSkeleton() {
-  return (
-    <div className="p-4">
-      <div className="space-y-3">
-        <Skeleton className="h-5 w-2/5"/>
-        <Skeleton className="h-4 w-4/5"/>
-      </div>
     </div>
   )
 }

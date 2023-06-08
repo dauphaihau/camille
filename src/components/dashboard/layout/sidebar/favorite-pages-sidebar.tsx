@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 
 import { Box, Row } from "core/components";
-import { PageItem } from "./page-item-sidebar";
+import { PageItemSidebar } from "./page-item-sidebar";
 import useStore from "lib/store";
 import { PageOperations } from "components/dashboard/page-operations";
 import { TitleOfItemsSidebar } from "./title-of-items-sidebar";
@@ -32,9 +32,9 @@ export function FavoritePagesSidebar() {
           {
             user.favoritePages && user.favoritePages.length ?
               user.favoritePages.map((page) => (
-                <PageItem favorite key={page.id} page={page} notebook={page.notebook}>
+                <PageItemSidebar favorite key={page.id} page={page} notebook={page.notebook}>
                   <PageOperations favorite placeOnSidebar page={page}/>
-                </PageItem>
+                </PageItemSidebar>
               ))
               : null
           }

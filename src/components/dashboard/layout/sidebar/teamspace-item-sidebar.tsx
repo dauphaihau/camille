@@ -2,7 +2,7 @@ import { Teamspace } from "@prisma/client"
 import * as React from "react";
 import { useState } from "react";
 
-import { Box, Icons, Loading, Row } from "core/components";
+import { Box, Icons, Row } from "core/components";
 import { cn } from "core/helpers";
 import { useGetNotebooksInTeamspace } from "lib/request-by-swr/teamspace";
 import { NotebookItemSidebar } from "./notebook-item-sidebar";
@@ -10,6 +10,7 @@ import { TeamspaceOperations } from "../../teamspace/teamspace-operations";
 import { NewNotebookDialog } from "components/dialog/new-notebook-dialog";
 import { useStoreMulti } from "lib/store";
 import { NotebookOperations } from "components/dashboard/notebook-operations";
+import { PageItemSidebar } from "./page-item-sidebar";
 
 interface TeamspaceItemProps {
   teamspace: Pick<Teamspace, "id" | "name" | "isOrigin">
@@ -62,10 +63,7 @@ export default function TeamspaceItemSidebar({ teamspace }: TeamspaceItemProps) 
         showNotebooks &&
         <div className='px-1'>
           {
-            isLoading ?
-              <Row justify={'center'} classes={'mt-2'}>
-                <Loading/>
-              </Row> :
+            isLoading ? <PageItemSidebar.Skeleton notebook/> :
               notebooks.length > 0 ?
                 notebooks.map((notebook) => (
                   <NotebookItemSidebar

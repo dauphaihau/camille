@@ -7,8 +7,8 @@ import { withMethods } from "lib/api-middlewares/with-methods"
 import { getWorkspaceSubscriptionPlan } from "lib/request/subscription"
 import { RequiresStandardPlanError } from "lib/exceptions"
 import { authOptions } from "lib/auth"
-import { freePlan } from "../../../config/subscriptions";
-import { withPlan } from "../../../lib/api-middlewares/with-plan";
+import { freePlan } from "config/subscriptions";
+import { withPlan } from "lib/api-middlewares/with-plan";
 
 const notebookCreateSchema = z.object({
   workspaceId: z.string(),
@@ -73,4 +73,3 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default withMethods(["POST"], withPlan(handler))
-// export default withMethods(["POST"], handler)
