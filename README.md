@@ -26,7 +26,7 @@ Current functionality includes:
 - Upgrade plan for workspace via Stripe (Testing Mode)
 
 ## Known Bugs
-Feel free to email me at dauphaihau@gmail.com if you run into any issues or have questions, ideas or concerns. Please enjoy
+Feel free to email me at hautran.job@outlook.com if you run into any issues or have questions, ideas or concerns. Please enjoy
 and feel free to share your opinion, constructive criticism, or comments about my work. Thank you! 🙂
 
 ## Future Updates

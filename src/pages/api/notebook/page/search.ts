@@ -34,12 +34,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const { workspaceId, searchValue } = req.query
 
       if (typeof searchValue !== "string") {
-        console.log('dauphaihau debug: searchValue must be string')
         return res.status(400).end()
       }
 
       if (!workspaceId) {
-        console.log('dauphaihau debug: workspaceId is null')
         return res.status(422).end()
       }
 
@@ -59,14 +57,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.send({ code: '200', data: { pages } })
       }
 
-      // console.log('dauphaihau debug: string-date', String(new Date()))
       const dateLocalTime = dayjs()
       const dateUtcOffSet0 = dayjs().utcOffset(0).startOf('date');
       const dateUtc = dayjs().utc()
-
-      // console.log('dauphaihau debug: date local timezone', dateLocalTime.format())
-      // console.log('dauphaihau debug: date utc', dateUtc.format())
-      // console.log('dauphaihau debug: date utc', dateUtcOffSet0.format())
 
       const today = dateUtcOffSet0.toDate(); // or format
       const yesterday = dateUtc.subtract(1, 'day').format()

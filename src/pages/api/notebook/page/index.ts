@@ -51,7 +51,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
       const body = pageCreateSchema.parse(req.body)
-      console.log('dauphaihau debug: body', body)
       const page = await db.page.create({
         data: {
           title: body.title as string,
@@ -71,7 +70,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
       })
     } catch (error) {
-      console.log('dauphaihau debug: error', error)
       if (error instanceof z.ZodError) {
         return res.status(422).json(error.issues)
       }

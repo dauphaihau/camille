@@ -86,7 +86,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       }
       return res.end()
     } catch (error) {
-      console.log('dauphaihau debug: error', error)
       if (error instanceof z.ZodError) {
         return res.status(422).json(error.issues)
       }

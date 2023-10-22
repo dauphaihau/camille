@@ -43,7 +43,6 @@ export default function ShareButton({ page, triggerShortcutShare }) {
       )
 
     } catch (err) {
-      console.log('dauphaihau debug: err', err)
       // setCopySuccess('Failed to copy!');
     }
   }

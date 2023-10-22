@@ -54,7 +54,6 @@
   p, h1, h2, h3, h4, h5, label, span, a {
     /*@apply text-primary-black;*/
     /*color: rgba(0, 0, 0, .8);*/
-    /*font-family: Eina, serif;*/
   }
 
   /* #endregion  /**======== Default Typography =========== */

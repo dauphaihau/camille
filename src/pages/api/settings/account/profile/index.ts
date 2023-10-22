@@ -80,8 +80,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const body = updateProfileSchema.parse(req.body)
 
-      console.log('dauphaihau debug: body', body)
-
       await db.user.update({
         where: { id: session.user.id },
         data: {
@@ -91,7 +89,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       return res.send({ code: '200', message: 'Update profile success' })
     } catch (error) {
-      console.log('dauphaihau debug: error', error)
       if (error instanceof z.ZodError) {
         return res.status(422).json(error.issues)
       }

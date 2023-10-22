@@ -73,10 +73,8 @@ export const authOptions: NextAuthOptions = {
             }
           }, function (err, info) {
             if (err) {
-              console.log('dauphaihau debug: err', err)
               reject(err)
             } else {
-              console.log('dauphaihau debug: info', info)
               resolve(info)
             }
           })
@@ -205,7 +203,7 @@ function htmlActivation(params: {url: string; host: string; theme}) {
 
   return `
       <h1 style="margin: 10px 0; color: rgba(51, 51, 51, 1); font-size: 22px; font-weight: bold; text-align: left"
-      >Welcome to Camille,</h1>
+      >Welcome to Meepo,</h1>
       <p
       style="margin-bottom: 10px; font-size: 16px; line-height: 1.625; color: ${color.text}"
       >Click the link below to activate your account.</p>

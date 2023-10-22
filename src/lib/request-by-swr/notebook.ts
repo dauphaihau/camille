@@ -36,8 +36,6 @@ export function useGetPagesDeleted(workspaceId) {
     mutate
   } = useSWR(workspaceId ? `http://localhost:3000/api/notebook/page/deleted?workspaceId=${workspaceId}` : null, fetcher)
 
-  console.log('dauphaihau debug: data', data)
-
   return {
     // notebook: data,
     pages: data?.data,

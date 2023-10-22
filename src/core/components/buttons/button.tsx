@@ -67,35 +67,16 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
           color === 'black' && [
             { 'bg-black text-white hover:opacity-80': variant === 'filled' },
             { 'bg-white text-black hover:bg-[#e9eaeb]': variant === 'outline' },
-
             { 'bg-transparent text-primary-black hover:text-primary-black hover:bg-accent-light': variant === 'text' },
-            // { 'bg-transparent text-primary-black hover:text-primary-black hover:bg-zinc-100': variant === 'text' },
-
-            // 'border-2 border-black dark:border-white',
             { 'border-[1px] border-solid border-black': variant !== 'text' && !disabled },
-            // { 'border-[1px] border-solid border-black': variant !== 'default' && variant !== 'text' && !disabled },
-
             'dark:bg-white dark:text-black',
-            // 'dark:hover:bg-black dark:hover:text-white',
-            // 'dark:hover:bg-black',
-            // 'dark:hover:bg-gray-300',
             'dark:hover:bg-[#f8f9fa]',
-
-            // { 'hover:bg-white hover:text-black': !disabled && variant === 'filled' }
-            // { 'hover:opacity-80': !disabled && variant === 'filled' }
-
-            // 'hover:bg-white hover:text-black',
-            // 'active:bg-primary-500',
-            // 'disabled:bg-primary-400 disabled:hover:bg-primary-400',
           ],
-
           color === 'red' && [
             { 'bg-[#eb5757] text-white': variant === 'filled' },
             { 'bg-white text-black': variant === 'outline' },
             { 'hover:bg-[#c45753]': !disabled },
-            // 'border-[1px] border-solid border-black',
             'dark:bg-white dark:text-black',
-            // 'hover:bg-[#c45753]',
           ],
 
           color === 'gray' && !disabled && [
@@ -104,7 +85,6 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
           ],
 
           variant === 'default' && [
-            // { 'border-[1px] border-solid border-[#cfd4da]': variant !== 'default' && !disabled },
             { 'border-[1px] border-solid border-[#cfd4da]': !disabled },
             { 'hover:bg-[#f8f9fa]': !disabled }
           ],
@@ -114,13 +94,7 @@ const Button = forwardRef<HTMLButtonElement, Partial<ButtonProps>>((props, ref) 
             'bg-[#e5e5e5] text-[#acacac] dark:bg-[#383a3f] dark:text-[#25262b] cursor-not-allowed hover:opacity-100'
           ]
         ],
-        // [
-        //   disabled && !isLoading && [
-        //     'bg-[#e5e5e5] text-[#acacac] dark:bg-[#383a3f] dark:text-[#25262b] cursor-not-allowed hover:opacity-100'
-        //   ]
-        // ],
         {
-          // 'opacity-30 hover:opacity-30': disabled || isLoading,
           'opacity-30 hover:opacity-30': isLoading,
           'cursor-wait': isLoading,
           'cursor-not-allow': buttonDisabled,

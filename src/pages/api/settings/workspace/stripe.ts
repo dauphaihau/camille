@@ -14,7 +14,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       const session = await getServerSession(req, res, authOptions)
       if (!session) {
-        console.log('dauphaihau debug: session is null')
         return res.status(400)
       }
       const user = session.user
@@ -23,7 +22,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       const subscriptionPlan = await getWorkspaceSubscriptionPlan(req.query.workspaceId as string)
       if (!subscriptionPlan) {
-        console.log('dauphaihau debug: subscriptionPlan is null')
         return res.status(400)
       }
 

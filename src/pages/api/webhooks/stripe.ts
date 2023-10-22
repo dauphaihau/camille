@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import Stripe from "pages/api/webhooks/stripe"
+import Stripe from "stripe"
 import rawBody from "raw-body"
 
 import { stripe } from "lib/stripe"
@@ -66,8 +66,6 @@ export default async function handler(
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     )
-
-    console.log('dauphaihau debug: subscription', subscription)
 
     await db.workspace.update({
       where: {

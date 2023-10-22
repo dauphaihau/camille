@@ -44,14 +44,14 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
 
     if (!signInResult?.ok) {
       return toast({
-        title: "Something went wrong.",
+        // title: "Something went wrong.",
         message: "Your sign in request failed. Please try again.",
         type: "error",
       })
     }
 
     return toast({
-      title: "Check your email",
+      // title: "Check your email",
       message: "We sent you a login link. Be sure to check your spam too.",
       type: "success",
     })
@@ -71,6 +71,7 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
               />
             </div>
             <Button
+              onClick={methods.handleSubmit(onSubmit)}
               disabled={!methods.watch('email')}
               isLoading={isLoading}
             >

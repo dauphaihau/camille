@@ -80,7 +80,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.send({ code: '200', message: 'delete notebook success' })
       // return res.status(204).end()
     } catch (error) {
-      console.log('dauphaihau debug: error', error)
       return res.status(500).end()
     }
   }

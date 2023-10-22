@@ -13,7 +13,6 @@ export default async function MembersPage({ params }) {
   if (!user) redirect(PATH.HOME)
 
   const members = await getListMembers(params.domainWorkspace)
-  // console.log('dauphaihau debug: members', members)
 
   return (
     <DashboardSettingsShell>

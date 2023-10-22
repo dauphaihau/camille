@@ -42,7 +42,7 @@ export const getDetailWorkspace = cache(async (
   })
 
   if (!res) {
-    return console.log('dauphaihau debug: workspace is null')
+    return
   }
 
   let isStandard;

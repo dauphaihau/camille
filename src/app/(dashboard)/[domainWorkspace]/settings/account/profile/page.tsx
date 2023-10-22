@@ -18,9 +18,6 @@ export default async function ProfilePage({ params }) {
     return notFound()
   }
 
-  // console.log('dauphaihau debug: user', user)
-  console.log('dauphaihau debug: user', user)
-
   return (
     <DashboardSettingsShell>
       <DashboardSettingsHeader

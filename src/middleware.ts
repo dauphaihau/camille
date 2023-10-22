@@ -28,7 +28,6 @@ export default withAuth(
       //   from += req.nextUrl.search;
       // }
       //
-      // console.log('dauphaihau debug: from', from)
       // return NextResponse.redirect(
       //   new URL(`/login?from=${encodeURIComponent(from)}`, req.url)
       // );

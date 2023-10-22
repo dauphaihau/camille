@@ -28,7 +28,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
       const { teamspaceId } = req.query
-      console.log('dauphaihau debug: teamspace-id', teamspaceId)
 
       const notebooks = await db.teamspace.findFirst({
         where: {
@@ -41,11 +40,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           createdAt: 'desc',
         },
       })
-      console.log('dauphaihau debug: notebooks', notebooks)
 
       return res.json(notebooks)
     } catch (error) {
-      console.log('dauphaihau debug: error', error)
       return res.status(500).end()
     }
   }
@@ -126,7 +123,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       res.end()
     } catch (error) {
-      console.log('dauphaihau debug: error', error)
       return res.status(500).end()
     }
   }

@@ -59,7 +59,6 @@ export function useGetPagesDeleted(workspaceId) {
 }
 
 export function useSearchPage(params) {
-  console.log('dauphaihau debug: params', params)
   // const fetcher = url => api.get(url, { params }).then(res => res.data)
   const fetcher = (input, init) => fetch(input, init).then(res => res.json())
   const {
@@ -69,8 +68,6 @@ export function useSearchPage(params) {
     `/api/notebook/page/search?searchValue=${params.searchValue}&workspaceId=${params.workspaceId}`
     : null, fetcher
   )
-
-  console.log('dauphaihau debug: data', data)
 
   return {
     // pages: data?.data,

@@ -202,7 +202,6 @@ export function PageOperations({
       )
 
     } catch (err) {
-      console.log('dauphaihau debug: err', err)
       // setCopySuccess('Failed to copy!');
     }
   }

@@ -37,13 +37,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       })
 
       const transaction = await db.$transaction([deleteTracks, deleteNotebooks, deleteWorkspace])
-      // console.log('dauphaihau debug: transaction', transaction)
 
       // res.end()
 
       // redirect to another domain workspace
 
-      console.log('dauphaihau debug: transaction', transaction)
       const userOnWorkspace = await db.userOnWorkspace.findFirst({
         where: { userId: session.user.id },
         select: {
@@ -52,7 +50,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           }
         }
       })
-      console.log('dauphaihau debug: user-on-workspace', userOnWorkspace)
       res.send({
         code: '200',
         message: 'Delete workspace successfully',

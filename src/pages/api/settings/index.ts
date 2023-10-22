@@ -37,11 +37,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       const dbUser = await db.user.findFirst({
         where: {
-          email: 'dauphaihau@yopmail.com',
+          email: 'hautran.job@outlook.com',
         },
       })
-
-      console.log('dauphaihau debug: db-user', dbUser)
 
       const domain = await db.domain.findFirst({
         select: {
@@ -52,7 +50,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
 
-      console.log('dauphaihau debug: domain', domain)
       return res.json(domain)
     } catch (error) {
       return res.status(500).end()
@@ -83,7 +80,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       })
 
-      // console.log('dauphaihau debug: domain', domain)
 
       // return res.status(200)
       // return res.json(notebook)

@@ -136,7 +136,6 @@ export const useKeyboardShortcut = (shortcutKeys, callback, userOptions) => {
 
   const keydownListener = useCallback(
     (keydownEvent) => {
-      // console.log('dauphaihau debug: keydown-event', keydownEvent)
       const loweredKey = String(keydownEvent.key).toLowerCase();
       if (!(shortcutArray.indexOf(loweredKey) >= 0)) return;
 
