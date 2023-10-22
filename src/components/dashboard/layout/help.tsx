@@ -46,16 +46,12 @@ export default function Help() {
               <div className={'text-sm mb-4 leading-[20px]'}>
                 Reach me out via {' '}
                 <p className={'font-medium text-link'}>
-                  <a href="mailto:dauphaihau@gmail.com">dauphaihau@gmail.com</a>
+                  <a href="mailto:hautran.job@outlook.com">hautran.job@outlook.com</a>
                 </p>
               </div>
             </div>
 
             <Row align={'center'} gap={2}>
-              {/*<Button>Visit my website</Button>*/}
-              {/*<a href="https://github.com/dauphaihau/camille">*/}
-              {/*  */}
-              {/*</a>*/}
               <Link href={'https://github.com/dauphaihau/camille'} target={'_blank'}>
                 <Button variant={'default'}>Github Repo</Button>
               </Link>
