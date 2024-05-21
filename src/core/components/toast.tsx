@@ -1,12 +1,12 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import hotToast, { Toaster as HotToaster, ToastPosition } from "react-hot-toast"
+import * as React from 'react';
+import hotToast, { Toaster as HotToaster, ToastPosition } from 'react-hot-toast';
 
-import { Icons } from "core/components";
-import { cn } from "core/helpers";
+import { Icons } from 'core/components';
+import { cn } from 'core/helpers';
 
-export const Toaster = HotToaster
+export const Toaster = HotToaster;
 
 interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
   visible: boolean
@@ -15,16 +15,14 @@ interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
 export function Toast({ visible, className, ...props }: ToastProps) {
   return (
     <div
-      className={cn(
-        "h-[33px] mb-2 flex w-auto flex-col items-start gap-1 rounded-[4px] bg-white py-[6px] px-3 shadow-lg",
-        // "min-h-16 mb-2 flex w-auto flex-col items-start gap-1 rounded-md bg-white px-[6px] py-3 shadow-lg",
-        // "min-h-16 mb-2 flex w-[350px] flex-col items-start gap-1 rounded-md bg-white px-6 py-4 shadow-lg",
-        visible && "animate-in slide-in-from-bottom-5",
+      className={ cn(
+        'h-8 mb-2 flex w-auto flex-col items-start gap-1 rounded bg-white py-1.5 px-3 shadow-lg',
+        visible && 'animate-in slide-in-from-bottom-5',
         className
-      )}
-      {...props}
+      ) }
+      { ...props }
     />
-  )
+  );
 }
 
 
@@ -33,25 +31,25 @@ interface ToastIconProps extends Partial<React.SVGProps<SVGSVGElement>> {
 }
 
 Toast.Icon = function ToastIcon({ name, className, ...props }: ToastIconProps) {
-  const Icon = Icons[name]
+  const Icon = Icons[name];
 
   if (!Icon) {
-    return null
+    return null;
   }
 
   return (
-    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
-      <Icon className={cn("h-10 w-10", className)} {...props} />
+    <div className='flex h-20 w-20 items-center justify-center rounded-full bg-slate-100'>
+      <Icon className={ cn('h-10 w-10', className) } { ...props } />
     </div>
-  )
-}
+  );
+};
 
 
 interface ToastTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 
 Toast.Title = function ToastTitle({ className, ...props }: ToastTitleProps) {
-  return <p className={cn("text-sm font-medium", className)} {...props} />
-}
+  return <p className={ cn('text-sm font-medium', className) } { ...props } />;
+};
 
 
 interface ToastDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
@@ -60,34 +58,37 @@ Toast.Description = function ToastDescription({
   className,
   ...props
 }: ToastDescriptionProps) {
-  return <p className={cn("text-sm", className)} {...props} />
+  return <p className={ cn('text-sm', className) } { ...props } />;
   // return <p className={cn("text-sm opacity-80", className)} {...props} />
-}
+};
 
 interface ToastOpts {
   title?: string
   message: string
-  type?: "success" | "error" | "default"
+  type?: 'success' | 'error' | 'default'
   duration?: number
   position?: ToastPosition
 }
 
 export function toast(opts: ToastOpts) {
-  const { title, message, type = "default", duration = 3000, position = 'bottom-center' } = opts
+  const {
+    // title,
+    message, type = 'default', duration = 3000, position = 'bottom-center',
+  } = opts;
 
   return hotToast.custom(
     ({ visible }) => (
       <Toast
-        visible={visible}
-        className={cn({
-          "bg-red-600 text-white": type === "error",
-          "bg-black text-white": type === "success",
-        })}
+        visible={ visible }
+        className={ cn({
+          'bg-red-600 text-white': type === 'error',
+          'bg-black text-white': type === 'success',
+        }) }
       >
-        {/*{title && <Toast.Title>{title}</Toast.Title>}*/}
-        {message && <Toast.Description>{message}</Toast.Description>}
+        { /*{title && <Toast.Title>{title}</Toast.Title>}*/ }
+        { message && <Toast.Description>{ message }</Toast.Description> }
       </Toast>
     ),
     { duration, position }
-  )
+  );
 }

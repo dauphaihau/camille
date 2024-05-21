@@ -1,123 +1,151 @@
-"use client"
+'use client';
 
-import { Notebook } from "@prisma/client"
-import { useRouter, useSelectedLayoutSegment } from "next/navigation"
-import { useCallback, useReducer } from "react"
+import { Notebook } from '@prisma/client';
+import { useRouter, useSelectedLayoutSegment } from 'next/navigation';
+import { useReducer } from 'react';
 
-import { Popover, toast, Alert, Button, Icons, DropdownMenu, InputWithoutRhf } from "core/components"
-import { deleteNotebook, updateNotebook } from "lib/request-by-swr/notebook";
-import { cn, debounce } from "core/helpers";
-import { PATH } from "config/const";
-import { useStoreMulti } from "lib/store";
+import * as React from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  Alert, Button, DropdownMenu, Icons, Input, Popover, toast
+} from 'core/components';
+import { useDeleteNotebook, useUpdateNotebook } from 'lib/request-client/notebook';
+import { cn } from 'core/helpers';
+import { PATH } from 'config/const';
+import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useDebounce } from 'core/hooks';
+import { IUpdateNotebook } from 'types/notebook';
 
 interface NotebookOperationsProps {
-  notebook: Pick<Notebook, "id" | 'title'>,
+  notebook: Pick<Notebook, 'id' | 'title'>,
   placeOnSidebar?: boolean
   teamspaceId?: string
 }
 
-const initialState: {[k: string]: boolean} = {
-  showDropdown: false,
-  showRenameForm: false,
-  showDeleteAlert: false,
-  isDeleteLoading: false,
+interface State {
+  showDropdown: boolean,
+  showRenameForm: boolean,
+  showDeleteAlert: boolean,
 }
 
-export function NotebookOperations({ teamspaceId, notebook, placeOnSidebar = false }: NotebookOperationsProps) {
-  const router = useRouter()
-  const currentNotebookId = useSelectedLayoutSegment()
-  const { workspace, setReFetchTeamspaceId } = useStoreMulti('workspace', 'setReFetchTeamspaceId')
-  const [event, setEvent] = useReducer((prev, next) => ({
-    ...prev, ...next
-  }), initialState)
+export function NotebookOperations(
+  { teamspaceId, notebook, placeOnSidebar = false }: NotebookOperationsProps
+) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const currentNotebookId = useSelectedLayoutSegment();
+  const { data: { workspace } = {} } = useGetDetailWorkspace();
 
-  const handleDelete = async (event) => {
-    event.preventDefault()
-    setEvent({ isDeleteLoading: true })
-    const response = await deleteNotebook(notebook.id)
-    setEvent({ isDeleteLoading: false })
+  const {
+    mutateAsync: updateNotebook,
+    isError: isErrorUpdateNotebook,
+  } = useUpdateNotebook(notebook.id);
 
-    if (response.code !== '200') {
-      return toast({
-        title: "Something went wrong.",
-        message: "Your notebook was not deleted. Please try again.",
-        type: "error",
-      })
+  const {
+    isPending: isPendingDeleteNotebook,
+    mutateAsync: deleteNotebook,
+    isError: isErrorDeleteNotebook,
+  } = useDeleteNotebook(notebook.id);
+
+  const debouncedUpdateNotebook = useDebounce(handleUpdateNotebook, 400);
+
+  const [state, setState] = useReducer(
+    (state: State, newState: Partial<State>) => ({
+      ...state, ...newState,
+    }),
+    {
+      showDropdown: false,
+      showRenameForm: false,
+      showDeleteAlert: false,
+    }
+  );
+
+  const handleDelete = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    await deleteNotebook();
+
+    if (isErrorDeleteNotebook) {
+      toast({
+        title: 'Something went wrong.',
+        message: 'Your notebook was not deleted. Please try again.',
+        type: 'error',
+      });
+      return;
     }
 
     toast({
-      message: "Moved to trash",
-      type: "success",
-    })
+      message: 'Moved to trash',
+      type: 'success',
+    });
 
-    setEvent({ showDeleteAlert: false })
+    setState({ showDeleteAlert: false });
 
     if (currentNotebookId === notebook.id) {
-      router.push(workspace?.domain ? `/${workspace.domain}` : PATH.HOME)
+      router.push(workspace?.domain ? `/${workspace.domain}` : PATH.HOME);
     }
 
     if (teamspaceId) {
-      setReFetchTeamspaceId(teamspaceId)
+      await queryClient.invalidateQueries({
+        queryKey: ['notebooks-by-teamspace', teamspaceId],
+      });
     }
-    router.refresh()
+  };
+
+  async function handleUpdateNotebook(values: IUpdateNotebook) {
+    await updateNotebook(values);
+
+    if (isErrorUpdateNotebook) {
+      toast({
+        title: 'Something went wrong.',
+        message: 'Your notebook was not saved. Please try again.',
+        type: 'error',
+      });
+      return;
+    }
+    // router.refresh();
   }
 
-  async function handleUpdateNotebook(id, values) {
-    const response = await updateNotebook(id, values)
-
-    if (response.code !== '200') {
-      return toast({
-        title: "Something went wrong.",
-        message: "Your notebook was not saved. Please try again.",
-        type: "error",
-      })
-    }
-    router.refresh()
-  }
-
-  const debounceTitle = useCallback(
-    debounce((value) => {
-      handleUpdateNotebook(notebook.id, { title: value })
-    }, 300),
-    []
-  );
+  const onChangeTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedUpdateNotebook({ title: event.target.value });
+  };
 
   return (
     <>
       <DropdownMenu
-        open={event.showDropdown}
-        onOpenChange={(open) => setEvent({ showDropdown: open })}
+        open={ state.showDropdown }
+        onOpenChange={ (open) => setState({ showDropdown: open }) }
       >
         <DropdownMenu.Trigger>
 
           <Icons.ellipsisHorizontal
-            size={12}
-            className={cn('btn-icon text-[#686662]',
-            )}
+            size={ 12 }
+            className={ cn('btn-icon text-[#686662]'
+            ) }
           />
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
           <DropdownMenu.Content
-            className={`absolute w-[265px] top-0 ${placeOnSidebar ? 'left-0' : 'right-0'}`}
-            // className={`w-[265px]`}
+            className={ `absolute w-[265px] top-0 ${placeOnSidebar ? '-left-10' : 'right-0'}` }
           >
             <DropdownMenu.Item
-              onClick={() => setEvent({ showDeleteAlert: true })}
-            >Delete</DropdownMenu.Item>
-            {/*<DropdownMenu.Item>Duplicates</DropdownMenu.Item>*/}
-            {/*<DropdownMenu.Item>Copy link</DropdownMenu.Item>*/}
-            {/*<DropdownMenu.Separator/>*/}
-            {/*<DropdownMenu.Item>Add to favorites</DropdownMenu.Item>*/}
-            {/*<DropdownMenu.Item*/}
-            {/*  onClick={() => setEvent({ showRenameForm: true })}*/}
-            {/*>Rename</DropdownMenu.Item>*/}
+              onClick={ () => setState({ showDeleteAlert: true }) }
+            >Delete
+            </DropdownMenu.Item>
+            { /*<DropdownMenu.Item>Duplicates</DropdownMenu.Item>*/ }
+            { /*<DropdownMenu.Item>Copy link</DropdownMenu.Item>*/ }
+            { /*<DropdownMenu.Separator/>*/ }
+            { /*<DropdownMenu.Item>Add to favorites</DropdownMenu.Item>*/ }
+            <DropdownMenu.Item
+              onClick={ () => setState({ showRenameForm: true }) }
+            >Rename
+            </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
 
       <Alert
-        open={event.showDeleteAlert}
-        onOpenChange={(open) => setEvent({ showDeleteAlert: open })}
+        open={ state.showDeleteAlert }
+        onOpenChange={ (open) => setState({ showDeleteAlert: open }) }
       >
         <Alert.Content>
           <Alert.Header>
@@ -128,32 +156,34 @@ export function NotebookOperations({ teamspaceId, notebook, placeOnSidebar = fal
           </Alert.Header>
           <Alert.Footer>
             <Alert.Cancel>Cancel</Alert.Cancel>
-            <Alert.Action onClick={handleDelete}>
-              <Button color='red' isLoading={event.isDeleteLoading}>Yes, Delete it</Button>
+            <Alert.Action onClick={ handleDelete }>
+              <Button
+                color='red'
+                isLoading={ isPendingDeleteNotebook }
+              >Yes, Delete it
+              </Button>
             </Alert.Action>
           </Alert.Footer>
         </Alert.Content>
       </Alert>
 
-      <Popover open={event.showRenameForm}>
+      <Popover open={ state.showRenameForm }>
         <Popover.Trigger
-          className={cn('w-full invisible',
-            event.showRenameForm ? '' : 'absolute'
-          )}
+          className={ cn('w-full invisible',
+            state.showRenameForm ? '' : 'absolute'
+          ) }
         />
         <Popover.Content
-          onPointerDownOutside={() => setEvent({ showRenameForm: false })}
-          side='bottom' className='w-[414px] ml-12 mt-22'
+          onPointerDownOutside={ () => setState({ showRenameForm: false }) }
+          side='bottom'
+          className='w-[414px] ml-12 mt-22'
         >
-          <InputWithoutRhf
-            id='notebookTitle'
-            defaultValue={notebook.title}
-            onChange={(e) => {
-              debounceTitle(e.target.value)
-            }}
+          <Input
+            defaultValue={ notebook.title }
+            onChange={ onChangeTitle }
           />
         </Popover.Content>
       </Popover>
     </>
-  )
+  );
 }

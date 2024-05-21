@@ -1,6 +1,6 @@
-import React, { ComponentPropsWithoutRef, forwardRef } from "react";
-import { cn } from "core/helpers";
-import { ClassValue } from "clsx";
+import React, { ComponentPropsWithoutRef, forwardRef } from 'react';
+import { ClassValue } from 'clsx';
+import { cn } from 'core/helpers';
 
 enum GAP {
   FIRST = 1,
@@ -73,30 +73,30 @@ type RowProps = {
   classes: string | ClassValue[],
 } & ComponentPropsWithoutRef<'div'>
 
-const Row = forwardRef(({
+const Row = forwardRef<HTMLDivElement, Partial<RowProps>>(({
   children, classes, gap = 0, hideIf, justify, align, content, wrap, reverse, ...others
-}: Partial<RowProps>, ref: any) => {
+}, ref) => {
 
-  if (hideIf) return null
+  if (hideIf) return null;
 
   return (
     <div
-      ref={ref}
-      className={cn('flex',
+      ref={ ref }
+      className={ cn('flex',
         GAP_MAPS[gap],
         justify && JUSTIFY_MAPS[justify],
         align && ALIGN_ITEM_MAPS[align],
         content && ALIGN_CONTENT_MAPS[content],
         wrap && WRAP_MAPS[wrap],
         { 'flex-row-reverse': reverse },
-        cn(classes),
-      )}
-      {...others}
+        cn(classes)
+      ) }
+      { ...others }
     >
-      {children}
+      { children }
     </div>
   );
-})
+});
 
 Row.displayName = 'Row';
 export default Row;

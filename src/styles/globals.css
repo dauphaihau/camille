@@ -181,6 +181,7 @@
   .fade-in-start [data-fade='18'] {
     transition-delay: 3300ms;
   }
+
   /* #endregion  /**======== Fade In =========== */
 }
 
@@ -194,4 +195,20 @@ p {
 .ce-block__content,
 .ce-toolbar__content {
   max-width: 708px !important;
+}
+
+.ce-toolbar__settings-btn:hover {
+  background-color: var(--accent-light);
+}
+
+.ce-code__textarea {
+  background-color: #f7f6f3 !important;
+}
+
+.ce-toolbar__plus:hover {
+  background-color: var(--accent-light);
+}
+
+.ce-popover__item:hover:not(.ce-popover__item--no-visible-hover) {
+  background-color: var(--accent-light);
 }

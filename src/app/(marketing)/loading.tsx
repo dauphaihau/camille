@@ -1,11 +1,5 @@
-import { Loading } from "core/components";
+import LoadingFullPage from 'components/common/loading-full-page';
 
-export default function LoadingFullPage() {
-  return (
-    <>
-      <div className='grid place-items-center h-screen'>
-        <Loading className={'h-6 w-6'}/>
-      </div>
-    </>
-  )
+export default function Loading() {
+  return <LoadingFullPage />;
 }

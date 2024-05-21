@@ -1,7 +1,6 @@
-import { forwardRef, ReactNode } from "react";
-import { cn } from "core/helpers";
-import { ClassValue } from "clsx";
-import Grid from "./grid";
+import { forwardRef, ReactNode } from 'react';
+import { ClassValue } from 'clsx';
+import { cn } from 'core/helpers';
 
 interface BoxProps {
   classes: string | ClassValue[],
@@ -20,27 +19,24 @@ interface BoxProps {
   style: object
 }
 
-const Box = forwardRef((props: Partial<BoxProps>, ref: any) => {
-
+const Box = forwardRef<HTMLDivElement, Partial<BoxProps>>((props, ref) => {
   const {
     children, classes, hideIf = false,
-    footer, nav, header, main, form, section, aside, blockquote,
+    footer, nav, header, main, aside,
     ...others
-  } = props
+  } = props;
 
-  const className = cn(classes)
+  const className = cn(classes);
 
-  if (hideIf) return null
+  if (hideIf) return null;
 
-  if (header) return <header ref={ref} className={className} {...others}>{children}</header>
-  if (nav) return <nav ref={ref} className={className} {...others}>{children}</nav>
-  if (footer) return <footer ref={ref} className={className} {...others}>{children}</footer>
-  if (main) return <main ref={ref} className={className} {...others}>{children}</main>
-  if (form) return <form ref={ref} className={className} {...others}>{children}</form>
-  if (aside) return <aside ref={ref} className={className} {...others}>{children}</aside>
-  if (blockquote) return <blockquote ref={ref} className={className} {...others}>{children}</blockquote>
-  return (<div ref={ref} className={className} {...others}>{children}</div>);
-})
+  if (header) return <header ref={ ref } className={ className } { ...others }>{ children }</header>;
+  if (nav) return <nav ref={ ref } className={ className } { ...others }>{ children }</nav>;
+  if (footer) return <footer ref={ ref } className={ className } { ...others }>{ children }</footer>;
+  if (main) return <main ref={ ref } className={ className } { ...others }>{ children }</main>;
+  if (aside) return <aside ref={ ref } className={ className } { ...others }>{ children }</aside>;
+  return (<div ref={ ref } className={ className } { ...others }>{ children }</div>);
+});
 
 Box.displayName = 'Box';
 export default Box;

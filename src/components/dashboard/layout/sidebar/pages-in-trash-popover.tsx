@@ -1,110 +1,151 @@
-'use client'
+'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import { Alert, toast, InputWithoutRhf, Popover, Button, Col, Icons, Loading, Row } from "core/components";
-import { deletePage, useGetPagesDeleted } from "lib/request-by-swr/page";
-import { DELETE_PAGE_TYPE } from "config/const";
-import Title from "components/common/title";
-import useStore from "lib/store";
-import { ItemSidebar } from "./item-sidebar";
+import { Page } from '@prisma/client';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  Alert, Button, Col, Icons, Input, Loading, Popover, Row, toast
+} from 'core/components';
+import { useDeletePage, useGetPagesDeleted } from 'lib/request-client/page';
+import { DELETE_PAGE_TYPE } from 'config/const';
+import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { ItemSidebar } from './item-sidebar';
 
 export function PagesInTrashPopover() {
+  const queryClient = useQueryClient();
+
   const [state, setState] = useState({
     showPopover: false,
     showDeleteAlert: false,
     isDeleteLoading: false,
     pageDelete: null,
-  })
+  });
 
-  const workspace = useStore(state => state.workspace)
-  const setReFetchNotebookId = useStore(state => state.setReFetchNotebookId)
-  const { isLoading, pages, mutate } = useGetPagesDeleted(state.showPopover && workspace ? workspace.id : null)
+  const { data: { workspace } = {} } = useGetDetailWorkspace();
 
-  const handleDelete = async (event, page, type = DELETE_PAGE_TYPE.HARD_DELETE) => {
-    event.preventDefault()
-    const { id, notebookId } = page
-    setState({ ...state, isDeleteLoading: true })
-    const response = await deletePage(id, type)
-    setState({ ...state, isDeleteLoading: false })
+  const { isLoading, data: { pages } = {}, refetch } = useGetPagesDeleted(
+    state.showPopover && workspace?.id ? workspace.id : undefined
+  );
 
-    if (response.code !== '200') {
-      return toast({
-        title: "Something went wrong.",
-        message: "Your post was not deleted. Please try again.",
-        type: "error",
-      })
+  const {
+    mutateAsync: deletePage,
+    isError: isErrorDeletePage,
+  } = useDeletePage();
+
+  useEffect(() => {
+    if (state.showPopover) {
+      (async () => await refetch())();
     }
-    setState({ ...state, showDeleteAlert: false })
+  }, [refetch, state.showPopover]);
+
+  const handleDelete = async (
+    event: React.MouseEvent<SVGElement, MouseEvent>,
+    page: Page,
+    type = DELETE_PAGE_TYPE.HARD_DELETE
+  ) => {
+    event.preventDefault();
+    await deletePage({
+      pageId: page.id,
+      type,
+    });
+
+    if (isErrorDeletePage) {
+      toast({
+        title: 'Something went wrong.',
+        message: 'Your post was not deleted. Please try again.',
+        type: 'error',
+      });
+      return;
+    }
+    setState({ ...state, showDeleteAlert: false });
     if (type === DELETE_PAGE_TYPE.RECOVER) {
-      setReFetchNotebookId(notebookId)
+      await queryClient.invalidateQueries({
+        queryKey: ['notebook', page.notebookId],
+      });
     }
-    // router.refresh()
-    await mutate()
-  }
+    await refetch();
+  };
 
   const Pages = () => {
     if (isLoading) {
-      return <div className={'mx-auto'}>
-        <Loading/>
+      return (
+        <div className='mx-auto'>
+          <Loading />
+        </div>
+      );
+    }
+
+    if (!pages || pages.length === 0) {
+      return <div className='mx-auto text-[#b2b2af] text-sm font-medium'>not found page</div>;
+    }
+
+    return (
+      <div>
+        { pages.map((page, index) => (
+          <Row
+            justify='between'
+            align='center'
+            key={ index }
+            classes='hover:bg-accent-light py-2 px-2 rounded-md cursor-pointer'
+          >
+            <Col gap={ 1 }>
+              <p className='text-sm font-medium'>{ page.title }</p>
+              <p className='text-sm font-normal text-[#a09f9d]'>{ page.notebook?.title }</p>
+            </Col>
+            <Row
+              align='center'
+              gap={ 1 }
+            >
+              <Icons.arrowBack
+                className='btn-icon'
+                onClick={ (e) => handleDelete(e, page, DELETE_PAGE_TYPE.RECOVER) }
+              />
+              <Icons.trash
+                className='btn-icon'
+                onClick={ () => {
+                  setState({ ...state, showDeleteAlert: true, pageDelete: page });
+                } }
+              />
+            </Row>
+          </Row>
+        )) }
       </div>
-    }
-
-    if (pages.length === 0) {
-      return <div className={'mx-auto text-[#b2b2af] text-sm font-medium'}>not found page</div>
-    }
-
-    return pages.map((page, index) => (
-      <Row
-        justify='between' align='center' key={index}
-        classes='hover:bg-accent py-0.5 px-2 rounded-sm cursor-pointer'
-      >
-        <Col gap={1}>
-          <Title maxW={200} classesText={'text-sm'}>{page.title}</Title>
-          {page?.url && <Title maxW={200} className={'text-[#a09f9d]'} classesText={'text-xs'}>{page.url}</Title>}
-        </Col>
-        <Row align='center' gap={1}>
-          <Icons.arrowBack
-            className='btn-icon'
-            onClick={(e) => handleDelete(e, page, DELETE_PAGE_TYPE.RECOVER)}
-          />
-          <Icons.trash
-            className='btn-icon'
-            onClick={() => {
-              setState({ ...state, showDeleteAlert: true, pageDelete: page });
-            }}
-          />
-        </Row>
-      </Row>
-    ))
-  }
+    );
+  };
 
   return (
     <Popover
-      open={state.showPopover}
-      onOpenChange={(open) => setState({ ...state, showPopover: open })}
+      open={ state.showPopover }
+      onOpenChange={ (open) => setState({ ...state, showPopover: open }) }
     >
       <Popover.Trigger className='w-full relative'>
         <ItemSidebar
           title='Trash'
-          icon={'trash'}
-          titleTooltip={'Restore deleted pages.'}
+          icon='trash'
+          titleTooltip='Restore deleted pages.'
         />
       </Popover.Trigger>
-      {/*<Popover.Content side='right' className='w-[414px] ml-3 absolute z-[1000px] '>*/}
-      <Popover.Content side='right' className='w-[414px] ml-3 mt-32 z-[1000px] '>
-        <div className='mb-2'>
-          <InputWithoutRhf id='search' placeholder='Filter by page title ...'/>
+
+      <Popover.Content
+        side='right'
+        className='w-[414px] ml-3 mt-32 p-1'
+      >
+        <div className='mb-2 px-2 mt-2'>
+          <Input
+            id='search'
+            placeholder='Filter by page title ...'
+          />
         </div>
         <div className='h-[380px] overflow-scroll '>
-          <Col gap={2}>
-            <Pages/>
+          <Col gap={ 2 }>
+            <Pages />
           </Col>
         </div>
 
         <Alert
-          open={state.showDeleteAlert}
-          onOpenChange={(open) => setState({ ...state, showDeleteAlert: open })}
+          open={ state.showDeleteAlert }
+          onOpenChange={ (open) => setState({ ...state, showDeleteAlert: open }) }
         >
           <Alert.Content>
             <Alert.Header>
@@ -115,8 +156,12 @@ export function PagesInTrashPopover() {
             </Alert.Header>
             <Alert.Footer>
               <Alert.Cancel>Cancel</Alert.Cancel>
-              <Alert.Action onClick={(e) => handleDelete(e, state.pageDelete)}>
-                <Button color='red' isLoading={state.isDeleteLoading}>Yes, Delete it</Button>
+              <Alert.Action onClick={ (e) => handleDelete(e, state.pageDelete) }>
+                <Button
+                  color='red'
+                  isLoading={ state.isDeleteLoading }
+                >Yes, Delete it
+                </Button>
               </Alert.Action>
             </Alert.Footer>
           </Alert.Content>
@@ -124,5 +169,5 @@ export function PagesInTrashPopover() {
 
       </Popover.Content>
     </Popover>
-  )
+  );
 }

@@ -1,37 +1,31 @@
-import { notFound, redirect } from "next/navigation"
+import { notFound } from 'next/navigation';
 
-import { getCurrentUser } from "lib/session"
-import { Editor } from "components/dashboard/editor"
-import { getPage } from "lib/request/page"
-import { PATH } from "config/const";
-import OperationOnTopPage from "components/dashboard/page/header/operation-on-top-page";
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
+import { Editor } from 'components/dashboard/editor';
+import { getPage } from 'lib/request-server/page';
+import HeaderEditor from 'components/dashboard/page/header/header-editor';
+import { DashboardSlugs } from 'types/workspace';
 
 interface EditorPageProps {
-  params: {pageId: string}
+  params: DashboardSlugs
 }
 
 export default async function EditorPage({ params }: EditorPageProps) {
-  const user = await getCurrentUser()
+  const queryClient = new QueryClient();
 
-  if (!user) {
-    redirect(PATH.LOGIN)
-  }
+  const page = await queryClient.fetchQuery({
+    queryKey: ['page', params.pageId],
+    queryFn: () => getPage(params.pageId),
+  });
 
-  const page = await getPage(params.pageId, user.id)
-
-  if (!page) {
-    notFound()
-  }
+  if (!page) notFound();
 
   return (
-    <>
-      <OperationOnTopPage page={page}/>
-      <div
-        className='overflow-scroll max-h-full'
-        style={{ height: 'calc(100vh - 45px)' }}
-      >
-        <Editor page={page}/>
+    <HydrationBoundary state={ dehydrate(queryClient) }>
+      <div>
+        <HeaderEditor />
+        <Editor />
       </div>
-    </>
-  )
+    </HydrationBoundary>
+  );
 }

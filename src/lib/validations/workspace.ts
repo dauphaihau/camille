@@ -1,8 +1,17 @@
-import * as z from "zod"
+import * as z from 'zod';
+import { workspaceSchema } from '../../../prisma/zod';
 
-export const workspaceSchema = z.object({
-  name: z.string().min(1, 'Required').max(32),
-  // name: z.string().max(32),
-  domain: z.string().min(3).max(32)
-    .regex(new RegExp(/^(?!-+$)[a-z0-9-]+$/i), 'Domain invalid'),
-})
+export const createWorkspaceSchema = workspaceSchema.pick({
+  name: true,
+  domain: true,
+});
+
+export const updateWorkspaceSchema = workspaceSchema.pick({
+  name: true,
+  domain: true,
+}).partial()
+  .merge(
+    z.object({
+      workspaceId: workspaceSchema.shape.id,
+    })
+  );

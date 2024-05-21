@@ -1,28 +1,28 @@
-import { NextApiRequest, NextApiResponse } from "next"
-import { getServerSession } from "next-auth/next"
+import { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth/next';
 
-import { standardPlan } from "config/subscriptions"
-import { withMethods } from "lib/api-middlewares/with-methods"
-import { getWorkspaceSubscriptionPlan } from "lib/request/subscription"
-import { stripe } from "lib/stripe"
-import { absoluteUrl } from "core/helpers"
-import { authOptions } from "lib/auth"
-import { withPermission } from "lib/api-middlewares/with-permission";
+import { standardPlan } from 'config/subscriptions';
+import { withMethods } from 'lib/api-middlewares/with-methods';
+import { getWorkspaceSubscriptionPlan } from 'lib/request-server/subscription';
+import { stripe } from 'lib/stripe';
+import { absoluteUrl } from 'core/helpers';
+import { authOptions } from 'lib/auth';
+import { withPermission } from 'lib/api-middlewares/with-permission';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "GET") {
+  if (req.method === 'GET') {
     try {
-      const session = await getServerSession(req, res, authOptions)
+      const session = await getServerSession(req, res, authOptions);
       if (!session) {
-        return res.status(400)
+        return res.status(400);
       }
-      const user = session.user
+      const user = session.user;
 
-      const settingsPlansUrl = absoluteUrl(`/${req.query.domainWorkspace}/settings/plans`)
+      const settingsPlansUrl = absoluteUrl(`/${req.query.domainWorkspace}/settings/plans`);
 
-      const subscriptionPlan = await getWorkspaceSubscriptionPlan(req.query.workspaceId as string)
+      const subscriptionPlan = await getWorkspaceSubscriptionPlan(req.query.workspaceId as string);
       if (!subscriptionPlan) {
-        return res.status(400)
+        return res.status(400);
       }
 
       // ----  The workspace is on the standard plan.
@@ -31,8 +31,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         const stripeSession = await stripe.billingPortal.sessions.create({
           customer: subscriptionPlan.stripeCustomerId,
           return_url: settingsPlansUrl,
-        })
-        return res.json({ url: stripeSession.url })
+        });
+        return res.json({ url: stripeSession.url });
       }
 
       // ---- The workspace is on the free plan.
@@ -40,9 +40,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const stripeSession = await stripe.checkout.sessions.create({
         success_url: settingsPlansUrl,
         cancel_url: settingsPlansUrl,
-        payment_method_types: ["card"],
-        mode: "subscription",
-        billing_address_collection: "auto",
+        payment_method_types: ['card'],
+        mode: 'subscription',
+        billing_address_collection: 'auto',
         customer_email: user.email as string ,
         line_items: [
           {
@@ -65,9 +65,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         //   userId: user.id,
         //   workspaceId: req.query.workspaceId as string,
         // },
-      })
+      });
 
-      return res.json({ url: stripeSession.url })
+      return res.json({ url: stripeSession.url });
     } catch (error) {
       // return res.status(500).end()
       res.status(error.statusCode || 500).json(error.message);
@@ -75,4 +75,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default withMethods(["GET"], withPermission(handler))
+export default withMethods(['GET'], withPermission(handler));

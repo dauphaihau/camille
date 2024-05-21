@@ -1,83 +1,104 @@
-'use client'
+'use client';
 
-import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
-import { Input, Button, Dialog, Icons } from "core/components";
-import { toast } from "core/components";
-import { addMember } from "lib/request-by-swr/settings-member";
-import { ROLE_USER_ON_WORKSPACE } from "config/const";
-import { useStoreMulti } from "lib/store";
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  Button, Dialog, Icons, Input
+} from 'core/components';
+import { toast } from 'core/components';
+import { useAddMember } from 'lib/request-client/settings-member';
+import { ROLE_USER_ON_WORKSPACE } from 'config/const';
+import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { IAddMember } from 'types/member';
 
 export default function AddMemberDialog() {
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false)
   const formHandler = useForm();
-  const router = useRouter();
-  const { workspace, user } = useStoreMulti('workspace', 'user')
+  const { data: { workspace, user } = {} } = useGetDetailWorkspace();
 
-  async function onSubmit({ email }) {
-    setIsLoading(true)
-    if (!workspace) return
+  const {
+    isPending: isPendingAddMember,
+    mutateAsync: addMember,
+    isError: isErrorAddMember,
+  } = useAddMember();
 
-    const response = await addMember({
+  async function onSubmit({ email }: IAddMember) {
+    if (!workspace) return;
+
+    await addMember({
       workspaceId: workspace.id,
       email,
-    })
+    });
 
-    setIsLoading(false)
-
-    if (response.code !== '200') {
-      return toast({
-        title: "Something went wrong.",
-        message: response.message,
-        type: "error",
-      })
+    if (isErrorAddMember) {
+      toast({
+        title: 'Something went wrong.',
+        message: 'Your member was not added. Please try again.',
+        type: 'error',
+      });
+      return;
     }
 
-    router.refresh()
-    setOpen(!open)
-    formHandler.reset()
+    await queryClient.invalidateQueries({
+      queryKey: ['members', workspace.domain],
+    });
+
+    setOpen(!open);
+    formHandler.reset();
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={ open }
+      onOpenChange={ setOpen }
+    >
       <Dialog.Trigger asChild>
-        <Button disabled={user?.userOnWorkspace && user?.userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER}>Add members</Button>
+        <Button
+          disabled={
+           (user?.userOnWorkspace && user?.userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.MEMBER) as boolean
+          }
+        >
+          Add members
+        </Button>
       </Dialog.Trigger>
 
       <Dialog.Content>
         <h3>Invite member</h3>
 
         <div
-          onClick={() => setOpen(false)}
+          onClick={ () => setOpen(false) }
           className='
           absolute top-3.5 right-[14px] cursor-pointer
           btn-icon bg-accent-light rounded-full text-xs flex justify-center items-center'
         >
-          <Icons.close/>
+          <Icons.close />
         </div>
-        <FormProvider {...formHandler} >
-          <form onSubmit={formHandler.handleSubmit(onSubmit)} className='space-y-3'>
-            <Input
-              // placeholder='Search name or emails'
-              // placeholder='Search email'
-              disabled={isLoading}
-              sizeInput='md'
-              label='Email'
-              id='email'
-            />
-            <div className='flex justify-end pt-5 gap-1'>
-              <Button
-                disabled={formHandler.watch('email') === user.email || isLoading}
-                type="submit" isLoading={isLoading}
-              >
+        <form
+          onSubmit={ formHandler.handleSubmit(onSubmit) }
+          className='space-y-3'
+        >
+          <Input
+            // placeholder='Search name or emails'
+            // placeholder='Search email'
+            { ...formHandler.register('email') }
+            disabled={ isPendingAddMember }
+            sizeInput='md'
+            label='Email'
+            id='email'
+          />
+          <div className='flex justify-end pt-5 gap-1'>
+            <Button
+              disabled={ formHandler.watch('email') === user?.email || isPendingAddMember }
+              type='submit'
+              isLoading={ isPendingAddMember }
+            >
                 Invite
-              </Button>
-            </div>
-          </form>
-        </FormProvider>
+            </Button>
+          </div>
+        </form>
       </Dialog.Content>
     </Dialog>
   );

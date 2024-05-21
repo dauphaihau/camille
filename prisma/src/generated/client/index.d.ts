@@ -4,136 +4,325 @@
 **/
 
 import * as runtime from './runtime/library';
-type UnwrapPromise<P extends any> = P extends Promise<infer R> ? R : P
-type UnwrapTuple<Tuple extends readonly unknown[]> = {
-  [K in keyof Tuple]: K extends `${number}` ? Tuple[K] extends Prisma.PrismaPromise<infer X> ? X : UnwrapPromise<Tuple[K]> : UnwrapPromise<Tuple[K]>
-};
+import $Types = runtime.Types // general types
+import $Public = runtime.Types.Public
+import $Utils = runtime.Types.Utils
+import $Extensions = runtime.Types.Extensions
 
+export type PrismaPromise<T> = $Public.PrismaPromise<T>
+
+
+export type AccountPayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "Account"
+  objects: {
+    user: UserPayload<ExtArgs>
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    type: string
+    provider: string
+    providerAccountId: string
+    refresh_token: string | null
+    access_token: string | null
+    expires_at: number | null
+    token_type: string | null
+    scope: string | null
+    id_token: string | null
+    session_state: string | null
+    createdAt: Date
+    updatedAt: Date
+    userId: string
+  }, ExtArgs["result"]["account"]>
+  composites: {}
+}
 
 /**
  * Model Account
  * 
  */
-export type Account = {
-  id: string
-  userId: string
-  type: string
-  provider: string
-  providerAccountId: string
-  refresh_token: string | null
-  access_token: string | null
-  expires_at: number | null
-  token_type: string | null
-  scope: string | null
-  id_token: string | null
-  session_state: string | null
-  createdAt: Date
-  updatedAt: Date
+export type Account = runtime.Types.DefaultSelection<AccountPayload>
+export type SessionPayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "Session"
+  objects: {
+    user: UserPayload<ExtArgs> | null
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    sessionToken: string
+    accessToken: string | null
+    expires: Date
+    userId: string | null
+  }, ExtArgs["result"]["session"]>
+  composites: {}
 }
 
 /**
  * Model Session
  * 
  */
-export type Session = {
-  id: string
-  sessionToken: string
-  accessToken: string | null
-  expires: Date
-  userId: string | null
+export type Session = runtime.Types.DefaultSelection<SessionPayload>
+export type UserPayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "User"
+  objects: {
+    accounts: AccountPayload<ExtArgs>[]
+    sessions: SessionPayload<ExtArgs>[]
+    userOnWorkspace: UserOnWorkspacePayload<ExtArgs>[]
+    userOnTeamspace: UserOnTeamspacePayload<ExtArgs>[]
+    trackingUserAccess: TrackingUserAccessOnWorkspacePayload<ExtArgs>[]
+    favorites: FavoritePayload<ExtArgs>[]
+    notebooks: NotebookPayload<ExtArgs>[]
+    PagesCreated: PagePayload<ExtArgs>[]
+    PagesUpdated: PagePayload<ExtArgs>[]
+    PagesDeleted: PagePayload<ExtArgs>[]
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    name: string | null
+    email: string | null
+    emailVerified: Date | null
+    image: string | null
+    createdAt: Date
+    updatedAt: Date
+    stripeCustomerId: string | null
+    lastAccessWorkspaceId: string | null
+  }, ExtArgs["result"]["user"]>
+  composites: {}
 }
 
 /**
  * Model User
  * 
  */
-export type User = {
-  id: string
-  name: string | null
-  email: string | null
-  emailVerified: Date | null
-  image: string | null
-  createdAt: Date
-  updatedAt: Date
-  stripeCustomerId: string | null
-  lastAccessWorkspaceId: string | null
+export type User = runtime.Types.DefaultSelection<UserPayload>
+export type VerificationTokenPayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "VerificationToken"
+  objects: {}
+  scalars: $Extensions.GetResult<{
+    id: string
+    identifier: string
+    token: string
+    expires: Date
+    createdAt: Date
+    updatedAt: Date
+  }, ExtArgs["result"]["verificationToken"]>
+  composites: {}
 }
 
 /**
  * Model VerificationToken
  * 
  */
-export type VerificationToken = {
-  id: string
-  identifier: string
-  token: string
-  expires: Date
-  createdAt: Date
-  updatedAt: Date
+export type VerificationToken = runtime.Types.DefaultSelection<VerificationTokenPayload>
+export type TrackingUserAccessOnWorkspacePayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "TrackingUserAccessOnWorkspace"
+  objects: {
+    user: UserPayload<ExtArgs>
+    workspace: WorkspacePayload<ExtArgs>
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    createdAt: Date
+    lastAccessNotebookId: string | null
+    lastAccessPageId: string | null
+    userId: string
+    workspaceId: string
+  }, ExtArgs["result"]["trackingUserAccessOnWorkspace"]>
+  composites: {}
 }
 
 /**
- * Model TrackingUserAccess
+ * Model TrackingUserAccessOnWorkspace
  * 
  */
-export type TrackingUserAccess = {
-  id: string
-  userId: string | null
-  lastAccessWorkspaceId: string | null
-  lastAccessNotebookId: string | null
-  lastAccessPageId: string | null
-  createdAt: Date
+export type TrackingUserAccessOnWorkspace = runtime.Types.DefaultSelection<TrackingUserAccessOnWorkspacePayload>
+export type WorkspacePayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "Workspace"
+  objects: {
+    trackingUserAccessOnWorkspace: TrackingUserAccessOnWorkspacePayload<ExtArgs> | null
+    userOnWorkspace: UserOnWorkspacePayload<ExtArgs>[]
+    teamspaces: TeamspacePayload<ExtArgs>[]
+    notebooks: NotebookPayload<ExtArgs>[]
+    favorites: FavoritePayload<ExtArgs>[]
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    /**
+     * @zod.min(3, 'Name must be 3 to 32 characters')
+     * @zod.max(32, 'Name must be 3 to 32 characters')
+     */
+    name: string
+    /**
+     * @zod.min(3, { message: "Domain must be 3 to 32 characters" }).regex(new RegExp(/^(?!-+$)[a-z0-9-]+$/i), 'Domain invalid')
+     * @zod.max(32, 'Domain must be 3 to 32 characters')
+     */
+    domain: string
+    stripeCustomerId: string | null
+    stripeWorkspaceId: string | null
+    stripeSubscriptionId: string | null
+    stripePriceId: string | null
+    stripeCurrentPeriodEnd: Date | null
+    createdAt: Date
+    updatedAt: Date
+    createdBy: string
+  }, ExtArgs["result"]["workspace"]>
+  composites: {}
 }
 
 /**
  * Model Workspace
  * 
  */
-export type Workspace = {
-  id: string
-  name: string
-  domain: string
-  stripeCustomerId: string | null
-  stripeWorkspaceId: string | null
-  stripeSubscriptionId: string | null
-  stripePriceId: string | null
-  stripeCurrentPeriodEnd: Date | null
-  createdBy: string
-  createdAt: Date
-  updatedAt: Date
+export type Workspace = runtime.Types.DefaultSelection<WorkspacePayload>
+export type TeamspacePayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "Teamspace"
+  objects: {
+    workspace: WorkspacePayload<ExtArgs> | null
+    userOnTeamspace: UserOnTeamspacePayload<ExtArgs>[]
+    notebooks: NotebookPayload<ExtArgs>[]
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    name: string
+    description: string | null
+    createdAt: Date
+    updatedAt: Date
+    isOrigin: boolean | null
+    archivedAt: Date | null
+    workspaceId: string | null
+    createdBy: string
+  }, ExtArgs["result"]["teamspace"]>
+  composites: {}
+}
+
+/**
+ * Model Teamspace
+ * 
+ */
+export type Teamspace = runtime.Types.DefaultSelection<TeamspacePayload>
+export type NotebookPayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "Notebook"
+  objects: {
+    pages: PagePayload<ExtArgs>[]
+    workspace: WorkspacePayload<ExtArgs>
+    teamspace: TeamspacePayload<ExtArgs> | null
+    user: UserPayload<ExtArgs>
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    title: string
+    description: string | null
+    published: boolean
+    createdAt: Date
+    updatedAt: Date
+    workspaceId: string
+    teamspaceId: string | null
+    createdBy: string
+  }, ExtArgs["result"]["notebook"]>
+  composites: {}
 }
 
 /**
  * Model Notebook
  * 
  */
-export type Notebook = {
-  id: string
-  title: string
-  description: string
-  published: boolean
-  createdAt: Date
-  updatedAt: Date
-  workspaceId: string
+export type Notebook = runtime.Types.DefaultSelection<NotebookPayload>
+export type PagePayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "Page"
+  objects: {
+    notebook: NotebookPayload<ExtArgs>
+    createdByUser: UserPayload<ExtArgs>
+    deletedByUser: UserPayload<ExtArgs> | null
+    updatedByUser: UserPayload<ExtArgs>
+    favorites: FavoritePayload<ExtArgs>[]
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    title: string
+    content: Prisma.JsonValue | null
+    published: boolean
+    createdAt: Date
+    updatedAt: Date
+    deletedAt: Date | null
+    notebookId: string
+    createdBy: string
+    deletedBy: string | null
+    updatedBy: string
+  }, ExtArgs["result"]["page"]>
+  composites: {}
 }
 
 /**
  * Model Page
  * 
  */
-export type Page = {
-  id: string
-  title: string
-  content: Prisma.JsonValue | null
-  published: boolean
-  createdAt: Date
-  updatedBy: string | null
-  updatedAt: Date
-  deletedBy: string | null
-  deletedAt: Date | null
-  notebookId: string
+export type Page = runtime.Types.DefaultSelection<PagePayload>
+export type FavoritePayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "Favorite"
+  objects: {
+    user: UserPayload<ExtArgs>
+    workspace: WorkspacePayload<ExtArgs> | null
+    page: PagePayload<ExtArgs> | null
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    userId: string
+    workspaceId: string
+    pageId: string
+  }, ExtArgs["result"]["favorite"]>
+  composites: {}
 }
 
+/**
+ * Model Favorite
+ * 
+ */
+export type Favorite = runtime.Types.DefaultSelection<FavoritePayload>
+export type UserOnWorkspacePayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "UserOnWorkspace"
+  objects: {
+    user: UserPayload<ExtArgs>
+    workspace: WorkspacePayload<ExtArgs>
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    role: number
+    createdAt: Date
+    updatedAt: Date
+    userId: string
+    workspaceId: string
+  }, ExtArgs["result"]["userOnWorkspace"]>
+  composites: {}
+}
+
+/**
+ * Model UserOnWorkspace
+ * 
+ */
+export type UserOnWorkspace = runtime.Types.DefaultSelection<UserOnWorkspacePayload>
+export type UserOnTeamspacePayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "UserOnTeamspace"
+  objects: {
+    user: UserPayload<ExtArgs>
+    teamspace: TeamspacePayload<ExtArgs>
+  }
+  scalars: $Extensions.GetResult<{
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    operation: number
+    userId: string
+    teamspaceId: string
+  }, ExtArgs["result"]["userOnTeamspace"]>
+  composites: {}
+}
+
+/**
+ * Model UserOnTeamspace
+ * 
+ */
+export type UserOnTeamspace = runtime.Types.DefaultSelection<UserOnTeamspacePayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -154,8 +343,11 @@ export class PrismaClient<
   U = 'log' extends keyof T ? T['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<T['log']> : never : never,
   GlobalReject extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined = 'rejectOnNotFound' extends keyof T
     ? T['rejectOnNotFound']
-    : false
-      > {
+    : false,
+  ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs
+> {
+  [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
+
     /**
    * ##  Prisma Client ʲˢ
    * 
@@ -186,6 +378,8 @@ export class PrismaClient<
 
   /**
    * Add a middleware
+   * @deprecated since 4.16.0. For new code, prefer client extensions instead.
+   * @see https://pris.ly/d/extensions
    */
   $use(cb: Prisma.Middleware): void
 
@@ -248,9 +442,12 @@ export class PrismaClient<
    * 
    * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): Promise<UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): Promise<runtime.Types.Utils.UnwrapTuple<P>>
 
-  $transaction<R>(fn: (prisma: Omit<this, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => Promise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): Promise<R>
+  $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => Promise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): Promise<R>
+
+
+  $extends: $Extensions.ExtendsHook<'extends', Prisma.TypeMapCb, ExtArgs>
 
       /**
    * `prisma.account`: Exposes CRUD operations for the **Account** model.
@@ -260,7 +457,7 @@ export class PrismaClient<
     * const accounts = await prisma.account.findMany()
     * ```
     */
-  get account(): Prisma.AccountDelegate<GlobalReject>;
+  get account(): Prisma.AccountDelegate<GlobalReject, ExtArgs>;
 
   /**
    * `prisma.session`: Exposes CRUD operations for the **Session** model.
@@ -270,7 +467,7 @@ export class PrismaClient<
     * const sessions = await prisma.session.findMany()
     * ```
     */
-  get session(): Prisma.SessionDelegate<GlobalReject>;
+  get session(): Prisma.SessionDelegate<GlobalReject, ExtArgs>;
 
   /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
@@ -280,7 +477,7 @@ export class PrismaClient<
     * const users = await prisma.user.findMany()
     * ```
     */
-  get user(): Prisma.UserDelegate<GlobalReject>;
+  get user(): Prisma.UserDelegate<GlobalReject, ExtArgs>;
 
   /**
    * `prisma.verificationToken`: Exposes CRUD operations for the **VerificationToken** model.
@@ -290,17 +487,17 @@ export class PrismaClient<
     * const verificationTokens = await prisma.verificationToken.findMany()
     * ```
     */
-  get verificationToken(): Prisma.VerificationTokenDelegate<GlobalReject>;
+  get verificationToken(): Prisma.VerificationTokenDelegate<GlobalReject, ExtArgs>;
 
   /**
-   * `prisma.trackingUserAccess`: Exposes CRUD operations for the **TrackingUserAccess** model.
+   * `prisma.trackingUserAccessOnWorkspace`: Exposes CRUD operations for the **TrackingUserAccessOnWorkspace** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more TrackingUserAccesses
-    * const trackingUserAccesses = await prisma.trackingUserAccess.findMany()
+    * // Fetch zero or more TrackingUserAccessOnWorkspaces
+    * const trackingUserAccessOnWorkspaces = await prisma.trackingUserAccessOnWorkspace.findMany()
     * ```
     */
-  get trackingUserAccess(): Prisma.TrackingUserAccessDelegate<GlobalReject>;
+  get trackingUserAccessOnWorkspace(): Prisma.TrackingUserAccessOnWorkspaceDelegate<GlobalReject, ExtArgs>;
 
   /**
    * `prisma.workspace`: Exposes CRUD operations for the **Workspace** model.
@@ -310,7 +507,17 @@ export class PrismaClient<
     * const workspaces = await prisma.workspace.findMany()
     * ```
     */
-  get workspace(): Prisma.WorkspaceDelegate<GlobalReject>;
+  get workspace(): Prisma.WorkspaceDelegate<GlobalReject, ExtArgs>;
+
+  /**
+   * `prisma.teamspace`: Exposes CRUD operations for the **Teamspace** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Teamspaces
+    * const teamspaces = await prisma.teamspace.findMany()
+    * ```
+    */
+  get teamspace(): Prisma.TeamspaceDelegate<GlobalReject, ExtArgs>;
 
   /**
    * `prisma.notebook`: Exposes CRUD operations for the **Notebook** model.
@@ -320,7 +527,7 @@ export class PrismaClient<
     * const notebooks = await prisma.notebook.findMany()
     * ```
     */
-  get notebook(): Prisma.NotebookDelegate<GlobalReject>;
+  get notebook(): Prisma.NotebookDelegate<GlobalReject, ExtArgs>;
 
   /**
    * `prisma.page`: Exposes CRUD operations for the **Page** model.
@@ -330,13 +537,48 @@ export class PrismaClient<
     * const pages = await prisma.page.findMany()
     * ```
     */
-  get page(): Prisma.PageDelegate<GlobalReject>;
+  get page(): Prisma.PageDelegate<GlobalReject, ExtArgs>;
+
+  /**
+   * `prisma.favorite`: Exposes CRUD operations for the **Favorite** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Favorites
+    * const favorites = await prisma.favorite.findMany()
+    * ```
+    */
+  get favorite(): Prisma.FavoriteDelegate<GlobalReject, ExtArgs>;
+
+  /**
+   * `prisma.userOnWorkspace`: Exposes CRUD operations for the **UserOnWorkspace** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more UserOnWorkspaces
+    * const userOnWorkspaces = await prisma.userOnWorkspace.findMany()
+    * ```
+    */
+  get userOnWorkspace(): Prisma.UserOnWorkspaceDelegate<GlobalReject, ExtArgs>;
+
+  /**
+   * `prisma.userOnTeamspace`: Exposes CRUD operations for the **UserOnTeamspace** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more UserOnTeamspaces
+    * const userOnTeamspaces = await prisma.userOnTeamspace.findMany()
+    * ```
+    */
+  get userOnTeamspace(): Prisma.UserOnTeamspaceDelegate<GlobalReject, ExtArgs>;
 }
 
 export namespace Prisma {
   export import DMMF = runtime.DMMF
 
-  export type PrismaPromise<T> = runtime.Types.Public.PrismaPromise<T>
+  export type PrismaPromise<T> = $Public.PrismaPromise<T>
+
+  /**
+   * Validator
+   */
+  export import validator = runtime.Public.validator
 
   /**
    * Prisma Errors
@@ -372,10 +614,19 @@ export namespace Prisma {
   export type MetricHistogram = runtime.MetricHistogram
   export type MetricHistogramBucket = runtime.MetricHistogramBucket
 
+  /**
+  * Extensions
+  */
+  export type Extension = $Extensions.UserArgs
+  export import getExtensionContext = runtime.Extensions.getExtensionContext
+  export type Args<T, F extends $Public.Operation> = $Public.Args<T, F>
+  export type Payload<T, F extends $Public.Operation> = $Public.Payload<T, F>
+  export type Result<T, A, F extends $Public.Operation> = $Public.Result<T, A, F>
+  export type Exact<T, W> = $Public.Exact<T, W>
 
   /**
-   * Prisma Client JS version: 4.11.0
-   * Query Engine version: 8fde8fef4033376662cad983758335009d522acb
+   * Prisma Client JS version: 4.16.2
+   * Query Engine version: e9771e62de70f79a5e1c604a2d7c8e2a0a874b48
    */
   export type PrismaVersion = {
     client: string
@@ -743,7 +994,7 @@ export namespace Prisma {
 
   export const type: unique symbol;
 
-  export function validator<V>(): <S>(select: runtime.Types.Utils.LegacyExact<S, V>) => S;
+
 
   /**
    * Used by group by
@@ -804,10 +1055,14 @@ export namespace Prisma {
     Session: 'Session',
     User: 'User',
     VerificationToken: 'VerificationToken',
-    TrackingUserAccess: 'TrackingUserAccess',
+    TrackingUserAccessOnWorkspace: 'TrackingUserAccessOnWorkspace',
     Workspace: 'Workspace',
+    Teamspace: 'Teamspace',
     Notebook: 'Notebook',
-    Page: 'Page'
+    Page: 'Page',
+    Favorite: 'Favorite',
+    UserOnWorkspace: 'UserOnWorkspace',
+    UserOnTeamspace: 'UserOnTeamspace'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -817,6 +1072,822 @@ export namespace Prisma {
     db?: Datasource
   }
 
+
+  interface TypeMapCb extends $Utils.Fn<{extArgs: $Extensions.Args}, $Utils.Record<string, any>> {
+    returns: Prisma.TypeMap<this['params']['extArgs']>
+  }
+
+  export type TypeMap<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    meta: {
+      modelProps: 'account' | 'session' | 'user' | 'verificationToken' | 'trackingUserAccessOnWorkspace' | 'workspace' | 'teamspace' | 'notebook' | 'page' | 'favorite' | 'userOnWorkspace' | 'userOnTeamspace'
+      txIsolationLevel: Prisma.TransactionIsolationLevel
+    },
+    model: {
+      Account: {
+        payload: AccountPayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.AccountFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<AccountPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AccountFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<AccountPayload>
+          }
+          findFirst: {
+            args: Prisma.AccountFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<AccountPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AccountFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<AccountPayload>
+          }
+          findMany: {
+            args: Prisma.AccountFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<AccountPayload>[]
+          }
+          create: {
+            args: Prisma.AccountCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<AccountPayload>
+          }
+          createMany: {
+            args: Prisma.AccountCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.AccountDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<AccountPayload>
+          }
+          update: {
+            args: Prisma.AccountUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<AccountPayload>
+          }
+          deleteMany: {
+            args: Prisma.AccountDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AccountUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.AccountUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<AccountPayload>
+          }
+          aggregate: {
+            args: Prisma.AccountAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateAccount>
+          }
+          groupBy: {
+            args: Prisma.AccountGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<AccountGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AccountCountArgs<ExtArgs>,
+            result: $Utils.Optional<AccountCountAggregateOutputType> | number
+          }
+        }
+      }
+      Session: {
+        payload: SessionPayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.SessionFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<SessionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SessionFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<SessionPayload>
+          }
+          findFirst: {
+            args: Prisma.SessionFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<SessionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SessionFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<SessionPayload>
+          }
+          findMany: {
+            args: Prisma.SessionFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<SessionPayload>[]
+          }
+          create: {
+            args: Prisma.SessionCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<SessionPayload>
+          }
+          createMany: {
+            args: Prisma.SessionCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.SessionDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<SessionPayload>
+          }
+          update: {
+            args: Prisma.SessionUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<SessionPayload>
+          }
+          deleteMany: {
+            args: Prisma.SessionDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SessionUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.SessionUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<SessionPayload>
+          }
+          aggregate: {
+            args: Prisma.SessionAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateSession>
+          }
+          groupBy: {
+            args: Prisma.SessionGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<SessionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SessionCountArgs<ExtArgs>,
+            result: $Utils.Optional<SessionCountAggregateOutputType> | number
+          }
+        }
+      }
+      User: {
+        payload: UserPayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.UserFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.UserFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserPayload>
+          }
+          findFirst: {
+            args: Prisma.UserFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.UserFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserPayload>
+          }
+          findMany: {
+            args: Prisma.UserFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserPayload>[]
+          }
+          create: {
+            args: Prisma.UserCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserPayload>
+          }
+          createMany: {
+            args: Prisma.UserCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.UserDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserPayload>
+          }
+          update: {
+            args: Prisma.UserUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserPayload>
+          }
+          deleteMany: {
+            args: Prisma.UserDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.UserUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.UserUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserPayload>
+          }
+          aggregate: {
+            args: Prisma.UserAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateUser>
+          }
+          groupBy: {
+            args: Prisma.UserGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<UserGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.UserCountArgs<ExtArgs>,
+            result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      VerificationToken: {
+        payload: VerificationTokenPayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.VerificationTokenFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<VerificationTokenPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.VerificationTokenFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<VerificationTokenPayload>
+          }
+          findFirst: {
+            args: Prisma.VerificationTokenFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<VerificationTokenPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.VerificationTokenFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<VerificationTokenPayload>
+          }
+          findMany: {
+            args: Prisma.VerificationTokenFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<VerificationTokenPayload>[]
+          }
+          create: {
+            args: Prisma.VerificationTokenCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<VerificationTokenPayload>
+          }
+          createMany: {
+            args: Prisma.VerificationTokenCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.VerificationTokenDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<VerificationTokenPayload>
+          }
+          update: {
+            args: Prisma.VerificationTokenUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<VerificationTokenPayload>
+          }
+          deleteMany: {
+            args: Prisma.VerificationTokenDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.VerificationTokenUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.VerificationTokenUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<VerificationTokenPayload>
+          }
+          aggregate: {
+            args: Prisma.VerificationTokenAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateVerificationToken>
+          }
+          groupBy: {
+            args: Prisma.VerificationTokenGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<VerificationTokenGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.VerificationTokenCountArgs<ExtArgs>,
+            result: $Utils.Optional<VerificationTokenCountAggregateOutputType> | number
+          }
+        }
+      }
+      TrackingUserAccessOnWorkspace: {
+        payload: TrackingUserAccessOnWorkspacePayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.TrackingUserAccessOnWorkspaceFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TrackingUserAccessOnWorkspacePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TrackingUserAccessOnWorkspaceFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TrackingUserAccessOnWorkspacePayload>
+          }
+          findFirst: {
+            args: Prisma.TrackingUserAccessOnWorkspaceFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TrackingUserAccessOnWorkspacePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TrackingUserAccessOnWorkspaceFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TrackingUserAccessOnWorkspacePayload>
+          }
+          findMany: {
+            args: Prisma.TrackingUserAccessOnWorkspaceFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TrackingUserAccessOnWorkspacePayload>[]
+          }
+          create: {
+            args: Prisma.TrackingUserAccessOnWorkspaceCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TrackingUserAccessOnWorkspacePayload>
+          }
+          createMany: {
+            args: Prisma.TrackingUserAccessOnWorkspaceCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.TrackingUserAccessOnWorkspaceDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TrackingUserAccessOnWorkspacePayload>
+          }
+          update: {
+            args: Prisma.TrackingUserAccessOnWorkspaceUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TrackingUserAccessOnWorkspacePayload>
+          }
+          deleteMany: {
+            args: Prisma.TrackingUserAccessOnWorkspaceDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TrackingUserAccessOnWorkspaceUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.TrackingUserAccessOnWorkspaceUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TrackingUserAccessOnWorkspacePayload>
+          }
+          aggregate: {
+            args: Prisma.TrackingUserAccessOnWorkspaceAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateTrackingUserAccessOnWorkspace>
+          }
+          groupBy: {
+            args: Prisma.TrackingUserAccessOnWorkspaceGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<TrackingUserAccessOnWorkspaceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TrackingUserAccessOnWorkspaceCountArgs<ExtArgs>,
+            result: $Utils.Optional<TrackingUserAccessOnWorkspaceCountAggregateOutputType> | number
+          }
+        }
+      }
+      Workspace: {
+        payload: WorkspacePayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.WorkspaceFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<WorkspacePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.WorkspaceFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<WorkspacePayload>
+          }
+          findFirst: {
+            args: Prisma.WorkspaceFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<WorkspacePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.WorkspaceFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<WorkspacePayload>
+          }
+          findMany: {
+            args: Prisma.WorkspaceFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<WorkspacePayload>[]
+          }
+          create: {
+            args: Prisma.WorkspaceCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<WorkspacePayload>
+          }
+          createMany: {
+            args: Prisma.WorkspaceCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.WorkspaceDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<WorkspacePayload>
+          }
+          update: {
+            args: Prisma.WorkspaceUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<WorkspacePayload>
+          }
+          deleteMany: {
+            args: Prisma.WorkspaceDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.WorkspaceUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.WorkspaceUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<WorkspacePayload>
+          }
+          aggregate: {
+            args: Prisma.WorkspaceAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateWorkspace>
+          }
+          groupBy: {
+            args: Prisma.WorkspaceGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<WorkspaceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.WorkspaceCountArgs<ExtArgs>,
+            result: $Utils.Optional<WorkspaceCountAggregateOutputType> | number
+          }
+        }
+      }
+      Teamspace: {
+        payload: TeamspacePayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.TeamspaceFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TeamspacePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TeamspaceFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TeamspacePayload>
+          }
+          findFirst: {
+            args: Prisma.TeamspaceFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TeamspacePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TeamspaceFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TeamspacePayload>
+          }
+          findMany: {
+            args: Prisma.TeamspaceFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TeamspacePayload>[]
+          }
+          create: {
+            args: Prisma.TeamspaceCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TeamspacePayload>
+          }
+          createMany: {
+            args: Prisma.TeamspaceCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.TeamspaceDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TeamspacePayload>
+          }
+          update: {
+            args: Prisma.TeamspaceUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TeamspacePayload>
+          }
+          deleteMany: {
+            args: Prisma.TeamspaceDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TeamspaceUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.TeamspaceUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<TeamspacePayload>
+          }
+          aggregate: {
+            args: Prisma.TeamspaceAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateTeamspace>
+          }
+          groupBy: {
+            args: Prisma.TeamspaceGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<TeamspaceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TeamspaceCountArgs<ExtArgs>,
+            result: $Utils.Optional<TeamspaceCountAggregateOutputType> | number
+          }
+        }
+      }
+      Notebook: {
+        payload: NotebookPayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.NotebookFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<NotebookPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.NotebookFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<NotebookPayload>
+          }
+          findFirst: {
+            args: Prisma.NotebookFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<NotebookPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.NotebookFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<NotebookPayload>
+          }
+          findMany: {
+            args: Prisma.NotebookFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<NotebookPayload>[]
+          }
+          create: {
+            args: Prisma.NotebookCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<NotebookPayload>
+          }
+          createMany: {
+            args: Prisma.NotebookCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.NotebookDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<NotebookPayload>
+          }
+          update: {
+            args: Prisma.NotebookUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<NotebookPayload>
+          }
+          deleteMany: {
+            args: Prisma.NotebookDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.NotebookUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.NotebookUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<NotebookPayload>
+          }
+          aggregate: {
+            args: Prisma.NotebookAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateNotebook>
+          }
+          groupBy: {
+            args: Prisma.NotebookGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<NotebookGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.NotebookCountArgs<ExtArgs>,
+            result: $Utils.Optional<NotebookCountAggregateOutputType> | number
+          }
+        }
+      }
+      Page: {
+        payload: PagePayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.PageFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<PagePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PageFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<PagePayload>
+          }
+          findFirst: {
+            args: Prisma.PageFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<PagePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PageFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<PagePayload>
+          }
+          findMany: {
+            args: Prisma.PageFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<PagePayload>[]
+          }
+          create: {
+            args: Prisma.PageCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<PagePayload>
+          }
+          createMany: {
+            args: Prisma.PageCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.PageDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<PagePayload>
+          }
+          update: {
+            args: Prisma.PageUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<PagePayload>
+          }
+          deleteMany: {
+            args: Prisma.PageDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PageUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.PageUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<PagePayload>
+          }
+          aggregate: {
+            args: Prisma.PageAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregatePage>
+          }
+          groupBy: {
+            args: Prisma.PageGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<PageGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PageCountArgs<ExtArgs>,
+            result: $Utils.Optional<PageCountAggregateOutputType> | number
+          }
+        }
+      }
+      Favorite: {
+        payload: FavoritePayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.FavoriteFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<FavoritePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FavoriteFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<FavoritePayload>
+          }
+          findFirst: {
+            args: Prisma.FavoriteFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<FavoritePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FavoriteFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<FavoritePayload>
+          }
+          findMany: {
+            args: Prisma.FavoriteFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<FavoritePayload>[]
+          }
+          create: {
+            args: Prisma.FavoriteCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<FavoritePayload>
+          }
+          createMany: {
+            args: Prisma.FavoriteCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.FavoriteDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<FavoritePayload>
+          }
+          update: {
+            args: Prisma.FavoriteUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<FavoritePayload>
+          }
+          deleteMany: {
+            args: Prisma.FavoriteDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FavoriteUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.FavoriteUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<FavoritePayload>
+          }
+          aggregate: {
+            args: Prisma.FavoriteAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateFavorite>
+          }
+          groupBy: {
+            args: Prisma.FavoriteGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<FavoriteGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FavoriteCountArgs<ExtArgs>,
+            result: $Utils.Optional<FavoriteCountAggregateOutputType> | number
+          }
+        }
+      }
+      UserOnWorkspace: {
+        payload: UserOnWorkspacePayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.UserOnWorkspaceFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnWorkspacePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.UserOnWorkspaceFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnWorkspacePayload>
+          }
+          findFirst: {
+            args: Prisma.UserOnWorkspaceFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnWorkspacePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.UserOnWorkspaceFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnWorkspacePayload>
+          }
+          findMany: {
+            args: Prisma.UserOnWorkspaceFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnWorkspacePayload>[]
+          }
+          create: {
+            args: Prisma.UserOnWorkspaceCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnWorkspacePayload>
+          }
+          createMany: {
+            args: Prisma.UserOnWorkspaceCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.UserOnWorkspaceDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnWorkspacePayload>
+          }
+          update: {
+            args: Prisma.UserOnWorkspaceUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnWorkspacePayload>
+          }
+          deleteMany: {
+            args: Prisma.UserOnWorkspaceDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.UserOnWorkspaceUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.UserOnWorkspaceUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnWorkspacePayload>
+          }
+          aggregate: {
+            args: Prisma.UserOnWorkspaceAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateUserOnWorkspace>
+          }
+          groupBy: {
+            args: Prisma.UserOnWorkspaceGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<UserOnWorkspaceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.UserOnWorkspaceCountArgs<ExtArgs>,
+            result: $Utils.Optional<UserOnWorkspaceCountAggregateOutputType> | number
+          }
+        }
+      }
+      UserOnTeamspace: {
+        payload: UserOnTeamspacePayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.UserOnTeamspaceFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnTeamspacePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.UserOnTeamspaceFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnTeamspacePayload>
+          }
+          findFirst: {
+            args: Prisma.UserOnTeamspaceFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnTeamspacePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.UserOnTeamspaceFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnTeamspacePayload>
+          }
+          findMany: {
+            args: Prisma.UserOnTeamspaceFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnTeamspacePayload>[]
+          }
+          create: {
+            args: Prisma.UserOnTeamspaceCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnTeamspacePayload>
+          }
+          createMany: {
+            args: Prisma.UserOnTeamspaceCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.UserOnTeamspaceDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnTeamspacePayload>
+          }
+          update: {
+            args: Prisma.UserOnTeamspaceUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnTeamspacePayload>
+          }
+          deleteMany: {
+            args: Prisma.UserOnTeamspaceDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.UserOnTeamspaceUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.UserOnTeamspaceUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<UserOnTeamspacePayload>
+          }
+          aggregate: {
+            args: Prisma.UserOnTeamspaceAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateUserOnTeamspace>
+          }
+          groupBy: {
+            args: Prisma.UserOnTeamspaceGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<UserOnTeamspaceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.UserOnTeamspaceCountArgs<ExtArgs>,
+            result: $Utils.Optional<UserOnTeamspaceCountAggregateOutputType> | number
+          }
+        }
+      }
+    }
+  } & {
+    other: {
+      payload: any
+      operations: {
+        $executeRawUnsafe: {
+          args: [query: string, ...values: any[]],
+          result: any
+        }
+        $executeRaw: {
+          args: [query: TemplateStringsArray | Prisma.Sql, ...values: any[]],
+          result: any
+        }
+        $queryRawUnsafe: {
+          args: [query: string, ...values: any[]],
+          result: any
+        }
+        $queryRaw: {
+          args: [query: TemplateStringsArray | Prisma.Sql, ...values: any[]],
+          result: any
+        }
+      }
+    }
+  }
+  export const defineExtension: $Extensions.ExtendsHook<'define', Prisma.TypeMapCb, $Extensions.DefaultArgs>
   export type DefaultPrismaClient = PrismaClient
   export type RejectOnNotFound = boolean | ((error: Error) => Error)
   export type RejectPerModel = { [P in ModelName]?: RejectOnNotFound }
@@ -957,7 +2028,7 @@ export namespace Prisma {
   /**
    * `PrismaClient` proxy available in interactive transactions.
    */
-  export type TransactionClient = Omit<Prisma.DefaultPrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>
+  export type TransactionClient = Omit<Prisma.DefaultPrismaClient, runtime.ITXClientDenyList>
 
   export type Datasource = {
     url?: string
@@ -976,43 +2047,119 @@ export namespace Prisma {
   export type UserCountOutputType = {
     accounts: number
     sessions: number
-    workspaces: number
+    userOnWorkspace: number
+    userOnTeamspace: number
     trackingUserAccess: number
+    favorites: number
+    notebooks: number
+    PagesCreated: number
+    PagesUpdated: number
+    PagesDeleted: number
   }
 
-  export type UserCountOutputTypeSelect = {
-    accounts?: boolean
-    sessions?: boolean
-    workspaces?: boolean
-    trackingUserAccess?: boolean
+  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    accounts?: boolean | UserCountOutputTypeCountAccountsArgs
+    sessions?: boolean | UserCountOutputTypeCountSessionsArgs
+    userOnWorkspace?: boolean | UserCountOutputTypeCountUserOnWorkspaceArgs
+    userOnTeamspace?: boolean | UserCountOutputTypeCountUserOnTeamspaceArgs
+    trackingUserAccess?: boolean | UserCountOutputTypeCountTrackingUserAccessArgs
+    favorites?: boolean | UserCountOutputTypeCountFavoritesArgs
+    notebooks?: boolean | UserCountOutputTypeCountNotebooksArgs
+    PagesCreated?: boolean | UserCountOutputTypeCountPagesCreatedArgs
+    PagesUpdated?: boolean | UserCountOutputTypeCountPagesUpdatedArgs
+    PagesDeleted?: boolean | UserCountOutputTypeCountPagesDeletedArgs
   }
-
-  export type UserCountOutputTypeGetPayload<S extends boolean | null | undefined | UserCountOutputTypeArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? UserCountOutputType :
-    S extends undefined ? never :
-    S extends { include: any } & (UserCountOutputTypeArgs)
-    ? UserCountOutputType 
-    : S extends { select: any } & (UserCountOutputTypeArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-    P extends keyof UserCountOutputType ? UserCountOutputType[P] : never
-  } 
-      : UserCountOutputType
-
-
-
 
   // Custom InputTypes
 
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeArgs = {
+  export type UserCountOutputTypeArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the UserCountOutputType
      */
-    select?: UserCountOutputTypeSelect | null
+    select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountAccountsArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: AccountWhereInput
+  }
+
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: SessionWhereInput
+  }
+
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountUserOnWorkspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: UserOnWorkspaceWhereInput
+  }
+
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountUserOnTeamspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: UserOnTeamspaceWhereInput
+  }
+
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountTrackingUserAccessArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: TrackingUserAccessOnWorkspaceWhereInput
+  }
+
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountFavoritesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: FavoriteWhereInput
+  }
+
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountNotebooksArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: NotebookWhereInput
+  }
+
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPagesCreatedArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: PageWhereInput
+  }
+
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPagesUpdatedArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: PageWhereInput
+  }
+
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPagesDeletedArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: PageWhereInput
   }
 
 
@@ -1023,43 +2170,106 @@ export namespace Prisma {
 
 
   export type WorkspaceCountOutputType = {
-    users: number
+    userOnWorkspace: number
+    teamspaces: number
     notebooks: number
-    trackingUserAccess: number
+    favorites: number
   }
 
-  export type WorkspaceCountOutputTypeSelect = {
-    users?: boolean
-    notebooks?: boolean
-    trackingUserAccess?: boolean
+  export type WorkspaceCountOutputTypeSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    userOnWorkspace?: boolean | WorkspaceCountOutputTypeCountUserOnWorkspaceArgs
+    teamspaces?: boolean | WorkspaceCountOutputTypeCountTeamspacesArgs
+    notebooks?: boolean | WorkspaceCountOutputTypeCountNotebooksArgs
+    favorites?: boolean | WorkspaceCountOutputTypeCountFavoritesArgs
   }
-
-  export type WorkspaceCountOutputTypeGetPayload<S extends boolean | null | undefined | WorkspaceCountOutputTypeArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? WorkspaceCountOutputType :
-    S extends undefined ? never :
-    S extends { include: any } & (WorkspaceCountOutputTypeArgs)
-    ? WorkspaceCountOutputType 
-    : S extends { select: any } & (WorkspaceCountOutputTypeArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-    P extends keyof WorkspaceCountOutputType ? WorkspaceCountOutputType[P] : never
-  } 
-      : WorkspaceCountOutputType
-
-
-
 
   // Custom InputTypes
 
   /**
    * WorkspaceCountOutputType without action
    */
-  export type WorkspaceCountOutputTypeArgs = {
+  export type WorkspaceCountOutputTypeArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the WorkspaceCountOutputType
      */
-    select?: WorkspaceCountOutputTypeSelect | null
+    select?: WorkspaceCountOutputTypeSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * WorkspaceCountOutputType without action
+   */
+  export type WorkspaceCountOutputTypeCountUserOnWorkspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: UserOnWorkspaceWhereInput
+  }
+
+
+  /**
+   * WorkspaceCountOutputType without action
+   */
+  export type WorkspaceCountOutputTypeCountTeamspacesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: TeamspaceWhereInput
+  }
+
+
+  /**
+   * WorkspaceCountOutputType without action
+   */
+  export type WorkspaceCountOutputTypeCountNotebooksArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: NotebookWhereInput
+  }
+
+
+  /**
+   * WorkspaceCountOutputType without action
+   */
+  export type WorkspaceCountOutputTypeCountFavoritesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: FavoriteWhereInput
+  }
+
+
+
+  /**
+   * Count Type TeamspaceCountOutputType
+   */
+
+
+  export type TeamspaceCountOutputType = {
+    userOnTeamspace: number
+    notebooks: number
+  }
+
+  export type TeamspaceCountOutputTypeSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    userOnTeamspace?: boolean | TeamspaceCountOutputTypeCountUserOnTeamspaceArgs
+    notebooks?: boolean | TeamspaceCountOutputTypeCountNotebooksArgs
+  }
+
+  // Custom InputTypes
+
+  /**
+   * TeamspaceCountOutputType without action
+   */
+  export type TeamspaceCountOutputTypeArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamspaceCountOutputType
+     */
+    select?: TeamspaceCountOutputTypeSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * TeamspaceCountOutputType without action
+   */
+  export type TeamspaceCountOutputTypeCountUserOnTeamspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: UserOnTeamspaceWhereInput
+  }
+
+
+  /**
+   * TeamspaceCountOutputType without action
+   */
+  export type TeamspaceCountOutputTypeCountNotebooksArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: NotebookWhereInput
   }
 
 
@@ -1073,36 +2283,63 @@ export namespace Prisma {
     pages: number
   }
 
-  export type NotebookCountOutputTypeSelect = {
-    pages?: boolean
+  export type NotebookCountOutputTypeSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    pages?: boolean | NotebookCountOutputTypeCountPagesArgs
   }
-
-  export type NotebookCountOutputTypeGetPayload<S extends boolean | null | undefined | NotebookCountOutputTypeArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? NotebookCountOutputType :
-    S extends undefined ? never :
-    S extends { include: any } & (NotebookCountOutputTypeArgs)
-    ? NotebookCountOutputType 
-    : S extends { select: any } & (NotebookCountOutputTypeArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-    P extends keyof NotebookCountOutputType ? NotebookCountOutputType[P] : never
-  } 
-      : NotebookCountOutputType
-
-
-
 
   // Custom InputTypes
 
   /**
    * NotebookCountOutputType without action
    */
-  export type NotebookCountOutputTypeArgs = {
+  export type NotebookCountOutputTypeArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the NotebookCountOutputType
      */
-    select?: NotebookCountOutputTypeSelect | null
+    select?: NotebookCountOutputTypeSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * NotebookCountOutputType without action
+   */
+  export type NotebookCountOutputTypeCountPagesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: PageWhereInput
+  }
+
+
+
+  /**
+   * Count Type PageCountOutputType
+   */
+
+
+  export type PageCountOutputType = {
+    favorites: number
+  }
+
+  export type PageCountOutputTypeSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    favorites?: boolean | PageCountOutputTypeCountFavoritesArgs
+  }
+
+  // Custom InputTypes
+
+  /**
+   * PageCountOutputType without action
+   */
+  export type PageCountOutputTypeArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PageCountOutputType
+     */
+    select?: PageCountOutputTypeSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * PageCountOutputType without action
+   */
+  export type PageCountOutputTypeCountFavoritesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: FavoriteWhereInput
   }
 
 
@@ -1134,7 +2371,6 @@ export namespace Prisma {
 
   export type AccountMinAggregateOutputType = {
     id: string | null
-    userId: string | null
     type: string | null
     provider: string | null
     providerAccountId: string | null
@@ -1147,11 +2383,11 @@ export namespace Prisma {
     session_state: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    userId: string | null
   }
 
   export type AccountMaxAggregateOutputType = {
     id: string | null
-    userId: string | null
     type: string | null
     provider: string | null
     providerAccountId: string | null
@@ -1164,11 +2400,11 @@ export namespace Prisma {
     session_state: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    userId: string | null
   }
 
   export type AccountCountAggregateOutputType = {
     id: number
-    userId: number
     type: number
     provider: number
     providerAccountId: number
@@ -1181,6 +2417,7 @@ export namespace Prisma {
     session_state: number
     createdAt: number
     updatedAt: number
+    userId: number
     _all: number
   }
 
@@ -1195,7 +2432,6 @@ export namespace Prisma {
 
   export type AccountMinAggregateInputType = {
     id?: true
-    userId?: true
     type?: true
     provider?: true
     providerAccountId?: true
@@ -1208,11 +2444,11 @@ export namespace Prisma {
     session_state?: true
     createdAt?: true
     updatedAt?: true
+    userId?: true
   }
 
   export type AccountMaxAggregateInputType = {
     id?: true
-    userId?: true
     type?: true
     provider?: true
     providerAccountId?: true
@@ -1225,11 +2461,11 @@ export namespace Prisma {
     session_state?: true
     createdAt?: true
     updatedAt?: true
+    userId?: true
   }
 
   export type AccountCountAggregateInputType = {
     id?: true
-    userId?: true
     type?: true
     provider?: true
     providerAccountId?: true
@@ -1242,10 +2478,11 @@ export namespace Prisma {
     session_state?: true
     createdAt?: true
     updatedAt?: true
+    userId?: true
     _all?: true
   }
 
-  export type AccountAggregateArgs = {
+  export type AccountAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Account to aggregate.
      */
@@ -1317,7 +2554,7 @@ export namespace Prisma {
 
 
 
-  export type AccountGroupByArgs = {
+  export type AccountGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     where?: AccountWhereInput
     orderBy?: Enumerable<AccountOrderByWithAggregationInput>
     by: AccountScalarFieldEnum[]
@@ -1334,7 +2571,6 @@ export namespace Prisma {
 
   export type AccountGroupByOutputType = {
     id: string
-    userId: string
     type: string
     provider: string
     providerAccountId: string
@@ -1347,6 +2583,7 @@ export namespace Prisma {
     session_state: string | null
     createdAt: Date
     updatedAt: Date
+    userId: string
     _count: AccountCountAggregateOutputType | null
     _avg: AccountAvgAggregateOutputType | null
     _sum: AccountSumAggregateOutputType | null
@@ -1368,9 +2605,8 @@ export namespace Prisma {
     >
 
 
-  export type AccountSelect = {
+  export type AccountSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    userId?: boolean
     type?: boolean
     provider?: boolean
     providerAccountId?: boolean
@@ -1383,38 +2619,41 @@ export namespace Prisma {
     session_state?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserArgs
+    userId?: boolean
+    user?: boolean | UserArgs<ExtArgs>
+  }, ExtArgs["result"]["account"]>
+
+  export type AccountSelectScalar = {
+    id?: boolean
+    type?: boolean
+    provider?: boolean
+    providerAccountId?: boolean
+    refresh_token?: boolean
+    access_token?: boolean
+    expires_at?: boolean
+    token_type?: boolean
+    scope?: boolean
+    id_token?: boolean
+    session_state?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+  }
+
+  export type AccountInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    user?: boolean | UserArgs<ExtArgs>
   }
 
 
-  export type AccountInclude = {
-    user?: boolean | UserArgs
-  }
+  type AccountGetPayload<S extends boolean | null | undefined | AccountArgs> = $Types.GetResult<AccountPayload, S>
 
-  export type AccountGetPayload<S extends boolean | null | undefined | AccountArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? Account :
-    S extends undefined ? never :
-    S extends { include: any } & (AccountArgs | AccountFindManyArgs)
-    ? Account  & {
-    [P in TruthyKeys<S['include']>]:
-        P extends 'user' ? UserGetPayload<S['include'][P]> :  never
-  } 
-    : S extends { select: any } & (AccountArgs | AccountFindManyArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-        P extends 'user' ? UserGetPayload<S['select'][P]> :  P extends keyof Account ? Account[P] : never
-  } 
-      : Account
-
-
-  type AccountCountArgs = 
+  type AccountCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
     Omit<AccountFindManyArgs, 'select' | 'include'> & {
       select?: AccountCountAggregateInputType | true
     }
 
-  export interface AccountDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
-
+  export interface AccountDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Account'], meta: { name: 'Account' } }
     /**
      * Find zero or one Account that matches the filter.
      * @param {AccountFindUniqueArgs} args - Arguments to find a Account
@@ -1426,9 +2665,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUnique<T extends AccountFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, AccountFindUniqueArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Account'> extends True ? Prisma__AccountClient<AccountGetPayload<T>> : Prisma__AccountClient<AccountGetPayload<T> | null, null>
+    findUnique<T extends AccountFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, AccountFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Account'> extends True ? Prisma__AccountClient<$Types.GetResult<AccountPayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__AccountClient<$Types.GetResult<AccountPayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
 
     /**
      * Find one Account that matches the filter or throw an error  with `error.code='P2025'` 
@@ -1442,9 +2681,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUniqueOrThrow<T extends AccountFindUniqueOrThrowArgs>(
-      args?: SelectSubset<T, AccountFindUniqueOrThrowArgs>
-    ): Prisma__AccountClient<AccountGetPayload<T>>
+    findUniqueOrThrow<T extends AccountFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, AccountFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__AccountClient<$Types.GetResult<AccountPayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
 
     /**
      * Find the first Account that matches the filter.
@@ -1459,9 +2698,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirst<T extends AccountFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, AccountFindFirstArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Account'> extends True ? Prisma__AccountClient<AccountGetPayload<T>> : Prisma__AccountClient<AccountGetPayload<T> | null, null>
+    findFirst<T extends AccountFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, AccountFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Account'> extends True ? Prisma__AccountClient<$Types.GetResult<AccountPayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__AccountClient<$Types.GetResult<AccountPayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
 
     /**
      * Find the first Account that matches the filter or
@@ -1477,9 +2716,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirstOrThrow<T extends AccountFindFirstOrThrowArgs>(
-      args?: SelectSubset<T, AccountFindFirstOrThrowArgs>
-    ): Prisma__AccountClient<AccountGetPayload<T>>
+    findFirstOrThrow<T extends AccountFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, AccountFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__AccountClient<$Types.GetResult<AccountPayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
 
     /**
      * Find zero or more Accounts that matches the filter.
@@ -1497,9 +2736,9 @@ export namespace Prisma {
      * const accountWithIdOnly = await prisma.account.findMany({ select: { id: true } })
      * 
     **/
-    findMany<T extends AccountFindManyArgs>(
-      args?: SelectSubset<T, AccountFindManyArgs>
-    ): Prisma.PrismaPromise<Array<AccountGetPayload<T>>>
+    findMany<T extends AccountFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, AccountFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<AccountPayload<ExtArgs>, T, 'findMany', never>>
 
     /**
      * Create a Account.
@@ -1513,9 +2752,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    create<T extends AccountCreateArgs>(
-      args: SelectSubset<T, AccountCreateArgs>
-    ): Prisma__AccountClient<AccountGetPayload<T>>
+    create<T extends AccountCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, AccountCreateArgs<ExtArgs>>
+    ): Prisma__AccountClient<$Types.GetResult<AccountPayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
 
     /**
      * Create many Accounts.
@@ -1529,8 +2768,8 @@ export namespace Prisma {
      *     })
      *     
     **/
-    createMany<T extends AccountCreateManyArgs>(
-      args?: SelectSubset<T, AccountCreateManyArgs>
+    createMany<T extends AccountCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, AccountCreateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -1545,9 +2784,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    delete<T extends AccountDeleteArgs>(
-      args: SelectSubset<T, AccountDeleteArgs>
-    ): Prisma__AccountClient<AccountGetPayload<T>>
+    delete<T extends AccountDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, AccountDeleteArgs<ExtArgs>>
+    ): Prisma__AccountClient<$Types.GetResult<AccountPayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
 
     /**
      * Update one Account.
@@ -1564,9 +2803,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    update<T extends AccountUpdateArgs>(
-      args: SelectSubset<T, AccountUpdateArgs>
-    ): Prisma__AccountClient<AccountGetPayload<T>>
+    update<T extends AccountUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, AccountUpdateArgs<ExtArgs>>
+    ): Prisma__AccountClient<$Types.GetResult<AccountPayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
 
     /**
      * Delete zero or more Accounts.
@@ -1580,8 +2819,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    deleteMany<T extends AccountDeleteManyArgs>(
-      args?: SelectSubset<T, AccountDeleteManyArgs>
+    deleteMany<T extends AccountDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, AccountDeleteManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -1601,8 +2840,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    updateMany<T extends AccountUpdateManyArgs>(
-      args: SelectSubset<T, AccountUpdateManyArgs>
+    updateMany<T extends AccountUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, AccountUpdateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -1622,9 +2861,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    upsert<T extends AccountUpsertArgs>(
-      args: SelectSubset<T, AccountUpsertArgs>
-    ): Prisma__AccountClient<AccountGetPayload<T>>
+    upsert<T extends AccountUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, AccountUpsertArgs<ExtArgs>>
+    ): Prisma__AccountClient<$Types.GetResult<AccountPayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
 
     /**
      * Count the number of Accounts.
@@ -1642,7 +2881,7 @@ export namespace Prisma {
     count<T extends AccountCountArgs>(
       args?: Subset<T, AccountCountArgs>,
     ): Prisma.PrismaPromise<
-      T extends _Record<'select', any>
+      T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], AccountCountAggregateOutputType>
@@ -1760,7 +2999,7 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__AccountClient<T, Null = never> implements Prisma.PrismaPromise<T> {
+  export class Prisma__AccountClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
     private readonly _dmmf;
     private readonly _queryType;
     private readonly _rootField;
@@ -1775,7 +3014,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: 'PrismaPromise';
     constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
 
-    user<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+    user<T extends UserArgs<ExtArgs> = {}>(args?: Subset<T, UserArgs<ExtArgs>>): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
 
     private get _document();
     /**
@@ -1807,15 +3046,15 @@ export namespace Prisma {
   /**
    * Account base type for findUnique actions
    */
-  export type AccountFindUniqueArgsBase = {
+  export type AccountFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
     /**
      * Filter, which Account to fetch.
      */
@@ -1825,7 +3064,7 @@ export namespace Prisma {
   /**
    * Account findUnique
    */
-  export interface AccountFindUniqueArgs extends AccountFindUniqueArgsBase {
+  export interface AccountFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends AccountFindUniqueArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
@@ -1837,15 +3076,15 @@ export namespace Prisma {
   /**
    * Account findUniqueOrThrow
    */
-  export type AccountFindUniqueOrThrowArgs = {
+  export type AccountFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
     /**
      * Filter, which Account to fetch.
      */
@@ -1856,15 +3095,15 @@ export namespace Prisma {
   /**
    * Account base type for findFirst actions
    */
-  export type AccountFindFirstArgsBase = {
+  export type AccountFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
     /**
      * Filter, which Account to fetch.
      */
@@ -1904,7 +3143,7 @@ export namespace Prisma {
   /**
    * Account findFirst
    */
-  export interface AccountFindFirstArgs extends AccountFindFirstArgsBase {
+  export interface AccountFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends AccountFindFirstArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
@@ -1916,15 +3155,15 @@ export namespace Prisma {
   /**
    * Account findFirstOrThrow
    */
-  export type AccountFindFirstOrThrowArgs = {
+  export type AccountFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
     /**
      * Filter, which Account to fetch.
      */
@@ -1965,15 +3204,15 @@ export namespace Prisma {
   /**
    * Account findMany
    */
-  export type AccountFindManyArgs = {
+  export type AccountFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
     /**
      * Filter, which Accounts to fetch.
      */
@@ -2009,15 +3248,15 @@ export namespace Prisma {
   /**
    * Account create
    */
-  export type AccountCreateArgs = {
+  export type AccountCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
     /**
      * The data needed to create a Account.
      */
@@ -2028,7 +3267,7 @@ export namespace Prisma {
   /**
    * Account createMany
    */
-  export type AccountCreateManyArgs = {
+  export type AccountCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to create many Accounts.
      */
@@ -2040,15 +3279,15 @@ export namespace Prisma {
   /**
    * Account update
    */
-  export type AccountUpdateArgs = {
+  export type AccountUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
     /**
      * The data needed to update a Account.
      */
@@ -2063,7 +3302,7 @@ export namespace Prisma {
   /**
    * Account updateMany
    */
-  export type AccountUpdateManyArgs = {
+  export type AccountUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to update Accounts.
      */
@@ -2078,15 +3317,15 @@ export namespace Prisma {
   /**
    * Account upsert
    */
-  export type AccountUpsertArgs = {
+  export type AccountUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
     /**
      * The filter to search for the Account to update in case it exists.
      */
@@ -2105,15 +3344,15 @@ export namespace Prisma {
   /**
    * Account delete
    */
-  export type AccountDeleteArgs = {
+  export type AccountDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
     /**
      * Filter which Account to delete.
      */
@@ -2124,7 +3363,7 @@ export namespace Prisma {
   /**
    * Account deleteMany
    */
-  export type AccountDeleteManyArgs = {
+  export type AccountDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Accounts to delete
      */
@@ -2135,15 +3374,15 @@ export namespace Prisma {
   /**
    * Account without action
    */
-  export type AccountArgs = {
+  export type AccountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
   }
 
 
@@ -2210,7 +3449,7 @@ export namespace Prisma {
     _all?: true
   }
 
-  export type SessionAggregateArgs = {
+  export type SessionAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Session to aggregate.
      */
@@ -2270,7 +3509,7 @@ export namespace Prisma {
 
 
 
-  export type SessionGroupByArgs = {
+  export type SessionGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     where?: SessionWhereInput
     orderBy?: Enumerable<SessionOrderByWithAggregationInput>
     by: SessionScalarFieldEnum[]
@@ -2308,44 +3547,37 @@ export namespace Prisma {
     >
 
 
-  export type SessionSelect = {
+  export type SessionSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     sessionToken?: boolean
     accessToken?: boolean
     expires?: boolean
     userId?: boolean
-    user?: boolean | UserArgs
+    user?: boolean | Session$userArgs<ExtArgs>
+  }, ExtArgs["result"]["session"]>
+
+  export type SessionSelectScalar = {
+    id?: boolean
+    sessionToken?: boolean
+    accessToken?: boolean
+    expires?: boolean
+    userId?: boolean
+  }
+
+  export type SessionInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    user?: boolean | Session$userArgs<ExtArgs>
   }
 
 
-  export type SessionInclude = {
-    user?: boolean | UserArgs
-  }
+  type SessionGetPayload<S extends boolean | null | undefined | SessionArgs> = $Types.GetResult<SessionPayload, S>
 
-  export type SessionGetPayload<S extends boolean | null | undefined | SessionArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? Session :
-    S extends undefined ? never :
-    S extends { include: any } & (SessionArgs | SessionFindManyArgs)
-    ? Session  & {
-    [P in TruthyKeys<S['include']>]:
-        P extends 'user' ? UserGetPayload<S['include'][P]> | null :  never
-  } 
-    : S extends { select: any } & (SessionArgs | SessionFindManyArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-        P extends 'user' ? UserGetPayload<S['select'][P]> | null :  P extends keyof Session ? Session[P] : never
-  } 
-      : Session
-
-
-  type SessionCountArgs = 
+  type SessionCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
     Omit<SessionFindManyArgs, 'select' | 'include'> & {
       select?: SessionCountAggregateInputType | true
     }
 
-  export interface SessionDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
-
+  export interface SessionDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Session'], meta: { name: 'Session' } }
     /**
      * Find zero or one Session that matches the filter.
      * @param {SessionFindUniqueArgs} args - Arguments to find a Session
@@ -2357,9 +3589,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUnique<T extends SessionFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, SessionFindUniqueArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Session'> extends True ? Prisma__SessionClient<SessionGetPayload<T>> : Prisma__SessionClient<SessionGetPayload<T> | null, null>
+    findUnique<T extends SessionFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, SessionFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Session'> extends True ? Prisma__SessionClient<$Types.GetResult<SessionPayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__SessionClient<$Types.GetResult<SessionPayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
 
     /**
      * Find one Session that matches the filter or throw an error  with `error.code='P2025'` 
@@ -2373,9 +3605,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUniqueOrThrow<T extends SessionFindUniqueOrThrowArgs>(
-      args?: SelectSubset<T, SessionFindUniqueOrThrowArgs>
-    ): Prisma__SessionClient<SessionGetPayload<T>>
+    findUniqueOrThrow<T extends SessionFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, SessionFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__SessionClient<$Types.GetResult<SessionPayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
 
     /**
      * Find the first Session that matches the filter.
@@ -2390,9 +3622,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirst<T extends SessionFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, SessionFindFirstArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Session'> extends True ? Prisma__SessionClient<SessionGetPayload<T>> : Prisma__SessionClient<SessionGetPayload<T> | null, null>
+    findFirst<T extends SessionFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, SessionFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Session'> extends True ? Prisma__SessionClient<$Types.GetResult<SessionPayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__SessionClient<$Types.GetResult<SessionPayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
 
     /**
      * Find the first Session that matches the filter or
@@ -2408,9 +3640,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirstOrThrow<T extends SessionFindFirstOrThrowArgs>(
-      args?: SelectSubset<T, SessionFindFirstOrThrowArgs>
-    ): Prisma__SessionClient<SessionGetPayload<T>>
+    findFirstOrThrow<T extends SessionFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, SessionFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__SessionClient<$Types.GetResult<SessionPayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
 
     /**
      * Find zero or more Sessions that matches the filter.
@@ -2428,9 +3660,9 @@ export namespace Prisma {
      * const sessionWithIdOnly = await prisma.session.findMany({ select: { id: true } })
      * 
     **/
-    findMany<T extends SessionFindManyArgs>(
-      args?: SelectSubset<T, SessionFindManyArgs>
-    ): Prisma.PrismaPromise<Array<SessionGetPayload<T>>>
+    findMany<T extends SessionFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, SessionFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<SessionPayload<ExtArgs>, T, 'findMany', never>>
 
     /**
      * Create a Session.
@@ -2444,9 +3676,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    create<T extends SessionCreateArgs>(
-      args: SelectSubset<T, SessionCreateArgs>
-    ): Prisma__SessionClient<SessionGetPayload<T>>
+    create<T extends SessionCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, SessionCreateArgs<ExtArgs>>
+    ): Prisma__SessionClient<$Types.GetResult<SessionPayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
 
     /**
      * Create many Sessions.
@@ -2460,8 +3692,8 @@ export namespace Prisma {
      *     })
      *     
     **/
-    createMany<T extends SessionCreateManyArgs>(
-      args?: SelectSubset<T, SessionCreateManyArgs>
+    createMany<T extends SessionCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, SessionCreateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -2476,9 +3708,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    delete<T extends SessionDeleteArgs>(
-      args: SelectSubset<T, SessionDeleteArgs>
-    ): Prisma__SessionClient<SessionGetPayload<T>>
+    delete<T extends SessionDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, SessionDeleteArgs<ExtArgs>>
+    ): Prisma__SessionClient<$Types.GetResult<SessionPayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
 
     /**
      * Update one Session.
@@ -2495,9 +3727,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    update<T extends SessionUpdateArgs>(
-      args: SelectSubset<T, SessionUpdateArgs>
-    ): Prisma__SessionClient<SessionGetPayload<T>>
+    update<T extends SessionUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, SessionUpdateArgs<ExtArgs>>
+    ): Prisma__SessionClient<$Types.GetResult<SessionPayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
 
     /**
      * Delete zero or more Sessions.
@@ -2511,8 +3743,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    deleteMany<T extends SessionDeleteManyArgs>(
-      args?: SelectSubset<T, SessionDeleteManyArgs>
+    deleteMany<T extends SessionDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, SessionDeleteManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -2532,8 +3764,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    updateMany<T extends SessionUpdateManyArgs>(
-      args: SelectSubset<T, SessionUpdateManyArgs>
+    updateMany<T extends SessionUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, SessionUpdateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -2553,9 +3785,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    upsert<T extends SessionUpsertArgs>(
-      args: SelectSubset<T, SessionUpsertArgs>
-    ): Prisma__SessionClient<SessionGetPayload<T>>
+    upsert<T extends SessionUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, SessionUpsertArgs<ExtArgs>>
+    ): Prisma__SessionClient<$Types.GetResult<SessionPayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
 
     /**
      * Count the number of Sessions.
@@ -2573,7 +3805,7 @@ export namespace Prisma {
     count<T extends SessionCountArgs>(
       args?: Subset<T, SessionCountArgs>,
     ): Prisma.PrismaPromise<
-      T extends _Record<'select', any>
+      T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], SessionCountAggregateOutputType>
@@ -2691,7 +3923,7 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__SessionClient<T, Null = never> implements Prisma.PrismaPromise<T> {
+  export class Prisma__SessionClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
     private readonly _dmmf;
     private readonly _queryType;
     private readonly _rootField;
@@ -2706,7 +3938,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: 'PrismaPromise';
     constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
 
-    user<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+    user<T extends Session$userArgs<ExtArgs> = {}>(args?: Subset<T, Session$userArgs<ExtArgs>>): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
 
     private get _document();
     /**
@@ -2738,15 +3970,15 @@ export namespace Prisma {
   /**
    * Session base type for findUnique actions
    */
-  export type SessionFindUniqueArgsBase = {
+  export type SessionFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Session
      */
-    select?: SessionSelect | null
+    select?: SessionSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: SessionInclude<ExtArgs> | null
     /**
      * Filter, which Session to fetch.
      */
@@ -2756,7 +3988,7 @@ export namespace Prisma {
   /**
    * Session findUnique
    */
-  export interface SessionFindUniqueArgs extends SessionFindUniqueArgsBase {
+  export interface SessionFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends SessionFindUniqueArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
@@ -2768,15 +4000,15 @@ export namespace Prisma {
   /**
    * Session findUniqueOrThrow
    */
-  export type SessionFindUniqueOrThrowArgs = {
+  export type SessionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Session
      */
-    select?: SessionSelect | null
+    select?: SessionSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: SessionInclude<ExtArgs> | null
     /**
      * Filter, which Session to fetch.
      */
@@ -2787,15 +4019,15 @@ export namespace Prisma {
   /**
    * Session base type for findFirst actions
    */
-  export type SessionFindFirstArgsBase = {
+  export type SessionFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Session
      */
-    select?: SessionSelect | null
+    select?: SessionSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: SessionInclude<ExtArgs> | null
     /**
      * Filter, which Session to fetch.
      */
@@ -2835,7 +4067,7 @@ export namespace Prisma {
   /**
    * Session findFirst
    */
-  export interface SessionFindFirstArgs extends SessionFindFirstArgsBase {
+  export interface SessionFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends SessionFindFirstArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
@@ -2847,15 +4079,15 @@ export namespace Prisma {
   /**
    * Session findFirstOrThrow
    */
-  export type SessionFindFirstOrThrowArgs = {
+  export type SessionFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Session
      */
-    select?: SessionSelect | null
+    select?: SessionSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: SessionInclude<ExtArgs> | null
     /**
      * Filter, which Session to fetch.
      */
@@ -2896,15 +4128,15 @@ export namespace Prisma {
   /**
    * Session findMany
    */
-  export type SessionFindManyArgs = {
+  export type SessionFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Session
      */
-    select?: SessionSelect | null
+    select?: SessionSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: SessionInclude<ExtArgs> | null
     /**
      * Filter, which Sessions to fetch.
      */
@@ -2940,15 +4172,15 @@ export namespace Prisma {
   /**
    * Session create
    */
-  export type SessionCreateArgs = {
+  export type SessionCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Session
      */
-    select?: SessionSelect | null
+    select?: SessionSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: SessionInclude<ExtArgs> | null
     /**
      * The data needed to create a Session.
      */
@@ -2959,7 +4191,7 @@ export namespace Prisma {
   /**
    * Session createMany
    */
-  export type SessionCreateManyArgs = {
+  export type SessionCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to create many Sessions.
      */
@@ -2971,15 +4203,15 @@ export namespace Prisma {
   /**
    * Session update
    */
-  export type SessionUpdateArgs = {
+  export type SessionUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Session
      */
-    select?: SessionSelect | null
+    select?: SessionSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: SessionInclude<ExtArgs> | null
     /**
      * The data needed to update a Session.
      */
@@ -2994,7 +4226,7 @@ export namespace Prisma {
   /**
    * Session updateMany
    */
-  export type SessionUpdateManyArgs = {
+  export type SessionUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to update Sessions.
      */
@@ -3009,15 +4241,15 @@ export namespace Prisma {
   /**
    * Session upsert
    */
-  export type SessionUpsertArgs = {
+  export type SessionUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Session
      */
-    select?: SessionSelect | null
+    select?: SessionSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: SessionInclude<ExtArgs> | null
     /**
      * The filter to search for the Session to update in case it exists.
      */
@@ -3036,15 +4268,15 @@ export namespace Prisma {
   /**
    * Session delete
    */
-  export type SessionDeleteArgs = {
+  export type SessionDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Session
      */
-    select?: SessionSelect | null
+    select?: SessionSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: SessionInclude<ExtArgs> | null
     /**
      * Filter which Session to delete.
      */
@@ -3055,7 +4287,7 @@ export namespace Prisma {
   /**
    * Session deleteMany
    */
-  export type SessionDeleteManyArgs = {
+  export type SessionDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Sessions to delete
      */
@@ -3064,17 +4296,33 @@ export namespace Prisma {
 
 
   /**
-   * Session without action
+   * Session.user
    */
-  export type SessionArgs = {
+  export type Session$userArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Session
+     * Select specific fields to fetch from the User
      */
-    select?: SessionSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+
+  /**
+   * Session without action
+   */
+  export type SessionArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Session
+     */
+    select?: SessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: SessionInclude<ExtArgs> | null
   }
 
 
@@ -3165,7 +4413,7 @@ export namespace Prisma {
     _all?: true
   }
 
-  export type UserAggregateArgs = {
+  export type UserAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which User to aggregate.
      */
@@ -3225,7 +4473,7 @@ export namespace Prisma {
 
 
 
-  export type UserGroupByArgs = {
+  export type UserGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     where?: UserWhereInput
     orderBy?: Enumerable<UserOrderByWithAggregationInput>
     by: UserScalarFieldEnum[]
@@ -3267,7 +4515,7 @@ export namespace Prisma {
     >
 
 
-  export type UserSelect = {
+  export type UserSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
     email?: boolean
@@ -3277,66 +4525,55 @@ export namespace Prisma {
     updatedAt?: boolean
     stripeCustomerId?: boolean
     lastAccessWorkspaceId?: boolean
-    accounts?: boolean | User$accountsArgs
-    sessions?: boolean | User$sessionsArgs
-    workspaces?: boolean | User$workspacesArgs
-    trackingUserAccess?: boolean | User$trackingUserAccessArgs
-    lastAccessWorkspace?: boolean | WorkspaceArgs
-    pagesUserUpdated?: boolean | PageArgs
-    pagesUserDeleted?: boolean | PageArgs
-    _count?: boolean | UserCountOutputTypeArgs
+    accounts?: boolean | User$accountsArgs<ExtArgs>
+    sessions?: boolean | User$sessionsArgs<ExtArgs>
+    userOnWorkspace?: boolean | User$userOnWorkspaceArgs<ExtArgs>
+    userOnTeamspace?: boolean | User$userOnTeamspaceArgs<ExtArgs>
+    trackingUserAccess?: boolean | User$trackingUserAccessArgs<ExtArgs>
+    favorites?: boolean | User$favoritesArgs<ExtArgs>
+    notebooks?: boolean | User$notebooksArgs<ExtArgs>
+    PagesCreated?: boolean | User$PagesCreatedArgs<ExtArgs>
+    PagesUpdated?: boolean | User$PagesUpdatedArgs<ExtArgs>
+    PagesDeleted?: boolean | User$PagesDeletedArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeArgs<ExtArgs>
+  }, ExtArgs["result"]["user"]>
+
+  export type UserSelectScalar = {
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    emailVerified?: boolean
+    image?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    stripeCustomerId?: boolean
+    lastAccessWorkspaceId?: boolean
+  }
+
+  export type UserInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    accounts?: boolean | User$accountsArgs<ExtArgs>
+    sessions?: boolean | User$sessionsArgs<ExtArgs>
+    userOnWorkspace?: boolean | User$userOnWorkspaceArgs<ExtArgs>
+    userOnTeamspace?: boolean | User$userOnTeamspaceArgs<ExtArgs>
+    trackingUserAccess?: boolean | User$trackingUserAccessArgs<ExtArgs>
+    favorites?: boolean | User$favoritesArgs<ExtArgs>
+    notebooks?: boolean | User$notebooksArgs<ExtArgs>
+    PagesCreated?: boolean | User$PagesCreatedArgs<ExtArgs>
+    PagesUpdated?: boolean | User$PagesUpdatedArgs<ExtArgs>
+    PagesDeleted?: boolean | User$PagesDeletedArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeArgs<ExtArgs>
   }
 
 
-  export type UserInclude = {
-    accounts?: boolean | User$accountsArgs
-    sessions?: boolean | User$sessionsArgs
-    workspaces?: boolean | User$workspacesArgs
-    trackingUserAccess?: boolean | User$trackingUserAccessArgs
-    lastAccessWorkspace?: boolean | WorkspaceArgs
-    pagesUserUpdated?: boolean | PageArgs
-    pagesUserDeleted?: boolean | PageArgs
-    _count?: boolean | UserCountOutputTypeArgs
-  }
+  type UserGetPayload<S extends boolean | null | undefined | UserArgs> = $Types.GetResult<UserPayload, S>
 
-  export type UserGetPayload<S extends boolean | null | undefined | UserArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? User :
-    S extends undefined ? never :
-    S extends { include: any } & (UserArgs | UserFindManyArgs)
-    ? User  & {
-    [P in TruthyKeys<S['include']>]:
-        P extends 'accounts' ? Array < AccountGetPayload<S['include'][P]>>  :
-        P extends 'sessions' ? Array < SessionGetPayload<S['include'][P]>>  :
-        P extends 'workspaces' ? Array < WorkspaceGetPayload<S['include'][P]>>  :
-        P extends 'trackingUserAccess' ? Array < TrackingUserAccessGetPayload<S['include'][P]>>  :
-        P extends 'lastAccessWorkspace' ? WorkspaceGetPayload<S['include'][P]> | null :
-        P extends 'pagesUserUpdated' ? PageGetPayload<S['include'][P]> | null :
-        P extends 'pagesUserDeleted' ? PageGetPayload<S['include'][P]> | null :
-        P extends '_count' ? UserCountOutputTypeGetPayload<S['include'][P]> :  never
-  } 
-    : S extends { select: any } & (UserArgs | UserFindManyArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-        P extends 'accounts' ? Array < AccountGetPayload<S['select'][P]>>  :
-        P extends 'sessions' ? Array < SessionGetPayload<S['select'][P]>>  :
-        P extends 'workspaces' ? Array < WorkspaceGetPayload<S['select'][P]>>  :
-        P extends 'trackingUserAccess' ? Array < TrackingUserAccessGetPayload<S['select'][P]>>  :
-        P extends 'lastAccessWorkspace' ? WorkspaceGetPayload<S['select'][P]> | null :
-        P extends 'pagesUserUpdated' ? PageGetPayload<S['select'][P]> | null :
-        P extends 'pagesUserDeleted' ? PageGetPayload<S['select'][P]> | null :
-        P extends '_count' ? UserCountOutputTypeGetPayload<S['select'][P]> :  P extends keyof User ? User[P] : never
-  } 
-      : User
-
-
-  type UserCountArgs = 
+  type UserCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
     Omit<UserFindManyArgs, 'select' | 'include'> & {
       select?: UserCountAggregateInputType | true
     }
 
-  export interface UserDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
-
+  export interface UserDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['User'], meta: { name: 'User' } }
     /**
      * Find zero or one User that matches the filter.
      * @param {UserFindUniqueArgs} args - Arguments to find a User
@@ -3348,9 +4585,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUnique<T extends UserFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, UserFindUniqueArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'User'> extends True ? Prisma__UserClient<UserGetPayload<T>> : Prisma__UserClient<UserGetPayload<T> | null, null>
+    findUnique<T extends UserFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, UserFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'User'> extends True ? Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
 
     /**
      * Find one User that matches the filter or throw an error  with `error.code='P2025'` 
@@ -3364,9 +4601,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUniqueOrThrow<T extends UserFindUniqueOrThrowArgs>(
-      args?: SelectSubset<T, UserFindUniqueOrThrowArgs>
-    ): Prisma__UserClient<UserGetPayload<T>>
+    findUniqueOrThrow<T extends UserFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
 
     /**
      * Find the first User that matches the filter.
@@ -3381,9 +4618,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirst<T extends UserFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, UserFindFirstArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'User'> extends True ? Prisma__UserClient<UserGetPayload<T>> : Prisma__UserClient<UserGetPayload<T> | null, null>
+    findFirst<T extends UserFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, UserFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'User'> extends True ? Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
 
     /**
      * Find the first User that matches the filter or
@@ -3399,9 +4636,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirstOrThrow<T extends UserFindFirstOrThrowArgs>(
-      args?: SelectSubset<T, UserFindFirstOrThrowArgs>
-    ): Prisma__UserClient<UserGetPayload<T>>
+    findFirstOrThrow<T extends UserFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
 
     /**
      * Find zero or more Users that matches the filter.
@@ -3419,9 +4656,9 @@ export namespace Prisma {
      * const userWithIdOnly = await prisma.user.findMany({ select: { id: true } })
      * 
     **/
-    findMany<T extends UserFindManyArgs>(
-      args?: SelectSubset<T, UserFindManyArgs>
-    ): Prisma.PrismaPromise<Array<UserGetPayload<T>>>
+    findMany<T extends UserFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<UserPayload<ExtArgs>, T, 'findMany', never>>
 
     /**
      * Create a User.
@@ -3435,9 +4672,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    create<T extends UserCreateArgs>(
-      args: SelectSubset<T, UserCreateArgs>
-    ): Prisma__UserClient<UserGetPayload<T>>
+    create<T extends UserCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, UserCreateArgs<ExtArgs>>
+    ): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
 
     /**
      * Create many Users.
@@ -3451,8 +4688,8 @@ export namespace Prisma {
      *     })
      *     
     **/
-    createMany<T extends UserCreateManyArgs>(
-      args?: SelectSubset<T, UserCreateManyArgs>
+    createMany<T extends UserCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserCreateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -3467,9 +4704,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    delete<T extends UserDeleteArgs>(
-      args: SelectSubset<T, UserDeleteArgs>
-    ): Prisma__UserClient<UserGetPayload<T>>
+    delete<T extends UserDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, UserDeleteArgs<ExtArgs>>
+    ): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
 
     /**
      * Update one User.
@@ -3486,9 +4723,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    update<T extends UserUpdateArgs>(
-      args: SelectSubset<T, UserUpdateArgs>
-    ): Prisma__UserClient<UserGetPayload<T>>
+    update<T extends UserUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, UserUpdateArgs<ExtArgs>>
+    ): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
 
     /**
      * Delete zero or more Users.
@@ -3502,8 +4739,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    deleteMany<T extends UserDeleteManyArgs>(
-      args?: SelectSubset<T, UserDeleteManyArgs>
+    deleteMany<T extends UserDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserDeleteManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -3523,8 +4760,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    updateMany<T extends UserUpdateManyArgs>(
-      args: SelectSubset<T, UserUpdateManyArgs>
+    updateMany<T extends UserUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, UserUpdateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -3544,9 +4781,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    upsert<T extends UserUpsertArgs>(
-      args: SelectSubset<T, UserUpsertArgs>
-    ): Prisma__UserClient<UserGetPayload<T>>
+    upsert<T extends UserUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, UserUpsertArgs<ExtArgs>>
+    ): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
 
     /**
      * Count the number of Users.
@@ -3564,7 +4801,7 @@ export namespace Prisma {
     count<T extends UserCountArgs>(
       args?: Subset<T, UserCountArgs>,
     ): Prisma.PrismaPromise<
-      T extends _Record<'select', any>
+      T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], UserCountAggregateOutputType>
@@ -3682,7 +4919,7 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__UserClient<T, Null = never> implements Prisma.PrismaPromise<T> {
+  export class Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
     private readonly _dmmf;
     private readonly _queryType;
     private readonly _rootField;
@@ -3697,19 +4934,25 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: 'PrismaPromise';
     constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
 
-    accounts<T extends User$accountsArgs= {}>(args?: Subset<T, User$accountsArgs>): Prisma.PrismaPromise<Array<AccountGetPayload<T>>| Null>;
+    accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<AccountPayload<ExtArgs>, T, 'findMany', never>| Null>;
 
-    sessions<T extends User$sessionsArgs= {}>(args?: Subset<T, User$sessionsArgs>): Prisma.PrismaPromise<Array<SessionGetPayload<T>>| Null>;
+    sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<SessionPayload<ExtArgs>, T, 'findMany', never>| Null>;
 
-    workspaces<T extends User$workspacesArgs= {}>(args?: Subset<T, User$workspacesArgs>): Prisma.PrismaPromise<Array<WorkspaceGetPayload<T>>| Null>;
+    userOnWorkspace<T extends User$userOnWorkspaceArgs<ExtArgs> = {}>(args?: Subset<T, User$userOnWorkspaceArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'findMany', never>| Null>;
 
-    trackingUserAccess<T extends User$trackingUserAccessArgs= {}>(args?: Subset<T, User$trackingUserAccessArgs>): Prisma.PrismaPromise<Array<TrackingUserAccessGetPayload<T>>| Null>;
+    userOnTeamspace<T extends User$userOnTeamspaceArgs<ExtArgs> = {}>(args?: Subset<T, User$userOnTeamspaceArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'findMany', never>| Null>;
 
-    lastAccessWorkspace<T extends WorkspaceArgs= {}>(args?: Subset<T, WorkspaceArgs>): Prisma__WorkspaceClient<WorkspaceGetPayload<T> | Null>;
+    trackingUserAccess<T extends User$trackingUserAccessArgs<ExtArgs> = {}>(args?: Subset<T, User$trackingUserAccessArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'findMany', never>| Null>;
 
-    pagesUserUpdated<T extends PageArgs= {}>(args?: Subset<T, PageArgs>): Prisma__PageClient<PageGetPayload<T> | Null>;
+    favorites<T extends User$favoritesArgs<ExtArgs> = {}>(args?: Subset<T, User$favoritesArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'findMany', never>| Null>;
 
-    pagesUserDeleted<T extends PageArgs= {}>(args?: Subset<T, PageArgs>): Prisma__PageClient<PageGetPayload<T> | Null>;
+    notebooks<T extends User$notebooksArgs<ExtArgs> = {}>(args?: Subset<T, User$notebooksArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findMany', never>| Null>;
+
+    PagesCreated<T extends User$PagesCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$PagesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<PagePayload<ExtArgs>, T, 'findMany', never>| Null>;
+
+    PagesUpdated<T extends User$PagesUpdatedArgs<ExtArgs> = {}>(args?: Subset<T, User$PagesUpdatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<PagePayload<ExtArgs>, T, 'findMany', never>| Null>;
+
+    PagesDeleted<T extends User$PagesDeletedArgs<ExtArgs> = {}>(args?: Subset<T, User$PagesDeletedArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<PagePayload<ExtArgs>, T, 'findMany', never>| Null>;
 
     private get _document();
     /**
@@ -3741,15 +4984,15 @@ export namespace Prisma {
   /**
    * User base type for findUnique actions
    */
-  export type UserFindUniqueArgsBase = {
+  export type UserFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
-    select?: UserSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -3759,7 +5002,7 @@ export namespace Prisma {
   /**
    * User findUnique
    */
-  export interface UserFindUniqueArgs extends UserFindUniqueArgsBase {
+  export interface UserFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends UserFindUniqueArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
@@ -3771,15 +5014,15 @@ export namespace Prisma {
   /**
    * User findUniqueOrThrow
    */
-  export type UserFindUniqueOrThrowArgs = {
+  export type UserFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
-    select?: UserSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -3790,15 +5033,15 @@ export namespace Prisma {
   /**
    * User base type for findFirst actions
    */
-  export type UserFindFirstArgsBase = {
+  export type UserFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
-    select?: UserSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -3838,7 +5081,7 @@ export namespace Prisma {
   /**
    * User findFirst
    */
-  export interface UserFindFirstArgs extends UserFindFirstArgsBase {
+  export interface UserFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends UserFindFirstArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
@@ -3850,15 +5093,15 @@ export namespace Prisma {
   /**
    * User findFirstOrThrow
    */
-  export type UserFindFirstOrThrowArgs = {
+  export type UserFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
-    select?: UserSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -3899,15 +5142,15 @@ export namespace Prisma {
   /**
    * User findMany
    */
-  export type UserFindManyArgs = {
+  export type UserFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
-    select?: UserSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which Users to fetch.
      */
@@ -3943,26 +5186,26 @@ export namespace Prisma {
   /**
    * User create
    */
-  export type UserCreateArgs = {
+  export type UserCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
-    select?: UserSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
+    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to create a User.
      */
-    data: XOR<UserCreateInput, UserUncheckedCreateInput>
+    data?: XOR<UserCreateInput, UserUncheckedCreateInput>
   }
 
 
   /**
    * User createMany
    */
-  export type UserCreateManyArgs = {
+  export type UserCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to create many Users.
      */
@@ -3974,15 +5217,15 @@ export namespace Prisma {
   /**
    * User update
    */
-  export type UserUpdateArgs = {
+  export type UserUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
-    select?: UserSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
+    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to update a User.
      */
@@ -3997,7 +5240,7 @@ export namespace Prisma {
   /**
    * User updateMany
    */
-  export type UserUpdateManyArgs = {
+  export type UserUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to update Users.
      */
@@ -4012,15 +5255,15 @@ export namespace Prisma {
   /**
    * User upsert
    */
-  export type UserUpsertArgs = {
+  export type UserUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
-    select?: UserSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
+    include?: UserInclude<ExtArgs> | null
     /**
      * The filter to search for the User to update in case it exists.
      */
@@ -4039,15 +5282,15 @@ export namespace Prisma {
   /**
    * User delete
    */
-  export type UserDeleteArgs = {
+  export type UserDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
-    select?: UserSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter which User to delete.
      */
@@ -4058,7 +5301,7 @@ export namespace Prisma {
   /**
    * User deleteMany
    */
-  export type UserDeleteManyArgs = {
+  export type UserDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Users to delete
      */
@@ -4069,15 +5312,15 @@ export namespace Prisma {
   /**
    * User.accounts
    */
-  export type User$accountsArgs = {
+  export type User$accountsArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Account
      */
-    select?: AccountSelect | null
+    select?: AccountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: AccountInclude | null
+    include?: AccountInclude<ExtArgs> | null
     where?: AccountWhereInput
     orderBy?: Enumerable<AccountOrderByWithRelationInput>
     cursor?: AccountWhereUniqueInput
@@ -4090,15 +5333,15 @@ export namespace Prisma {
   /**
    * User.sessions
    */
-  export type User$sessionsArgs = {
+  export type User$sessionsArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Session
      */
-    select?: SessionSelect | null
+    select?: SessionSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: SessionInclude | null
+    include?: SessionInclude<ExtArgs> | null
     where?: SessionWhereInput
     orderBy?: Enumerable<SessionOrderByWithRelationInput>
     cursor?: SessionWhereUniqueInput
@@ -4109,59 +5352,185 @@ export namespace Prisma {
 
 
   /**
-   * User.workspaces
+   * User.userOnWorkspace
    */
-  export type User$workspacesArgs = {
+  export type User$userOnWorkspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Workspace
+     * Select specific fields to fetch from the UserOnWorkspace
      */
-    select?: WorkspaceSelect | null
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
-    where?: WorkspaceWhereInput
-    orderBy?: Enumerable<WorkspaceOrderByWithRelationInput>
-    cursor?: WorkspaceWhereUniqueInput
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    where?: UserOnWorkspaceWhereInput
+    orderBy?: Enumerable<UserOnWorkspaceOrderByWithRelationInput>
+    cursor?: UserOnWorkspaceWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: Enumerable<WorkspaceScalarFieldEnum>
+    distinct?: Enumerable<UserOnWorkspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * User.userOnTeamspace
+   */
+  export type User$userOnTeamspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    where?: UserOnTeamspaceWhereInput
+    orderBy?: Enumerable<UserOnTeamspaceOrderByWithRelationInput>
+    cursor?: UserOnTeamspaceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<UserOnTeamspaceScalarFieldEnum>
   }
 
 
   /**
    * User.trackingUserAccess
    */
-  export type User$trackingUserAccessArgs = {
+  export type User$trackingUserAccessArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
-    where?: TrackingUserAccessWhereInput
-    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
-    cursor?: TrackingUserAccessWhereUniqueInput
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
+    where?: TrackingUserAccessOnWorkspaceWhereInput
+    orderBy?: Enumerable<TrackingUserAccessOnWorkspaceOrderByWithRelationInput>
+    cursor?: TrackingUserAccessOnWorkspaceWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: Enumerable<TrackingUserAccessScalarFieldEnum>
+    distinct?: Enumerable<TrackingUserAccessOnWorkspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * User.favorites
+   */
+  export type User$favoritesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    where?: FavoriteWhereInput
+    orderBy?: Enumerable<FavoriteOrderByWithRelationInput>
+    cursor?: FavoriteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<FavoriteScalarFieldEnum>
+  }
+
+
+  /**
+   * User.notebooks
+   */
+  export type User$notebooksArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notebook
+     */
+    select?: NotebookSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: NotebookInclude<ExtArgs> | null
+    where?: NotebookWhereInput
+    orderBy?: Enumerable<NotebookOrderByWithRelationInput>
+    cursor?: NotebookWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<NotebookScalarFieldEnum>
+  }
+
+
+  /**
+   * User.PagesCreated
+   */
+  export type User$PagesCreatedArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Page
+     */
+    select?: PageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: PageInclude<ExtArgs> | null
+    where?: PageWhereInput
+    orderBy?: Enumerable<PageOrderByWithRelationInput>
+    cursor?: PageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<PageScalarFieldEnum>
+  }
+
+
+  /**
+   * User.PagesUpdated
+   */
+  export type User$PagesUpdatedArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Page
+     */
+    select?: PageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: PageInclude<ExtArgs> | null
+    where?: PageWhereInput
+    orderBy?: Enumerable<PageOrderByWithRelationInput>
+    cursor?: PageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<PageScalarFieldEnum>
+  }
+
+
+  /**
+   * User.PagesDeleted
+   */
+  export type User$PagesDeletedArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Page
+     */
+    select?: PageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: PageInclude<ExtArgs> | null
+    where?: PageWhereInput
+    orderBy?: Enumerable<PageOrderByWithRelationInput>
+    cursor?: PageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<PageScalarFieldEnum>
   }
 
 
   /**
    * User without action
    */
-  export type UserArgs = {
+  export type UserArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
-    select?: UserSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
+    include?: UserInclude<ExtArgs> | null
   }
 
 
@@ -4234,7 +5603,7 @@ export namespace Prisma {
     _all?: true
   }
 
-  export type VerificationTokenAggregateArgs = {
+  export type VerificationTokenAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which VerificationToken to aggregate.
      */
@@ -4294,7 +5663,7 @@ export namespace Prisma {
 
 
 
-  export type VerificationTokenGroupByArgs = {
+  export type VerificationTokenGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     where?: VerificationTokenWhereInput
     orderBy?: Enumerable<VerificationTokenOrderByWithAggregationInput>
     by: VerificationTokenScalarFieldEnum[]
@@ -4333,7 +5702,16 @@ export namespace Prisma {
     >
 
 
-  export type VerificationTokenSelect = {
+  export type VerificationTokenSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    identifier?: boolean
+    token?: boolean
+    expires?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["verificationToken"]>
+
+  export type VerificationTokenSelectScalar = {
     id?: boolean
     identifier?: boolean
     token?: boolean
@@ -4343,27 +5721,15 @@ export namespace Prisma {
   }
 
 
-  export type VerificationTokenGetPayload<S extends boolean | null | undefined | VerificationTokenArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? VerificationToken :
-    S extends undefined ? never :
-    S extends { include: any } & (VerificationTokenArgs | VerificationTokenFindManyArgs)
-    ? VerificationToken 
-    : S extends { select: any } & (VerificationTokenArgs | VerificationTokenFindManyArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-    P extends keyof VerificationToken ? VerificationToken[P] : never
-  } 
-      : VerificationToken
+  type VerificationTokenGetPayload<S extends boolean | null | undefined | VerificationTokenArgs> = $Types.GetResult<VerificationTokenPayload, S>
 
-
-  type VerificationTokenCountArgs = 
+  type VerificationTokenCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
     Omit<VerificationTokenFindManyArgs, 'select' | 'include'> & {
       select?: VerificationTokenCountAggregateInputType | true
     }
 
-  export interface VerificationTokenDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
-
+  export interface VerificationTokenDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['VerificationToken'], meta: { name: 'VerificationToken' } }
     /**
      * Find zero or one VerificationToken that matches the filter.
      * @param {VerificationTokenFindUniqueArgs} args - Arguments to find a VerificationToken
@@ -4375,9 +5741,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUnique<T extends VerificationTokenFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, VerificationTokenFindUniqueArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'VerificationToken'> extends True ? Prisma__VerificationTokenClient<VerificationTokenGetPayload<T>> : Prisma__VerificationTokenClient<VerificationTokenGetPayload<T> | null, null>
+    findUnique<T extends VerificationTokenFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, VerificationTokenFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'VerificationToken'> extends True ? Prisma__VerificationTokenClient<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__VerificationTokenClient<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
 
     /**
      * Find one VerificationToken that matches the filter or throw an error  with `error.code='P2025'` 
@@ -4391,9 +5757,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUniqueOrThrow<T extends VerificationTokenFindUniqueOrThrowArgs>(
-      args?: SelectSubset<T, VerificationTokenFindUniqueOrThrowArgs>
-    ): Prisma__VerificationTokenClient<VerificationTokenGetPayload<T>>
+    findUniqueOrThrow<T extends VerificationTokenFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, VerificationTokenFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__VerificationTokenClient<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
 
     /**
      * Find the first VerificationToken that matches the filter.
@@ -4408,9 +5774,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirst<T extends VerificationTokenFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, VerificationTokenFindFirstArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'VerificationToken'> extends True ? Prisma__VerificationTokenClient<VerificationTokenGetPayload<T>> : Prisma__VerificationTokenClient<VerificationTokenGetPayload<T> | null, null>
+    findFirst<T extends VerificationTokenFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, VerificationTokenFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'VerificationToken'> extends True ? Prisma__VerificationTokenClient<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__VerificationTokenClient<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
 
     /**
      * Find the first VerificationToken that matches the filter or
@@ -4426,9 +5792,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirstOrThrow<T extends VerificationTokenFindFirstOrThrowArgs>(
-      args?: SelectSubset<T, VerificationTokenFindFirstOrThrowArgs>
-    ): Prisma__VerificationTokenClient<VerificationTokenGetPayload<T>>
+    findFirstOrThrow<T extends VerificationTokenFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, VerificationTokenFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__VerificationTokenClient<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
 
     /**
      * Find zero or more VerificationTokens that matches the filter.
@@ -4446,9 +5812,9 @@ export namespace Prisma {
      * const verificationTokenWithIdOnly = await prisma.verificationToken.findMany({ select: { id: true } })
      * 
     **/
-    findMany<T extends VerificationTokenFindManyArgs>(
-      args?: SelectSubset<T, VerificationTokenFindManyArgs>
-    ): Prisma.PrismaPromise<Array<VerificationTokenGetPayload<T>>>
+    findMany<T extends VerificationTokenFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, VerificationTokenFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'findMany', never>>
 
     /**
      * Create a VerificationToken.
@@ -4462,9 +5828,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    create<T extends VerificationTokenCreateArgs>(
-      args: SelectSubset<T, VerificationTokenCreateArgs>
-    ): Prisma__VerificationTokenClient<VerificationTokenGetPayload<T>>
+    create<T extends VerificationTokenCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, VerificationTokenCreateArgs<ExtArgs>>
+    ): Prisma__VerificationTokenClient<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
 
     /**
      * Create many VerificationTokens.
@@ -4478,8 +5844,8 @@ export namespace Prisma {
      *     })
      *     
     **/
-    createMany<T extends VerificationTokenCreateManyArgs>(
-      args?: SelectSubset<T, VerificationTokenCreateManyArgs>
+    createMany<T extends VerificationTokenCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, VerificationTokenCreateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -4494,9 +5860,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    delete<T extends VerificationTokenDeleteArgs>(
-      args: SelectSubset<T, VerificationTokenDeleteArgs>
-    ): Prisma__VerificationTokenClient<VerificationTokenGetPayload<T>>
+    delete<T extends VerificationTokenDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, VerificationTokenDeleteArgs<ExtArgs>>
+    ): Prisma__VerificationTokenClient<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
 
     /**
      * Update one VerificationToken.
@@ -4513,9 +5879,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    update<T extends VerificationTokenUpdateArgs>(
-      args: SelectSubset<T, VerificationTokenUpdateArgs>
-    ): Prisma__VerificationTokenClient<VerificationTokenGetPayload<T>>
+    update<T extends VerificationTokenUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, VerificationTokenUpdateArgs<ExtArgs>>
+    ): Prisma__VerificationTokenClient<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
 
     /**
      * Delete zero or more VerificationTokens.
@@ -4529,8 +5895,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    deleteMany<T extends VerificationTokenDeleteManyArgs>(
-      args?: SelectSubset<T, VerificationTokenDeleteManyArgs>
+    deleteMany<T extends VerificationTokenDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, VerificationTokenDeleteManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -4550,8 +5916,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    updateMany<T extends VerificationTokenUpdateManyArgs>(
-      args: SelectSubset<T, VerificationTokenUpdateManyArgs>
+    updateMany<T extends VerificationTokenUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, VerificationTokenUpdateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -4571,9 +5937,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    upsert<T extends VerificationTokenUpsertArgs>(
-      args: SelectSubset<T, VerificationTokenUpsertArgs>
-    ): Prisma__VerificationTokenClient<VerificationTokenGetPayload<T>>
+    upsert<T extends VerificationTokenUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, VerificationTokenUpsertArgs<ExtArgs>>
+    ): Prisma__VerificationTokenClient<$Types.GetResult<VerificationTokenPayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
 
     /**
      * Count the number of VerificationTokens.
@@ -4591,7 +5957,7 @@ export namespace Prisma {
     count<T extends VerificationTokenCountArgs>(
       args?: Subset<T, VerificationTokenCountArgs>,
     ): Prisma.PrismaPromise<
-      T extends _Record<'select', any>
+      T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], VerificationTokenCountAggregateOutputType>
@@ -4709,7 +6075,7 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__VerificationTokenClient<T, Null = never> implements Prisma.PrismaPromise<T> {
+  export class Prisma__VerificationTokenClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
     private readonly _dmmf;
     private readonly _queryType;
     private readonly _rootField;
@@ -4755,11 +6121,11 @@ export namespace Prisma {
   /**
    * VerificationToken base type for findUnique actions
    */
-  export type VerificationTokenFindUniqueArgsBase = {
+  export type VerificationTokenFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the VerificationToken
      */
-    select?: VerificationTokenSelect | null
+    select?: VerificationTokenSelect<ExtArgs> | null
     /**
      * Filter, which VerificationToken to fetch.
      */
@@ -4769,7 +6135,7 @@ export namespace Prisma {
   /**
    * VerificationToken findUnique
    */
-  export interface VerificationTokenFindUniqueArgs extends VerificationTokenFindUniqueArgsBase {
+  export interface VerificationTokenFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends VerificationTokenFindUniqueArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
@@ -4781,11 +6147,11 @@ export namespace Prisma {
   /**
    * VerificationToken findUniqueOrThrow
    */
-  export type VerificationTokenFindUniqueOrThrowArgs = {
+  export type VerificationTokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the VerificationToken
      */
-    select?: VerificationTokenSelect | null
+    select?: VerificationTokenSelect<ExtArgs> | null
     /**
      * Filter, which VerificationToken to fetch.
      */
@@ -4796,11 +6162,11 @@ export namespace Prisma {
   /**
    * VerificationToken base type for findFirst actions
    */
-  export type VerificationTokenFindFirstArgsBase = {
+  export type VerificationTokenFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the VerificationToken
      */
-    select?: VerificationTokenSelect | null
+    select?: VerificationTokenSelect<ExtArgs> | null
     /**
      * Filter, which VerificationToken to fetch.
      */
@@ -4840,7 +6206,7 @@ export namespace Prisma {
   /**
    * VerificationToken findFirst
    */
-  export interface VerificationTokenFindFirstArgs extends VerificationTokenFindFirstArgsBase {
+  export interface VerificationTokenFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends VerificationTokenFindFirstArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
@@ -4852,11 +6218,11 @@ export namespace Prisma {
   /**
    * VerificationToken findFirstOrThrow
    */
-  export type VerificationTokenFindFirstOrThrowArgs = {
+  export type VerificationTokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the VerificationToken
      */
-    select?: VerificationTokenSelect | null
+    select?: VerificationTokenSelect<ExtArgs> | null
     /**
      * Filter, which VerificationToken to fetch.
      */
@@ -4897,11 +6263,11 @@ export namespace Prisma {
   /**
    * VerificationToken findMany
    */
-  export type VerificationTokenFindManyArgs = {
+  export type VerificationTokenFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the VerificationToken
      */
-    select?: VerificationTokenSelect | null
+    select?: VerificationTokenSelect<ExtArgs> | null
     /**
      * Filter, which VerificationTokens to fetch.
      */
@@ -4937,11 +6303,11 @@ export namespace Prisma {
   /**
    * VerificationToken create
    */
-  export type VerificationTokenCreateArgs = {
+  export type VerificationTokenCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the VerificationToken
      */
-    select?: VerificationTokenSelect | null
+    select?: VerificationTokenSelect<ExtArgs> | null
     /**
      * The data needed to create a VerificationToken.
      */
@@ -4952,7 +6318,7 @@ export namespace Prisma {
   /**
    * VerificationToken createMany
    */
-  export type VerificationTokenCreateManyArgs = {
+  export type VerificationTokenCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to create many VerificationTokens.
      */
@@ -4964,11 +6330,11 @@ export namespace Prisma {
   /**
    * VerificationToken update
    */
-  export type VerificationTokenUpdateArgs = {
+  export type VerificationTokenUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the VerificationToken
      */
-    select?: VerificationTokenSelect | null
+    select?: VerificationTokenSelect<ExtArgs> | null
     /**
      * The data needed to update a VerificationToken.
      */
@@ -4983,7 +6349,7 @@ export namespace Prisma {
   /**
    * VerificationToken updateMany
    */
-  export type VerificationTokenUpdateManyArgs = {
+  export type VerificationTokenUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to update VerificationTokens.
      */
@@ -4998,11 +6364,11 @@ export namespace Prisma {
   /**
    * VerificationToken upsert
    */
-  export type VerificationTokenUpsertArgs = {
+  export type VerificationTokenUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the VerificationToken
      */
-    select?: VerificationTokenSelect | null
+    select?: VerificationTokenSelect<ExtArgs> | null
     /**
      * The filter to search for the VerificationToken to update in case it exists.
      */
@@ -5021,11 +6387,11 @@ export namespace Prisma {
   /**
    * VerificationToken delete
    */
-  export type VerificationTokenDeleteArgs = {
+  export type VerificationTokenDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the VerificationToken
      */
-    select?: VerificationTokenSelect | null
+    select?: VerificationTokenSelect<ExtArgs> | null
     /**
      * Filter which VerificationToken to delete.
      */
@@ -5036,7 +6402,7 @@ export namespace Prisma {
   /**
    * VerificationToken deleteMany
    */
-  export type VerificationTokenDeleteManyArgs = {
+  export type VerificationTokenDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which VerificationTokens to delete
      */
@@ -5047,365 +6413,357 @@ export namespace Prisma {
   /**
    * VerificationToken without action
    */
-  export type VerificationTokenArgs = {
+  export type VerificationTokenArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the VerificationToken
      */
-    select?: VerificationTokenSelect | null
+    select?: VerificationTokenSelect<ExtArgs> | null
   }
 
 
 
   /**
-   * Model TrackingUserAccess
+   * Model TrackingUserAccessOnWorkspace
    */
 
 
-  export type AggregateTrackingUserAccess = {
-    _count: TrackingUserAccessCountAggregateOutputType | null
-    _min: TrackingUserAccessMinAggregateOutputType | null
-    _max: TrackingUserAccessMaxAggregateOutputType | null
+  export type AggregateTrackingUserAccessOnWorkspace = {
+    _count: TrackingUserAccessOnWorkspaceCountAggregateOutputType | null
+    _min: TrackingUserAccessOnWorkspaceMinAggregateOutputType | null
+    _max: TrackingUserAccessOnWorkspaceMaxAggregateOutputType | null
   }
 
-  export type TrackingUserAccessMinAggregateOutputType = {
+  export type TrackingUserAccessOnWorkspaceMinAggregateOutputType = {
     id: string | null
-    userId: string | null
-    lastAccessWorkspaceId: string | null
+    createdAt: Date | null
     lastAccessNotebookId: string | null
     lastAccessPageId: string | null
-    createdAt: Date | null
+    userId: string | null
+    workspaceId: string | null
   }
 
-  export type TrackingUserAccessMaxAggregateOutputType = {
+  export type TrackingUserAccessOnWorkspaceMaxAggregateOutputType = {
     id: string | null
-    userId: string | null
-    lastAccessWorkspaceId: string | null
+    createdAt: Date | null
     lastAccessNotebookId: string | null
     lastAccessPageId: string | null
-    createdAt: Date | null
+    userId: string | null
+    workspaceId: string | null
   }
 
-  export type TrackingUserAccessCountAggregateOutputType = {
+  export type TrackingUserAccessOnWorkspaceCountAggregateOutputType = {
     id: number
-    userId: number
-    lastAccessWorkspaceId: number
+    createdAt: number
     lastAccessNotebookId: number
     lastAccessPageId: number
-    createdAt: number
+    userId: number
+    workspaceId: number
     _all: number
   }
 
 
-  export type TrackingUserAccessMinAggregateInputType = {
+  export type TrackingUserAccessOnWorkspaceMinAggregateInputType = {
     id?: true
-    userId?: true
-    lastAccessWorkspaceId?: true
+    createdAt?: true
     lastAccessNotebookId?: true
     lastAccessPageId?: true
-    createdAt?: true
+    userId?: true
+    workspaceId?: true
   }
 
-  export type TrackingUserAccessMaxAggregateInputType = {
+  export type TrackingUserAccessOnWorkspaceMaxAggregateInputType = {
     id?: true
-    userId?: true
-    lastAccessWorkspaceId?: true
+    createdAt?: true
     lastAccessNotebookId?: true
     lastAccessPageId?: true
-    createdAt?: true
+    userId?: true
+    workspaceId?: true
   }
 
-  export type TrackingUserAccessCountAggregateInputType = {
+  export type TrackingUserAccessOnWorkspaceCountAggregateInputType = {
     id?: true
-    userId?: true
-    lastAccessWorkspaceId?: true
+    createdAt?: true
     lastAccessNotebookId?: true
     lastAccessPageId?: true
-    createdAt?: true
+    userId?: true
+    workspaceId?: true
     _all?: true
   }
 
-  export type TrackingUserAccessAggregateArgs = {
+  export type TrackingUserAccessOnWorkspaceAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Filter which TrackingUserAccess to aggregate.
+     * Filter which TrackingUserAccessOnWorkspace to aggregate.
      */
-    where?: TrackingUserAccessWhereInput
+    where?: TrackingUserAccessOnWorkspaceWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of TrackingUserAccesses to fetch.
+     * Determine the order of TrackingUserAccessOnWorkspaces to fetch.
      */
-    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
+    orderBy?: Enumerable<TrackingUserAccessOnWorkspaceOrderByWithRelationInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: TrackingUserAccessWhereUniqueInput
+    cursor?: TrackingUserAccessOnWorkspaceWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` TrackingUserAccesses from the position of the cursor.
+     * Take `±n` TrackingUserAccessOnWorkspaces from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` TrackingUserAccesses.
+     * Skip the first `n` TrackingUserAccessOnWorkspaces.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned TrackingUserAccesses
+     * Count returned TrackingUserAccessOnWorkspaces
     **/
-    _count?: true | TrackingUserAccessCountAggregateInputType
+    _count?: true | TrackingUserAccessOnWorkspaceCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: TrackingUserAccessMinAggregateInputType
+    _min?: TrackingUserAccessOnWorkspaceMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: TrackingUserAccessMaxAggregateInputType
+    _max?: TrackingUserAccessOnWorkspaceMaxAggregateInputType
   }
 
-  export type GetTrackingUserAccessAggregateType<T extends TrackingUserAccessAggregateArgs> = {
-        [P in keyof T & keyof AggregateTrackingUserAccess]: P extends '_count' | 'count'
+  export type GetTrackingUserAccessOnWorkspaceAggregateType<T extends TrackingUserAccessOnWorkspaceAggregateArgs> = {
+        [P in keyof T & keyof AggregateTrackingUserAccessOnWorkspace]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateTrackingUserAccess[P]>
-      : GetScalarType<T[P], AggregateTrackingUserAccess[P]>
+        : GetScalarType<T[P], AggregateTrackingUserAccessOnWorkspace[P]>
+      : GetScalarType<T[P], AggregateTrackingUserAccessOnWorkspace[P]>
   }
 
 
 
 
-  export type TrackingUserAccessGroupByArgs = {
-    where?: TrackingUserAccessWhereInput
-    orderBy?: Enumerable<TrackingUserAccessOrderByWithAggregationInput>
-    by: TrackingUserAccessScalarFieldEnum[]
-    having?: TrackingUserAccessScalarWhereWithAggregatesInput
+  export type TrackingUserAccessOnWorkspaceGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: TrackingUserAccessOnWorkspaceWhereInput
+    orderBy?: Enumerable<TrackingUserAccessOnWorkspaceOrderByWithAggregationInput>
+    by: TrackingUserAccessOnWorkspaceScalarFieldEnum[]
+    having?: TrackingUserAccessOnWorkspaceScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: TrackingUserAccessCountAggregateInputType | true
-    _min?: TrackingUserAccessMinAggregateInputType
-    _max?: TrackingUserAccessMaxAggregateInputType
+    _count?: TrackingUserAccessOnWorkspaceCountAggregateInputType | true
+    _min?: TrackingUserAccessOnWorkspaceMinAggregateInputType
+    _max?: TrackingUserAccessOnWorkspaceMaxAggregateInputType
   }
 
 
-  export type TrackingUserAccessGroupByOutputType = {
+  export type TrackingUserAccessOnWorkspaceGroupByOutputType = {
     id: string
-    userId: string | null
-    lastAccessWorkspaceId: string | null
+    createdAt: Date
     lastAccessNotebookId: string | null
     lastAccessPageId: string | null
-    createdAt: Date
-    _count: TrackingUserAccessCountAggregateOutputType | null
-    _min: TrackingUserAccessMinAggregateOutputType | null
-    _max: TrackingUserAccessMaxAggregateOutputType | null
+    userId: string
+    workspaceId: string
+    _count: TrackingUserAccessOnWorkspaceCountAggregateOutputType | null
+    _min: TrackingUserAccessOnWorkspaceMinAggregateOutputType | null
+    _max: TrackingUserAccessOnWorkspaceMaxAggregateOutputType | null
   }
 
-  type GetTrackingUserAccessGroupByPayload<T extends TrackingUserAccessGroupByArgs> = Prisma.PrismaPromise<
+  type GetTrackingUserAccessOnWorkspaceGroupByPayload<T extends TrackingUserAccessOnWorkspaceGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickArray<TrackingUserAccessGroupByOutputType, T['by']> &
+      PickArray<TrackingUserAccessOnWorkspaceGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof TrackingUserAccessGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof TrackingUserAccessOnWorkspaceGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], TrackingUserAccessGroupByOutputType[P]>
-            : GetScalarType<T[P], TrackingUserAccessGroupByOutputType[P]>
+              : GetScalarType<T[P], TrackingUserAccessOnWorkspaceGroupByOutputType[P]>
+            : GetScalarType<T[P], TrackingUserAccessOnWorkspaceGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type TrackingUserAccessSelect = {
+  export type TrackingUserAccessOnWorkspaceSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    userId?: boolean
-    lastAccessWorkspaceId?: boolean
+    createdAt?: boolean
     lastAccessNotebookId?: boolean
     lastAccessPageId?: boolean
+    userId?: boolean
+    workspaceId?: boolean
+    user?: boolean | UserArgs<ExtArgs>
+    workspace?: boolean | WorkspaceArgs<ExtArgs>
+  }, ExtArgs["result"]["trackingUserAccessOnWorkspace"]>
+
+  export type TrackingUserAccessOnWorkspaceSelectScalar = {
+    id?: boolean
     createdAt?: boolean
-    user?: boolean | UserArgs
-    workspace?: boolean | WorkspaceArgs
+    lastAccessNotebookId?: boolean
+    lastAccessPageId?: boolean
+    userId?: boolean
+    workspaceId?: boolean
+  }
+
+  export type TrackingUserAccessOnWorkspaceInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    user?: boolean | UserArgs<ExtArgs>
+    workspace?: boolean | WorkspaceArgs<ExtArgs>
   }
 
 
-  export type TrackingUserAccessInclude = {
-    user?: boolean | UserArgs
-    workspace?: boolean | WorkspaceArgs
-  }
+  type TrackingUserAccessOnWorkspaceGetPayload<S extends boolean | null | undefined | TrackingUserAccessOnWorkspaceArgs> = $Types.GetResult<TrackingUserAccessOnWorkspacePayload, S>
 
-  export type TrackingUserAccessGetPayload<S extends boolean | null | undefined | TrackingUserAccessArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? TrackingUserAccess :
-    S extends undefined ? never :
-    S extends { include: any } & (TrackingUserAccessArgs | TrackingUserAccessFindManyArgs)
-    ? TrackingUserAccess  & {
-    [P in TruthyKeys<S['include']>]:
-        P extends 'user' ? UserGetPayload<S['include'][P]> | null :
-        P extends 'workspace' ? WorkspaceGetPayload<S['include'][P]> | null :  never
-  } 
-    : S extends { select: any } & (TrackingUserAccessArgs | TrackingUserAccessFindManyArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-        P extends 'user' ? UserGetPayload<S['select'][P]> | null :
-        P extends 'workspace' ? WorkspaceGetPayload<S['select'][P]> | null :  P extends keyof TrackingUserAccess ? TrackingUserAccess[P] : never
-  } 
-      : TrackingUserAccess
-
-
-  type TrackingUserAccessCountArgs = 
-    Omit<TrackingUserAccessFindManyArgs, 'select' | 'include'> & {
-      select?: TrackingUserAccessCountAggregateInputType | true
+  type TrackingUserAccessOnWorkspaceCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
+    Omit<TrackingUserAccessOnWorkspaceFindManyArgs, 'select' | 'include'> & {
+      select?: TrackingUserAccessOnWorkspaceCountAggregateInputType | true
     }
 
-  export interface TrackingUserAccessDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
-
+  export interface TrackingUserAccessOnWorkspaceDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TrackingUserAccessOnWorkspace'], meta: { name: 'TrackingUserAccessOnWorkspace' } }
     /**
-     * Find zero or one TrackingUserAccess that matches the filter.
-     * @param {TrackingUserAccessFindUniqueArgs} args - Arguments to find a TrackingUserAccess
+     * Find zero or one TrackingUserAccessOnWorkspace that matches the filter.
+     * @param {TrackingUserAccessOnWorkspaceFindUniqueArgs} args - Arguments to find a TrackingUserAccessOnWorkspace
      * @example
-     * // Get one TrackingUserAccess
-     * const trackingUserAccess = await prisma.trackingUserAccess.findUnique({
+     * // Get one TrackingUserAccessOnWorkspace
+     * const trackingUserAccessOnWorkspace = await prisma.trackingUserAccessOnWorkspace.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
     **/
-    findUnique<T extends TrackingUserAccessFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, TrackingUserAccessFindUniqueArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'TrackingUserAccess'> extends True ? Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>> : Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T> | null, null>
+    findUnique<T extends TrackingUserAccessOnWorkspaceFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, TrackingUserAccessOnWorkspaceFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'TrackingUserAccessOnWorkspace'> extends True ? Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
 
     /**
-     * Find one TrackingUserAccess that matches the filter or throw an error  with `error.code='P2025'` 
+     * Find one TrackingUserAccessOnWorkspace that matches the filter or throw an error  with `error.code='P2025'` 
      *     if no matches were found.
-     * @param {TrackingUserAccessFindUniqueOrThrowArgs} args - Arguments to find a TrackingUserAccess
+     * @param {TrackingUserAccessOnWorkspaceFindUniqueOrThrowArgs} args - Arguments to find a TrackingUserAccessOnWorkspace
      * @example
-     * // Get one TrackingUserAccess
-     * const trackingUserAccess = await prisma.trackingUserAccess.findUniqueOrThrow({
+     * // Get one TrackingUserAccessOnWorkspace
+     * const trackingUserAccessOnWorkspace = await prisma.trackingUserAccessOnWorkspace.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
     **/
-    findUniqueOrThrow<T extends TrackingUserAccessFindUniqueOrThrowArgs>(
-      args?: SelectSubset<T, TrackingUserAccessFindUniqueOrThrowArgs>
-    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
+    findUniqueOrThrow<T extends TrackingUserAccessOnWorkspaceFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, TrackingUserAccessOnWorkspaceFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
 
     /**
-     * Find the first TrackingUserAccess that matches the filter.
+     * Find the first TrackingUserAccessOnWorkspace that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {TrackingUserAccessFindFirstArgs} args - Arguments to find a TrackingUserAccess
+     * @param {TrackingUserAccessOnWorkspaceFindFirstArgs} args - Arguments to find a TrackingUserAccessOnWorkspace
      * @example
-     * // Get one TrackingUserAccess
-     * const trackingUserAccess = await prisma.trackingUserAccess.findFirst({
+     * // Get one TrackingUserAccessOnWorkspace
+     * const trackingUserAccessOnWorkspace = await prisma.trackingUserAccessOnWorkspace.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
     **/
-    findFirst<T extends TrackingUserAccessFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, TrackingUserAccessFindFirstArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'TrackingUserAccess'> extends True ? Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>> : Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T> | null, null>
+    findFirst<T extends TrackingUserAccessOnWorkspaceFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, TrackingUserAccessOnWorkspaceFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'TrackingUserAccessOnWorkspace'> extends True ? Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
 
     /**
-     * Find the first TrackingUserAccess that matches the filter or
+     * Find the first TrackingUserAccessOnWorkspace that matches the filter or
      * throw `NotFoundError` if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {TrackingUserAccessFindFirstOrThrowArgs} args - Arguments to find a TrackingUserAccess
+     * @param {TrackingUserAccessOnWorkspaceFindFirstOrThrowArgs} args - Arguments to find a TrackingUserAccessOnWorkspace
      * @example
-     * // Get one TrackingUserAccess
-     * const trackingUserAccess = await prisma.trackingUserAccess.findFirstOrThrow({
+     * // Get one TrackingUserAccessOnWorkspace
+     * const trackingUserAccessOnWorkspace = await prisma.trackingUserAccessOnWorkspace.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
     **/
-    findFirstOrThrow<T extends TrackingUserAccessFindFirstOrThrowArgs>(
-      args?: SelectSubset<T, TrackingUserAccessFindFirstOrThrowArgs>
-    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
+    findFirstOrThrow<T extends TrackingUserAccessOnWorkspaceFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, TrackingUserAccessOnWorkspaceFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
 
     /**
-     * Find zero or more TrackingUserAccesses that matches the filter.
+     * Find zero or more TrackingUserAccessOnWorkspaces that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {TrackingUserAccessFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @param {TrackingUserAccessOnWorkspaceFindManyArgs=} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all TrackingUserAccesses
-     * const trackingUserAccesses = await prisma.trackingUserAccess.findMany()
+     * // Get all TrackingUserAccessOnWorkspaces
+     * const trackingUserAccessOnWorkspaces = await prisma.trackingUserAccessOnWorkspace.findMany()
      * 
-     * // Get first 10 TrackingUserAccesses
-     * const trackingUserAccesses = await prisma.trackingUserAccess.findMany({ take: 10 })
+     * // Get first 10 TrackingUserAccessOnWorkspaces
+     * const trackingUserAccessOnWorkspaces = await prisma.trackingUserAccessOnWorkspace.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const trackingUserAccessWithIdOnly = await prisma.trackingUserAccess.findMany({ select: { id: true } })
+     * const trackingUserAccessOnWorkspaceWithIdOnly = await prisma.trackingUserAccessOnWorkspace.findMany({ select: { id: true } })
      * 
     **/
-    findMany<T extends TrackingUserAccessFindManyArgs>(
-      args?: SelectSubset<T, TrackingUserAccessFindManyArgs>
-    ): Prisma.PrismaPromise<Array<TrackingUserAccessGetPayload<T>>>
+    findMany<T extends TrackingUserAccessOnWorkspaceFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, TrackingUserAccessOnWorkspaceFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'findMany', never>>
 
     /**
-     * Create a TrackingUserAccess.
-     * @param {TrackingUserAccessCreateArgs} args - Arguments to create a TrackingUserAccess.
+     * Create a TrackingUserAccessOnWorkspace.
+     * @param {TrackingUserAccessOnWorkspaceCreateArgs} args - Arguments to create a TrackingUserAccessOnWorkspace.
      * @example
-     * // Create one TrackingUserAccess
-     * const TrackingUserAccess = await prisma.trackingUserAccess.create({
+     * // Create one TrackingUserAccessOnWorkspace
+     * const TrackingUserAccessOnWorkspace = await prisma.trackingUserAccessOnWorkspace.create({
      *   data: {
-     *     // ... data to create a TrackingUserAccess
+     *     // ... data to create a TrackingUserAccessOnWorkspace
      *   }
      * })
      * 
     **/
-    create<T extends TrackingUserAccessCreateArgs>(
-      args: SelectSubset<T, TrackingUserAccessCreateArgs>
-    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
+    create<T extends TrackingUserAccessOnWorkspaceCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, TrackingUserAccessOnWorkspaceCreateArgs<ExtArgs>>
+    ): Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
 
     /**
-     * Create many TrackingUserAccesses.
-     *     @param {TrackingUserAccessCreateManyArgs} args - Arguments to create many TrackingUserAccesses.
+     * Create many TrackingUserAccessOnWorkspaces.
+     *     @param {TrackingUserAccessOnWorkspaceCreateManyArgs} args - Arguments to create many TrackingUserAccessOnWorkspaces.
      *     @example
-     *     // Create many TrackingUserAccesses
-     *     const trackingUserAccess = await prisma.trackingUserAccess.createMany({
+     *     // Create many TrackingUserAccessOnWorkspaces
+     *     const trackingUserAccessOnWorkspace = await prisma.trackingUserAccessOnWorkspace.createMany({
      *       data: {
      *         // ... provide data here
      *       }
      *     })
      *     
     **/
-    createMany<T extends TrackingUserAccessCreateManyArgs>(
-      args?: SelectSubset<T, TrackingUserAccessCreateManyArgs>
+    createMany<T extends TrackingUserAccessOnWorkspaceCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, TrackingUserAccessOnWorkspaceCreateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Delete a TrackingUserAccess.
-     * @param {TrackingUserAccessDeleteArgs} args - Arguments to delete one TrackingUserAccess.
+     * Delete a TrackingUserAccessOnWorkspace.
+     * @param {TrackingUserAccessOnWorkspaceDeleteArgs} args - Arguments to delete one TrackingUserAccessOnWorkspace.
      * @example
-     * // Delete one TrackingUserAccess
-     * const TrackingUserAccess = await prisma.trackingUserAccess.delete({
+     * // Delete one TrackingUserAccessOnWorkspace
+     * const TrackingUserAccessOnWorkspace = await prisma.trackingUserAccessOnWorkspace.delete({
      *   where: {
-     *     // ... filter to delete one TrackingUserAccess
+     *     // ... filter to delete one TrackingUserAccessOnWorkspace
      *   }
      * })
      * 
     **/
-    delete<T extends TrackingUserAccessDeleteArgs>(
-      args: SelectSubset<T, TrackingUserAccessDeleteArgs>
-    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
+    delete<T extends TrackingUserAccessOnWorkspaceDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, TrackingUserAccessOnWorkspaceDeleteArgs<ExtArgs>>
+    ): Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
 
     /**
-     * Update one TrackingUserAccess.
-     * @param {TrackingUserAccessUpdateArgs} args - Arguments to update one TrackingUserAccess.
+     * Update one TrackingUserAccessOnWorkspace.
+     * @param {TrackingUserAccessOnWorkspaceUpdateArgs} args - Arguments to update one TrackingUserAccessOnWorkspace.
      * @example
-     * // Update one TrackingUserAccess
-     * const trackingUserAccess = await prisma.trackingUserAccess.update({
+     * // Update one TrackingUserAccessOnWorkspace
+     * const trackingUserAccessOnWorkspace = await prisma.trackingUserAccessOnWorkspace.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -5415,34 +6773,34 @@ export namespace Prisma {
      * })
      * 
     **/
-    update<T extends TrackingUserAccessUpdateArgs>(
-      args: SelectSubset<T, TrackingUserAccessUpdateArgs>
-    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
+    update<T extends TrackingUserAccessOnWorkspaceUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, TrackingUserAccessOnWorkspaceUpdateArgs<ExtArgs>>
+    ): Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
 
     /**
-     * Delete zero or more TrackingUserAccesses.
-     * @param {TrackingUserAccessDeleteManyArgs} args - Arguments to filter TrackingUserAccesses to delete.
+     * Delete zero or more TrackingUserAccessOnWorkspaces.
+     * @param {TrackingUserAccessOnWorkspaceDeleteManyArgs} args - Arguments to filter TrackingUserAccessOnWorkspaces to delete.
      * @example
-     * // Delete a few TrackingUserAccesses
-     * const { count } = await prisma.trackingUserAccess.deleteMany({
+     * // Delete a few TrackingUserAccessOnWorkspaces
+     * const { count } = await prisma.trackingUserAccessOnWorkspace.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
     **/
-    deleteMany<T extends TrackingUserAccessDeleteManyArgs>(
-      args?: SelectSubset<T, TrackingUserAccessDeleteManyArgs>
+    deleteMany<T extends TrackingUserAccessOnWorkspaceDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, TrackingUserAccessOnWorkspaceDeleteManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more TrackingUserAccesses.
+     * Update zero or more TrackingUserAccessOnWorkspaces.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {TrackingUserAccessUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {TrackingUserAccessOnWorkspaceUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many TrackingUserAccesses
-     * const trackingUserAccess = await prisma.trackingUserAccess.updateMany({
+     * // Update many TrackingUserAccessOnWorkspaces
+     * const trackingUserAccessOnWorkspace = await prisma.trackingUserAccessOnWorkspace.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -5452,59 +6810,59 @@ export namespace Prisma {
      * })
      * 
     **/
-    updateMany<T extends TrackingUserAccessUpdateManyArgs>(
-      args: SelectSubset<T, TrackingUserAccessUpdateManyArgs>
+    updateMany<T extends TrackingUserAccessOnWorkspaceUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, TrackingUserAccessOnWorkspaceUpdateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create or update one TrackingUserAccess.
-     * @param {TrackingUserAccessUpsertArgs} args - Arguments to update or create a TrackingUserAccess.
+     * Create or update one TrackingUserAccessOnWorkspace.
+     * @param {TrackingUserAccessOnWorkspaceUpsertArgs} args - Arguments to update or create a TrackingUserAccessOnWorkspace.
      * @example
-     * // Update or create a TrackingUserAccess
-     * const trackingUserAccess = await prisma.trackingUserAccess.upsert({
+     * // Update or create a TrackingUserAccessOnWorkspace
+     * const trackingUserAccessOnWorkspace = await prisma.trackingUserAccessOnWorkspace.upsert({
      *   create: {
-     *     // ... data to create a TrackingUserAccess
+     *     // ... data to create a TrackingUserAccessOnWorkspace
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the TrackingUserAccess we want to update
+     *     // ... the filter for the TrackingUserAccessOnWorkspace we want to update
      *   }
      * })
     **/
-    upsert<T extends TrackingUserAccessUpsertArgs>(
-      args: SelectSubset<T, TrackingUserAccessUpsertArgs>
-    ): Prisma__TrackingUserAccessClient<TrackingUserAccessGetPayload<T>>
+    upsert<T extends TrackingUserAccessOnWorkspaceUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, TrackingUserAccessOnWorkspaceUpsertArgs<ExtArgs>>
+    ): Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
 
     /**
-     * Count the number of TrackingUserAccesses.
+     * Count the number of TrackingUserAccessOnWorkspaces.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {TrackingUserAccessCountArgs} args - Arguments to filter TrackingUserAccesses to count.
+     * @param {TrackingUserAccessOnWorkspaceCountArgs} args - Arguments to filter TrackingUserAccessOnWorkspaces to count.
      * @example
-     * // Count the number of TrackingUserAccesses
-     * const count = await prisma.trackingUserAccess.count({
+     * // Count the number of TrackingUserAccessOnWorkspaces
+     * const count = await prisma.trackingUserAccessOnWorkspace.count({
      *   where: {
-     *     // ... the filter for the TrackingUserAccesses we want to count
+     *     // ... the filter for the TrackingUserAccessOnWorkspaces we want to count
      *   }
      * })
     **/
-    count<T extends TrackingUserAccessCountArgs>(
-      args?: Subset<T, TrackingUserAccessCountArgs>,
+    count<T extends TrackingUserAccessOnWorkspaceCountArgs>(
+      args?: Subset<T, TrackingUserAccessOnWorkspaceCountArgs>,
     ): Prisma.PrismaPromise<
-      T extends _Record<'select', any>
+      T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], TrackingUserAccessCountAggregateOutputType>
+          : GetScalarType<T['select'], TrackingUserAccessOnWorkspaceCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a TrackingUserAccess.
+     * Allows you to perform aggregations operations on a TrackingUserAccessOnWorkspace.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {TrackingUserAccessAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {TrackingUserAccessOnWorkspaceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -5524,13 +6882,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends TrackingUserAccessAggregateArgs>(args: Subset<T, TrackingUserAccessAggregateArgs>): Prisma.PrismaPromise<GetTrackingUserAccessAggregateType<T>>
+    aggregate<T extends TrackingUserAccessOnWorkspaceAggregateArgs>(args: Subset<T, TrackingUserAccessOnWorkspaceAggregateArgs>): Prisma.PrismaPromise<GetTrackingUserAccessOnWorkspaceAggregateType<T>>
 
     /**
-     * Group by TrackingUserAccess.
+     * Group by TrackingUserAccessOnWorkspace.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {TrackingUserAccessGroupByArgs} args - Group by arguments.
+     * @param {TrackingUserAccessOnWorkspaceGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -5545,14 +6903,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends TrackingUserAccessGroupByArgs,
+      T extends TrackingUserAccessOnWorkspaceGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: TrackingUserAccessGroupByArgs['orderBy'] }
-        : { orderBy?: TrackingUserAccessGroupByArgs['orderBy'] },
+        ? { orderBy: TrackingUserAccessOnWorkspaceGroupByArgs['orderBy'] }
+        : { orderBy?: TrackingUserAccessOnWorkspaceGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends TupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -5601,17 +6959,17 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, TrackingUserAccessGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTrackingUserAccessGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, TrackingUserAccessOnWorkspaceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTrackingUserAccessOnWorkspaceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
 
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for TrackingUserAccess.
+   * The delegate class that acts as a "Promise-like" for TrackingUserAccessOnWorkspace.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__TrackingUserAccessClient<T, Null = never> implements Prisma.PrismaPromise<T> {
+  export class Prisma__TrackingUserAccessOnWorkspaceClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
     private readonly _dmmf;
     private readonly _queryType;
     private readonly _rootField;
@@ -5626,9 +6984,9 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: 'PrismaPromise';
     constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
 
-    user<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+    user<T extends UserArgs<ExtArgs> = {}>(args?: Subset<T, UserArgs<ExtArgs>>): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
 
-    workspace<T extends WorkspaceArgs= {}>(args?: Subset<T, WorkspaceArgs>): Prisma__WorkspaceClient<WorkspaceGetPayload<T> | Null>;
+    workspace<T extends WorkspaceArgs<ExtArgs> = {}>(args?: Subset<T, WorkspaceArgs<ExtArgs>>): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
 
     private get _document();
     /**
@@ -5658,27 +7016,27 @@ export namespace Prisma {
   // Custom InputTypes
 
   /**
-   * TrackingUserAccess base type for findUnique actions
+   * TrackingUserAccessOnWorkspace base type for findUnique actions
    */
-  export type TrackingUserAccessFindUniqueArgsBase = {
+  export type TrackingUserAccessOnWorkspaceFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
     /**
-     * Filter, which TrackingUserAccess to fetch.
+     * Filter, which TrackingUserAccessOnWorkspace to fetch.
      */
-    where: TrackingUserAccessWhereUniqueInput
+    where: TrackingUserAccessOnWorkspaceWhereUniqueInput
   }
 
   /**
-   * TrackingUserAccess findUnique
+   * TrackingUserAccessOnWorkspace findUnique
    */
-  export interface TrackingUserAccessFindUniqueArgs extends TrackingUserAccessFindUniqueArgsBase {
+  export interface TrackingUserAccessOnWorkspaceFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends TrackingUserAccessOnWorkspaceFindUniqueArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
@@ -5688,76 +7046,76 @@ export namespace Prisma {
       
 
   /**
-   * TrackingUserAccess findUniqueOrThrow
+   * TrackingUserAccessOnWorkspace findUniqueOrThrow
    */
-  export type TrackingUserAccessFindUniqueOrThrowArgs = {
+  export type TrackingUserAccessOnWorkspaceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
     /**
-     * Filter, which TrackingUserAccess to fetch.
+     * Filter, which TrackingUserAccessOnWorkspace to fetch.
      */
-    where: TrackingUserAccessWhereUniqueInput
+    where: TrackingUserAccessOnWorkspaceWhereUniqueInput
   }
 
 
   /**
-   * TrackingUserAccess base type for findFirst actions
+   * TrackingUserAccessOnWorkspace base type for findFirst actions
    */
-  export type TrackingUserAccessFindFirstArgsBase = {
+  export type TrackingUserAccessOnWorkspaceFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
     /**
-     * Filter, which TrackingUserAccess to fetch.
+     * Filter, which TrackingUserAccessOnWorkspace to fetch.
      */
-    where?: TrackingUserAccessWhereInput
+    where?: TrackingUserAccessOnWorkspaceWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of TrackingUserAccesses to fetch.
+     * Determine the order of TrackingUserAccessOnWorkspaces to fetch.
      */
-    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
+    orderBy?: Enumerable<TrackingUserAccessOnWorkspaceOrderByWithRelationInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for TrackingUserAccesses.
+     * Sets the position for searching for TrackingUserAccessOnWorkspaces.
      */
-    cursor?: TrackingUserAccessWhereUniqueInput
+    cursor?: TrackingUserAccessOnWorkspaceWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` TrackingUserAccesses from the position of the cursor.
+     * Take `±n` TrackingUserAccessOnWorkspaces from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` TrackingUserAccesses.
+     * Skip the first `n` TrackingUserAccessOnWorkspaces.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of TrackingUserAccesses.
+     * Filter by unique combinations of TrackingUserAccessOnWorkspaces.
      */
-    distinct?: Enumerable<TrackingUserAccessScalarFieldEnum>
+    distinct?: Enumerable<TrackingUserAccessOnWorkspaceScalarFieldEnum>
   }
 
   /**
-   * TrackingUserAccess findFirst
+   * TrackingUserAccessOnWorkspace findFirst
    */
-  export interface TrackingUserAccessFindFirstArgs extends TrackingUserAccessFindFirstArgsBase {
+  export interface TrackingUserAccessOnWorkspaceFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends TrackingUserAccessOnWorkspaceFindFirstArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
@@ -5767,236 +7125,236 @@ export namespace Prisma {
       
 
   /**
-   * TrackingUserAccess findFirstOrThrow
+   * TrackingUserAccessOnWorkspace findFirstOrThrow
    */
-  export type TrackingUserAccessFindFirstOrThrowArgs = {
+  export type TrackingUserAccessOnWorkspaceFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
     /**
-     * Filter, which TrackingUserAccess to fetch.
+     * Filter, which TrackingUserAccessOnWorkspace to fetch.
      */
-    where?: TrackingUserAccessWhereInput
+    where?: TrackingUserAccessOnWorkspaceWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of TrackingUserAccesses to fetch.
+     * Determine the order of TrackingUserAccessOnWorkspaces to fetch.
      */
-    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
+    orderBy?: Enumerable<TrackingUserAccessOnWorkspaceOrderByWithRelationInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for TrackingUserAccesses.
+     * Sets the position for searching for TrackingUserAccessOnWorkspaces.
      */
-    cursor?: TrackingUserAccessWhereUniqueInput
+    cursor?: TrackingUserAccessOnWorkspaceWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` TrackingUserAccesses from the position of the cursor.
+     * Take `±n` TrackingUserAccessOnWorkspaces from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` TrackingUserAccesses.
+     * Skip the first `n` TrackingUserAccessOnWorkspaces.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of TrackingUserAccesses.
+     * Filter by unique combinations of TrackingUserAccessOnWorkspaces.
      */
-    distinct?: Enumerable<TrackingUserAccessScalarFieldEnum>
+    distinct?: Enumerable<TrackingUserAccessOnWorkspaceScalarFieldEnum>
   }
 
 
   /**
-   * TrackingUserAccess findMany
+   * TrackingUserAccessOnWorkspace findMany
    */
-  export type TrackingUserAccessFindManyArgs = {
+  export type TrackingUserAccessOnWorkspaceFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
     /**
-     * Filter, which TrackingUserAccesses to fetch.
+     * Filter, which TrackingUserAccessOnWorkspaces to fetch.
      */
-    where?: TrackingUserAccessWhereInput
+    where?: TrackingUserAccessOnWorkspaceWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of TrackingUserAccesses to fetch.
+     * Determine the order of TrackingUserAccessOnWorkspaces to fetch.
      */
-    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
+    orderBy?: Enumerable<TrackingUserAccessOnWorkspaceOrderByWithRelationInput>
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing TrackingUserAccesses.
+     * Sets the position for listing TrackingUserAccessOnWorkspaces.
      */
-    cursor?: TrackingUserAccessWhereUniqueInput
+    cursor?: TrackingUserAccessOnWorkspaceWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` TrackingUserAccesses from the position of the cursor.
+     * Take `±n` TrackingUserAccessOnWorkspaces from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` TrackingUserAccesses.
+     * Skip the first `n` TrackingUserAccessOnWorkspaces.
      */
     skip?: number
-    distinct?: Enumerable<TrackingUserAccessScalarFieldEnum>
+    distinct?: Enumerable<TrackingUserAccessOnWorkspaceScalarFieldEnum>
   }
 
 
   /**
-   * TrackingUserAccess create
+   * TrackingUserAccessOnWorkspace create
    */
-  export type TrackingUserAccessCreateArgs = {
+  export type TrackingUserAccessOnWorkspaceCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
     /**
-     * The data needed to create a TrackingUserAccess.
+     * The data needed to create a TrackingUserAccessOnWorkspace.
      */
-    data: XOR<TrackingUserAccessCreateInput, TrackingUserAccessUncheckedCreateInput>
+    data: XOR<TrackingUserAccessOnWorkspaceCreateInput, TrackingUserAccessOnWorkspaceUncheckedCreateInput>
   }
 
 
   /**
-   * TrackingUserAccess createMany
+   * TrackingUserAccessOnWorkspace createMany
    */
-  export type TrackingUserAccessCreateManyArgs = {
+  export type TrackingUserAccessOnWorkspaceCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many TrackingUserAccesses.
+     * The data used to create many TrackingUserAccessOnWorkspaces.
      */
-    data: Enumerable<TrackingUserAccessCreateManyInput>
+    data: Enumerable<TrackingUserAccessOnWorkspaceCreateManyInput>
     skipDuplicates?: boolean
   }
 
 
   /**
-   * TrackingUserAccess update
+   * TrackingUserAccessOnWorkspace update
    */
-  export type TrackingUserAccessUpdateArgs = {
+  export type TrackingUserAccessOnWorkspaceUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
     /**
-     * The data needed to update a TrackingUserAccess.
+     * The data needed to update a TrackingUserAccessOnWorkspace.
      */
-    data: XOR<TrackingUserAccessUpdateInput, TrackingUserAccessUncheckedUpdateInput>
+    data: XOR<TrackingUserAccessOnWorkspaceUpdateInput, TrackingUserAccessOnWorkspaceUncheckedUpdateInput>
     /**
-     * Choose, which TrackingUserAccess to update.
+     * Choose, which TrackingUserAccessOnWorkspace to update.
      */
-    where: TrackingUserAccessWhereUniqueInput
+    where: TrackingUserAccessOnWorkspaceWhereUniqueInput
   }
 
 
   /**
-   * TrackingUserAccess updateMany
+   * TrackingUserAccessOnWorkspace updateMany
    */
-  export type TrackingUserAccessUpdateManyArgs = {
+  export type TrackingUserAccessOnWorkspaceUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update TrackingUserAccesses.
+     * The data used to update TrackingUserAccessOnWorkspaces.
      */
-    data: XOR<TrackingUserAccessUpdateManyMutationInput, TrackingUserAccessUncheckedUpdateManyInput>
+    data: XOR<TrackingUserAccessOnWorkspaceUpdateManyMutationInput, TrackingUserAccessOnWorkspaceUncheckedUpdateManyInput>
     /**
-     * Filter which TrackingUserAccesses to update
+     * Filter which TrackingUserAccessOnWorkspaces to update
      */
-    where?: TrackingUserAccessWhereInput
+    where?: TrackingUserAccessOnWorkspaceWhereInput
   }
 
 
   /**
-   * TrackingUserAccess upsert
+   * TrackingUserAccessOnWorkspace upsert
    */
-  export type TrackingUserAccessUpsertArgs = {
+  export type TrackingUserAccessOnWorkspaceUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
     /**
-     * The filter to search for the TrackingUserAccess to update in case it exists.
+     * The filter to search for the TrackingUserAccessOnWorkspace to update in case it exists.
      */
-    where: TrackingUserAccessWhereUniqueInput
+    where: TrackingUserAccessOnWorkspaceWhereUniqueInput
     /**
-     * In case the TrackingUserAccess found by the `where` argument doesn't exist, create a new TrackingUserAccess with this data.
+     * In case the TrackingUserAccessOnWorkspace found by the `where` argument doesn't exist, create a new TrackingUserAccessOnWorkspace with this data.
      */
-    create: XOR<TrackingUserAccessCreateInput, TrackingUserAccessUncheckedCreateInput>
+    create: XOR<TrackingUserAccessOnWorkspaceCreateInput, TrackingUserAccessOnWorkspaceUncheckedCreateInput>
     /**
-     * In case the TrackingUserAccess was found with the provided `where` argument, update it with this data.
+     * In case the TrackingUserAccessOnWorkspace was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<TrackingUserAccessUpdateInput, TrackingUserAccessUncheckedUpdateInput>
+    update: XOR<TrackingUserAccessOnWorkspaceUpdateInput, TrackingUserAccessOnWorkspaceUncheckedUpdateInput>
   }
 
 
   /**
-   * TrackingUserAccess delete
+   * TrackingUserAccessOnWorkspace delete
    */
-  export type TrackingUserAccessDeleteArgs = {
+  export type TrackingUserAccessOnWorkspaceDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
     /**
-     * Filter which TrackingUserAccess to delete.
+     * Filter which TrackingUserAccessOnWorkspace to delete.
      */
-    where: TrackingUserAccessWhereUniqueInput
+    where: TrackingUserAccessOnWorkspaceWhereUniqueInput
   }
 
 
   /**
-   * TrackingUserAccess deleteMany
+   * TrackingUserAccessOnWorkspace deleteMany
    */
-  export type TrackingUserAccessDeleteManyArgs = {
+  export type TrackingUserAccessOnWorkspaceDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Filter which TrackingUserAccesses to delete
+     * Filter which TrackingUserAccessOnWorkspaces to delete
      */
-    where?: TrackingUserAccessWhereInput
+    where?: TrackingUserAccessOnWorkspaceWhereInput
   }
 
 
   /**
-   * TrackingUserAccess without action
+   * TrackingUserAccessOnWorkspace without action
    */
-  export type TrackingUserAccessArgs = {
+  export type TrackingUserAccessOnWorkspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: TrackingUserAccessSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
   }
 
 
@@ -6021,9 +7379,9 @@ export namespace Prisma {
     stripeSubscriptionId: string | null
     stripePriceId: string | null
     stripeCurrentPeriodEnd: Date | null
-    createdBy: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    createdBy: string | null
   }
 
   export type WorkspaceMaxAggregateOutputType = {
@@ -6035,9 +7393,9 @@ export namespace Prisma {
     stripeSubscriptionId: string | null
     stripePriceId: string | null
     stripeCurrentPeriodEnd: Date | null
-    createdBy: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    createdBy: string | null
   }
 
   export type WorkspaceCountAggregateOutputType = {
@@ -6049,9 +7407,9 @@ export namespace Prisma {
     stripeSubscriptionId: number
     stripePriceId: number
     stripeCurrentPeriodEnd: number
-    createdBy: number
     createdAt: number
     updatedAt: number
+    createdBy: number
     _all: number
   }
 
@@ -6065,9 +7423,9 @@ export namespace Prisma {
     stripeSubscriptionId?: true
     stripePriceId?: true
     stripeCurrentPeriodEnd?: true
-    createdBy?: true
     createdAt?: true
     updatedAt?: true
+    createdBy?: true
   }
 
   export type WorkspaceMaxAggregateInputType = {
@@ -6079,9 +7437,9 @@ export namespace Prisma {
     stripeSubscriptionId?: true
     stripePriceId?: true
     stripeCurrentPeriodEnd?: true
-    createdBy?: true
     createdAt?: true
     updatedAt?: true
+    createdBy?: true
   }
 
   export type WorkspaceCountAggregateInputType = {
@@ -6093,13 +7451,13 @@ export namespace Prisma {
     stripeSubscriptionId?: true
     stripePriceId?: true
     stripeCurrentPeriodEnd?: true
-    createdBy?: true
     createdAt?: true
     updatedAt?: true
+    createdBy?: true
     _all?: true
   }
 
-  export type WorkspaceAggregateArgs = {
+  export type WorkspaceAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Workspace to aggregate.
      */
@@ -6159,7 +7517,7 @@ export namespace Prisma {
 
 
 
-  export type WorkspaceGroupByArgs = {
+  export type WorkspaceGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     where?: WorkspaceWhereInput
     orderBy?: Enumerable<WorkspaceOrderByWithAggregationInput>
     by: WorkspaceScalarFieldEnum[]
@@ -6181,9 +7539,9 @@ export namespace Prisma {
     stripeSubscriptionId: string | null
     stripePriceId: string | null
     stripeCurrentPeriodEnd: Date | null
-    createdBy: string
     createdAt: Date
     updatedAt: Date
+    createdBy: string
     _count: WorkspaceCountAggregateOutputType | null
     _min: WorkspaceMinAggregateOutputType | null
     _max: WorkspaceMaxAggregateOutputType | null
@@ -6203,7 +7561,7 @@ export namespace Prisma {
     >
 
 
-  export type WorkspaceSelect = {
+  export type WorkspaceSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
     domain?: boolean
@@ -6212,57 +7570,50 @@ export namespace Prisma {
     stripeSubscriptionId?: boolean
     stripePriceId?: boolean
     stripeCurrentPeriodEnd?: boolean
-    createdBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    trackUserAccessWorkspace?: boolean | UserArgs
-    users?: boolean | Workspace$usersArgs
-    notebooks?: boolean | Workspace$notebooksArgs
-    trackingUserAccess?: boolean | Workspace$trackingUserAccessArgs
-    _count?: boolean | WorkspaceCountOutputTypeArgs
+    createdBy?: boolean
+    trackingUserAccessOnWorkspace?: boolean | Workspace$trackingUserAccessOnWorkspaceArgs<ExtArgs>
+    userOnWorkspace?: boolean | Workspace$userOnWorkspaceArgs<ExtArgs>
+    teamspaces?: boolean | Workspace$teamspacesArgs<ExtArgs>
+    notebooks?: boolean | Workspace$notebooksArgs<ExtArgs>
+    favorites?: boolean | Workspace$favoritesArgs<ExtArgs>
+    _count?: boolean | WorkspaceCountOutputTypeArgs<ExtArgs>
+  }, ExtArgs["result"]["workspace"]>
+
+  export type WorkspaceSelectScalar = {
+    id?: boolean
+    name?: boolean
+    domain?: boolean
+    stripeCustomerId?: boolean
+    stripeWorkspaceId?: boolean
+    stripeSubscriptionId?: boolean
+    stripePriceId?: boolean
+    stripeCurrentPeriodEnd?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    createdBy?: boolean
+  }
+
+  export type WorkspaceInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    trackingUserAccessOnWorkspace?: boolean | Workspace$trackingUserAccessOnWorkspaceArgs<ExtArgs>
+    userOnWorkspace?: boolean | Workspace$userOnWorkspaceArgs<ExtArgs>
+    teamspaces?: boolean | Workspace$teamspacesArgs<ExtArgs>
+    notebooks?: boolean | Workspace$notebooksArgs<ExtArgs>
+    favorites?: boolean | Workspace$favoritesArgs<ExtArgs>
+    _count?: boolean | WorkspaceCountOutputTypeArgs<ExtArgs>
   }
 
 
-  export type WorkspaceInclude = {
-    trackUserAccessWorkspace?: boolean | UserArgs
-    users?: boolean | Workspace$usersArgs
-    notebooks?: boolean | Workspace$notebooksArgs
-    trackingUserAccess?: boolean | Workspace$trackingUserAccessArgs
-    _count?: boolean | WorkspaceCountOutputTypeArgs
-  }
+  type WorkspaceGetPayload<S extends boolean | null | undefined | WorkspaceArgs> = $Types.GetResult<WorkspacePayload, S>
 
-  export type WorkspaceGetPayload<S extends boolean | null | undefined | WorkspaceArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? Workspace :
-    S extends undefined ? never :
-    S extends { include: any } & (WorkspaceArgs | WorkspaceFindManyArgs)
-    ? Workspace  & {
-    [P in TruthyKeys<S['include']>]:
-        P extends 'trackUserAccessWorkspace' ? UserGetPayload<S['include'][P]> | null :
-        P extends 'users' ? Array < UserGetPayload<S['include'][P]>>  :
-        P extends 'notebooks' ? Array < NotebookGetPayload<S['include'][P]>>  :
-        P extends 'trackingUserAccess' ? Array < TrackingUserAccessGetPayload<S['include'][P]>>  :
-        P extends '_count' ? WorkspaceCountOutputTypeGetPayload<S['include'][P]> :  never
-  } 
-    : S extends { select: any } & (WorkspaceArgs | WorkspaceFindManyArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-        P extends 'trackUserAccessWorkspace' ? UserGetPayload<S['select'][P]> | null :
-        P extends 'users' ? Array < UserGetPayload<S['select'][P]>>  :
-        P extends 'notebooks' ? Array < NotebookGetPayload<S['select'][P]>>  :
-        P extends 'trackingUserAccess' ? Array < TrackingUserAccessGetPayload<S['select'][P]>>  :
-        P extends '_count' ? WorkspaceCountOutputTypeGetPayload<S['select'][P]> :  P extends keyof Workspace ? Workspace[P] : never
-  } 
-      : Workspace
-
-
-  type WorkspaceCountArgs = 
+  type WorkspaceCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
     Omit<WorkspaceFindManyArgs, 'select' | 'include'> & {
       select?: WorkspaceCountAggregateInputType | true
     }
 
-  export interface WorkspaceDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
-
+  export interface WorkspaceDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Workspace'], meta: { name: 'Workspace' } }
     /**
      * Find zero or one Workspace that matches the filter.
      * @param {WorkspaceFindUniqueArgs} args - Arguments to find a Workspace
@@ -6274,9 +7625,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUnique<T extends WorkspaceFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, WorkspaceFindUniqueArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Workspace'> extends True ? Prisma__WorkspaceClient<WorkspaceGetPayload<T>> : Prisma__WorkspaceClient<WorkspaceGetPayload<T> | null, null>
+    findUnique<T extends WorkspaceFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, WorkspaceFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Workspace'> extends True ? Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
 
     /**
      * Find one Workspace that matches the filter or throw an error  with `error.code='P2025'` 
@@ -6290,9 +7641,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUniqueOrThrow<T extends WorkspaceFindUniqueOrThrowArgs>(
-      args?: SelectSubset<T, WorkspaceFindUniqueOrThrowArgs>
-    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+    findUniqueOrThrow<T extends WorkspaceFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, WorkspaceFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
 
     /**
      * Find the first Workspace that matches the filter.
@@ -6307,9 +7658,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirst<T extends WorkspaceFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, WorkspaceFindFirstArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Workspace'> extends True ? Prisma__WorkspaceClient<WorkspaceGetPayload<T>> : Prisma__WorkspaceClient<WorkspaceGetPayload<T> | null, null>
+    findFirst<T extends WorkspaceFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, WorkspaceFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Workspace'> extends True ? Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
 
     /**
      * Find the first Workspace that matches the filter or
@@ -6325,9 +7676,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirstOrThrow<T extends WorkspaceFindFirstOrThrowArgs>(
-      args?: SelectSubset<T, WorkspaceFindFirstOrThrowArgs>
-    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+    findFirstOrThrow<T extends WorkspaceFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, WorkspaceFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
 
     /**
      * Find zero or more Workspaces that matches the filter.
@@ -6345,9 +7696,9 @@ export namespace Prisma {
      * const workspaceWithIdOnly = await prisma.workspace.findMany({ select: { id: true } })
      * 
     **/
-    findMany<T extends WorkspaceFindManyArgs>(
-      args?: SelectSubset<T, WorkspaceFindManyArgs>
-    ): Prisma.PrismaPromise<Array<WorkspaceGetPayload<T>>>
+    findMany<T extends WorkspaceFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, WorkspaceFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findMany', never>>
 
     /**
      * Create a Workspace.
@@ -6361,9 +7712,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    create<T extends WorkspaceCreateArgs>(
-      args: SelectSubset<T, WorkspaceCreateArgs>
-    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+    create<T extends WorkspaceCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, WorkspaceCreateArgs<ExtArgs>>
+    ): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
 
     /**
      * Create many Workspaces.
@@ -6377,8 +7728,8 @@ export namespace Prisma {
      *     })
      *     
     **/
-    createMany<T extends WorkspaceCreateManyArgs>(
-      args?: SelectSubset<T, WorkspaceCreateManyArgs>
+    createMany<T extends WorkspaceCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, WorkspaceCreateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -6393,9 +7744,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    delete<T extends WorkspaceDeleteArgs>(
-      args: SelectSubset<T, WorkspaceDeleteArgs>
-    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+    delete<T extends WorkspaceDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, WorkspaceDeleteArgs<ExtArgs>>
+    ): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
 
     /**
      * Update one Workspace.
@@ -6412,9 +7763,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    update<T extends WorkspaceUpdateArgs>(
-      args: SelectSubset<T, WorkspaceUpdateArgs>
-    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+    update<T extends WorkspaceUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, WorkspaceUpdateArgs<ExtArgs>>
+    ): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
 
     /**
      * Delete zero or more Workspaces.
@@ -6428,8 +7779,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    deleteMany<T extends WorkspaceDeleteManyArgs>(
-      args?: SelectSubset<T, WorkspaceDeleteManyArgs>
+    deleteMany<T extends WorkspaceDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, WorkspaceDeleteManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -6449,8 +7800,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    updateMany<T extends WorkspaceUpdateManyArgs>(
-      args: SelectSubset<T, WorkspaceUpdateManyArgs>
+    updateMany<T extends WorkspaceUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, WorkspaceUpdateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -6470,9 +7821,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    upsert<T extends WorkspaceUpsertArgs>(
-      args: SelectSubset<T, WorkspaceUpsertArgs>
-    ): Prisma__WorkspaceClient<WorkspaceGetPayload<T>>
+    upsert<T extends WorkspaceUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, WorkspaceUpsertArgs<ExtArgs>>
+    ): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
 
     /**
      * Count the number of Workspaces.
@@ -6490,7 +7841,7 @@ export namespace Prisma {
     count<T extends WorkspaceCountArgs>(
       args?: Subset<T, WorkspaceCountArgs>,
     ): Prisma.PrismaPromise<
-      T extends _Record<'select', any>
+      T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], WorkspaceCountAggregateOutputType>
@@ -6608,7 +7959,7 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__WorkspaceClient<T, Null = never> implements Prisma.PrismaPromise<T> {
+  export class Prisma__WorkspaceClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
     private readonly _dmmf;
     private readonly _queryType;
     private readonly _rootField;
@@ -6623,13 +7974,15 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: 'PrismaPromise';
     constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
 
-    trackUserAccessWorkspace<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+    trackingUserAccessOnWorkspace<T extends Workspace$trackingUserAccessOnWorkspaceArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$trackingUserAccessOnWorkspaceArgs<ExtArgs>>): Prisma__TrackingUserAccessOnWorkspaceClient<$Types.GetResult<TrackingUserAccessOnWorkspacePayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
 
-    users<T extends Workspace$usersArgs= {}>(args?: Subset<T, Workspace$usersArgs>): Prisma.PrismaPromise<Array<UserGetPayload<T>>| Null>;
+    userOnWorkspace<T extends Workspace$userOnWorkspaceArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$userOnWorkspaceArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'findMany', never>| Null>;
 
-    notebooks<T extends Workspace$notebooksArgs= {}>(args?: Subset<T, Workspace$notebooksArgs>): Prisma.PrismaPromise<Array<NotebookGetPayload<T>>| Null>;
+    teamspaces<T extends Workspace$teamspacesArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$teamspacesArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'findMany', never>| Null>;
 
-    trackingUserAccess<T extends Workspace$trackingUserAccessArgs= {}>(args?: Subset<T, Workspace$trackingUserAccessArgs>): Prisma.PrismaPromise<Array<TrackingUserAccessGetPayload<T>>| Null>;
+    notebooks<T extends Workspace$notebooksArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$notebooksArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findMany', never>| Null>;
+
+    favorites<T extends Workspace$favoritesArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$favoritesArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'findMany', never>| Null>;
 
     private get _document();
     /**
@@ -6661,15 +8014,15 @@ export namespace Prisma {
   /**
    * Workspace base type for findUnique actions
    */
-  export type WorkspaceFindUniqueArgsBase = {
+  export type WorkspaceFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Workspace
      */
-    select?: WorkspaceSelect | null
+    select?: WorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
+    include?: WorkspaceInclude<ExtArgs> | null
     /**
      * Filter, which Workspace to fetch.
      */
@@ -6679,7 +8032,7 @@ export namespace Prisma {
   /**
    * Workspace findUnique
    */
-  export interface WorkspaceFindUniqueArgs extends WorkspaceFindUniqueArgsBase {
+  export interface WorkspaceFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends WorkspaceFindUniqueArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
@@ -6691,15 +8044,15 @@ export namespace Prisma {
   /**
    * Workspace findUniqueOrThrow
    */
-  export type WorkspaceFindUniqueOrThrowArgs = {
+  export type WorkspaceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Workspace
      */
-    select?: WorkspaceSelect | null
+    select?: WorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
+    include?: WorkspaceInclude<ExtArgs> | null
     /**
      * Filter, which Workspace to fetch.
      */
@@ -6710,15 +8063,15 @@ export namespace Prisma {
   /**
    * Workspace base type for findFirst actions
    */
-  export type WorkspaceFindFirstArgsBase = {
+  export type WorkspaceFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Workspace
      */
-    select?: WorkspaceSelect | null
+    select?: WorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
+    include?: WorkspaceInclude<ExtArgs> | null
     /**
      * Filter, which Workspace to fetch.
      */
@@ -6758,7 +8111,7 @@ export namespace Prisma {
   /**
    * Workspace findFirst
    */
-  export interface WorkspaceFindFirstArgs extends WorkspaceFindFirstArgsBase {
+  export interface WorkspaceFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends WorkspaceFindFirstArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
@@ -6770,15 +8123,15 @@ export namespace Prisma {
   /**
    * Workspace findFirstOrThrow
    */
-  export type WorkspaceFindFirstOrThrowArgs = {
+  export type WorkspaceFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Workspace
      */
-    select?: WorkspaceSelect | null
+    select?: WorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
+    include?: WorkspaceInclude<ExtArgs> | null
     /**
      * Filter, which Workspace to fetch.
      */
@@ -6819,15 +8172,15 @@ export namespace Prisma {
   /**
    * Workspace findMany
    */
-  export type WorkspaceFindManyArgs = {
+  export type WorkspaceFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Workspace
      */
-    select?: WorkspaceSelect | null
+    select?: WorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
+    include?: WorkspaceInclude<ExtArgs> | null
     /**
      * Filter, which Workspaces to fetch.
      */
@@ -6863,15 +8216,15 @@ export namespace Prisma {
   /**
    * Workspace create
    */
-  export type WorkspaceCreateArgs = {
+  export type WorkspaceCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Workspace
      */
-    select?: WorkspaceSelect | null
+    select?: WorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
+    include?: WorkspaceInclude<ExtArgs> | null
     /**
      * The data needed to create a Workspace.
      */
@@ -6882,7 +8235,7 @@ export namespace Prisma {
   /**
    * Workspace createMany
    */
-  export type WorkspaceCreateManyArgs = {
+  export type WorkspaceCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to create many Workspaces.
      */
@@ -6894,15 +8247,15 @@ export namespace Prisma {
   /**
    * Workspace update
    */
-  export type WorkspaceUpdateArgs = {
+  export type WorkspaceUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Workspace
      */
-    select?: WorkspaceSelect | null
+    select?: WorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
+    include?: WorkspaceInclude<ExtArgs> | null
     /**
      * The data needed to update a Workspace.
      */
@@ -6917,7 +8270,7 @@ export namespace Prisma {
   /**
    * Workspace updateMany
    */
-  export type WorkspaceUpdateManyArgs = {
+  export type WorkspaceUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to update Workspaces.
      */
@@ -6932,15 +8285,15 @@ export namespace Prisma {
   /**
    * Workspace upsert
    */
-  export type WorkspaceUpsertArgs = {
+  export type WorkspaceUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Workspace
      */
-    select?: WorkspaceSelect | null
+    select?: WorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
+    include?: WorkspaceInclude<ExtArgs> | null
     /**
      * The filter to search for the Workspace to update in case it exists.
      */
@@ -6959,15 +8312,15 @@ export namespace Prisma {
   /**
    * Workspace delete
    */
-  export type WorkspaceDeleteArgs = {
+  export type WorkspaceDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Workspace
      */
-    select?: WorkspaceSelect | null
+    select?: WorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
+    include?: WorkspaceInclude<ExtArgs> | null
     /**
      * Filter which Workspace to delete.
      */
@@ -6978,7 +8331,7 @@ export namespace Prisma {
   /**
    * Workspace deleteMany
    */
-  export type WorkspaceDeleteManyArgs = {
+  export type WorkspaceDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Workspaces to delete
      */
@@ -6987,38 +8340,75 @@ export namespace Prisma {
 
 
   /**
-   * Workspace.users
+   * Workspace.trackingUserAccessOnWorkspace
    */
-  export type Workspace$usersArgs = {
+  export type Workspace$trackingUserAccessOnWorkspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the User
+     * Select specific fields to fetch from the TrackingUserAccessOnWorkspace
      */
-    select?: UserSelect | null
+    select?: TrackingUserAccessOnWorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: UserInclude | null
-    where?: UserWhereInput
-    orderBy?: Enumerable<UserOrderByWithRelationInput>
-    cursor?: UserWhereUniqueInput
+    include?: TrackingUserAccessOnWorkspaceInclude<ExtArgs> | null
+    where?: TrackingUserAccessOnWorkspaceWhereInput
+  }
+
+
+  /**
+   * Workspace.userOnWorkspace
+   */
+  export type Workspace$userOnWorkspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    where?: UserOnWorkspaceWhereInput
+    orderBy?: Enumerable<UserOnWorkspaceOrderByWithRelationInput>
+    cursor?: UserOnWorkspaceWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: Enumerable<UserScalarFieldEnum>
+    distinct?: Enumerable<UserOnWorkspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * Workspace.teamspaces
+   */
+  export type Workspace$teamspacesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
+    where?: TeamspaceWhereInput
+    orderBy?: Enumerable<TeamspaceOrderByWithRelationInput>
+    cursor?: TeamspaceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<TeamspaceScalarFieldEnum>
   }
 
 
   /**
    * Workspace.notebooks
    */
-  export type Workspace$notebooksArgs = {
+  export type Workspace$notebooksArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Notebook
      */
-    select?: NotebookSelect | null
+    select?: NotebookSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: NotebookInclude<ExtArgs> | null
     where?: NotebookWhereInput
     orderBy?: Enumerable<NotebookOrderByWithRelationInput>
     cursor?: NotebookWhereUniqueInput
@@ -7029,38 +8419,1066 @@ export namespace Prisma {
 
 
   /**
-   * Workspace.trackingUserAccess
+   * Workspace.favorites
    */
-  export type Workspace$trackingUserAccessArgs = {
+  export type Workspace$favoritesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the TrackingUserAccess
+     * Select specific fields to fetch from the Favorite
      */
-    select?: TrackingUserAccessSelect | null
+    select?: FavoriteSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: TrackingUserAccessInclude | null
-    where?: TrackingUserAccessWhereInput
-    orderBy?: Enumerable<TrackingUserAccessOrderByWithRelationInput>
-    cursor?: TrackingUserAccessWhereUniqueInput
+    include?: FavoriteInclude<ExtArgs> | null
+    where?: FavoriteWhereInput
+    orderBy?: Enumerable<FavoriteOrderByWithRelationInput>
+    cursor?: FavoriteWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: Enumerable<TrackingUserAccessScalarFieldEnum>
+    distinct?: Enumerable<FavoriteScalarFieldEnum>
   }
 
 
   /**
    * Workspace without action
    */
-  export type WorkspaceArgs = {
+  export type WorkspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Workspace
      */
-    select?: WorkspaceSelect | null
+    select?: WorkspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: WorkspaceInclude | null
+    include?: WorkspaceInclude<ExtArgs> | null
+  }
+
+
+
+  /**
+   * Model Teamspace
+   */
+
+
+  export type AggregateTeamspace = {
+    _count: TeamspaceCountAggregateOutputType | null
+    _min: TeamspaceMinAggregateOutputType | null
+    _max: TeamspaceMaxAggregateOutputType | null
+  }
+
+  export type TeamspaceMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    isOrigin: boolean | null
+    archivedAt: Date | null
+    workspaceId: string | null
+    createdBy: string | null
+  }
+
+  export type TeamspaceMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    isOrigin: boolean | null
+    archivedAt: Date | null
+    workspaceId: string | null
+    createdBy: string | null
+  }
+
+  export type TeamspaceCountAggregateOutputType = {
+    id: number
+    name: number
+    description: number
+    createdAt: number
+    updatedAt: number
+    isOrigin: number
+    archivedAt: number
+    workspaceId: number
+    createdBy: number
+    _all: number
+  }
+
+
+  export type TeamspaceMinAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+    isOrigin?: true
+    archivedAt?: true
+    workspaceId?: true
+    createdBy?: true
+  }
+
+  export type TeamspaceMaxAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+    isOrigin?: true
+    archivedAt?: true
+    workspaceId?: true
+    createdBy?: true
+  }
+
+  export type TeamspaceCountAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+    isOrigin?: true
+    archivedAt?: true
+    workspaceId?: true
+    createdBy?: true
+    _all?: true
+  }
+
+  export type TeamspaceAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Teamspace to aggregate.
+     */
+    where?: TeamspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Teamspaces to fetch.
+     */
+    orderBy?: Enumerable<TeamspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TeamspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Teamspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Teamspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Teamspaces
+    **/
+    _count?: true | TeamspaceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TeamspaceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TeamspaceMaxAggregateInputType
+  }
+
+  export type GetTeamspaceAggregateType<T extends TeamspaceAggregateArgs> = {
+        [P in keyof T & keyof AggregateTeamspace]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTeamspace[P]>
+      : GetScalarType<T[P], AggregateTeamspace[P]>
+  }
+
+
+
+
+  export type TeamspaceGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: TeamspaceWhereInput
+    orderBy?: Enumerable<TeamspaceOrderByWithAggregationInput>
+    by: TeamspaceScalarFieldEnum[]
+    having?: TeamspaceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TeamspaceCountAggregateInputType | true
+    _min?: TeamspaceMinAggregateInputType
+    _max?: TeamspaceMaxAggregateInputType
+  }
+
+
+  export type TeamspaceGroupByOutputType = {
+    id: string
+    name: string
+    description: string | null
+    createdAt: Date
+    updatedAt: Date
+    isOrigin: boolean | null
+    archivedAt: Date | null
+    workspaceId: string | null
+    createdBy: string
+    _count: TeamspaceCountAggregateOutputType | null
+    _min: TeamspaceMinAggregateOutputType | null
+    _max: TeamspaceMaxAggregateOutputType | null
+  }
+
+  type GetTeamspaceGroupByPayload<T extends TeamspaceGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickArray<TeamspaceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TeamspaceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TeamspaceGroupByOutputType[P]>
+            : GetScalarType<T[P], TeamspaceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TeamspaceSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    isOrigin?: boolean
+    archivedAt?: boolean
+    workspaceId?: boolean
+    createdBy?: boolean
+    workspace?: boolean | Teamspace$workspaceArgs<ExtArgs>
+    userOnTeamspace?: boolean | Teamspace$userOnTeamspaceArgs<ExtArgs>
+    notebooks?: boolean | Teamspace$notebooksArgs<ExtArgs>
+    _count?: boolean | TeamspaceCountOutputTypeArgs<ExtArgs>
+  }, ExtArgs["result"]["teamspace"]>
+
+  export type TeamspaceSelectScalar = {
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    isOrigin?: boolean
+    archivedAt?: boolean
+    workspaceId?: boolean
+    createdBy?: boolean
+  }
+
+  export type TeamspaceInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    workspace?: boolean | Teamspace$workspaceArgs<ExtArgs>
+    userOnTeamspace?: boolean | Teamspace$userOnTeamspaceArgs<ExtArgs>
+    notebooks?: boolean | Teamspace$notebooksArgs<ExtArgs>
+    _count?: boolean | TeamspaceCountOutputTypeArgs<ExtArgs>
+  }
+
+
+  type TeamspaceGetPayload<S extends boolean | null | undefined | TeamspaceArgs> = $Types.GetResult<TeamspacePayload, S>
+
+  type TeamspaceCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
+    Omit<TeamspaceFindManyArgs, 'select' | 'include'> & {
+      select?: TeamspaceCountAggregateInputType | true
+    }
+
+  export interface TeamspaceDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Teamspace'], meta: { name: 'Teamspace' } }
+    /**
+     * Find zero or one Teamspace that matches the filter.
+     * @param {TeamspaceFindUniqueArgs} args - Arguments to find a Teamspace
+     * @example
+     * // Get one Teamspace
+     * const teamspace = await prisma.teamspace.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUnique<T extends TeamspaceFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, TeamspaceFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Teamspace'> extends True ? Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
+
+    /**
+     * Find one Teamspace that matches the filter or throw an error  with `error.code='P2025'` 
+     *     if no matches were found.
+     * @param {TeamspaceFindUniqueOrThrowArgs} args - Arguments to find a Teamspace
+     * @example
+     * // Get one Teamspace
+     * const teamspace = await prisma.teamspace.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUniqueOrThrow<T extends TeamspaceFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, TeamspaceFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
+
+    /**
+     * Find the first Teamspace that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamspaceFindFirstArgs} args - Arguments to find a Teamspace
+     * @example
+     * // Get one Teamspace
+     * const teamspace = await prisma.teamspace.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirst<T extends TeamspaceFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, TeamspaceFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Teamspace'> extends True ? Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
+
+    /**
+     * Find the first Teamspace that matches the filter or
+     * throw `NotFoundError` if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamspaceFindFirstOrThrowArgs} args - Arguments to find a Teamspace
+     * @example
+     * // Get one Teamspace
+     * const teamspace = await prisma.teamspace.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirstOrThrow<T extends TeamspaceFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, TeamspaceFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
+
+    /**
+     * Find zero or more Teamspaces that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamspaceFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Teamspaces
+     * const teamspaces = await prisma.teamspace.findMany()
+     * 
+     * // Get first 10 Teamspaces
+     * const teamspaces = await prisma.teamspace.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const teamspaceWithIdOnly = await prisma.teamspace.findMany({ select: { id: true } })
+     * 
+    **/
+    findMany<T extends TeamspaceFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, TeamspaceFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'findMany', never>>
+
+    /**
+     * Create a Teamspace.
+     * @param {TeamspaceCreateArgs} args - Arguments to create a Teamspace.
+     * @example
+     * // Create one Teamspace
+     * const Teamspace = await prisma.teamspace.create({
+     *   data: {
+     *     // ... data to create a Teamspace
+     *   }
+     * })
+     * 
+    **/
+    create<T extends TeamspaceCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, TeamspaceCreateArgs<ExtArgs>>
+    ): Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
+
+    /**
+     * Create many Teamspaces.
+     *     @param {TeamspaceCreateManyArgs} args - Arguments to create many Teamspaces.
+     *     @example
+     *     // Create many Teamspaces
+     *     const teamspace = await prisma.teamspace.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends TeamspaceCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, TeamspaceCreateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Teamspace.
+     * @param {TeamspaceDeleteArgs} args - Arguments to delete one Teamspace.
+     * @example
+     * // Delete one Teamspace
+     * const Teamspace = await prisma.teamspace.delete({
+     *   where: {
+     *     // ... filter to delete one Teamspace
+     *   }
+     * })
+     * 
+    **/
+    delete<T extends TeamspaceDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, TeamspaceDeleteArgs<ExtArgs>>
+    ): Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
+
+    /**
+     * Update one Teamspace.
+     * @param {TeamspaceUpdateArgs} args - Arguments to update one Teamspace.
+     * @example
+     * // Update one Teamspace
+     * const teamspace = await prisma.teamspace.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    update<T extends TeamspaceUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, TeamspaceUpdateArgs<ExtArgs>>
+    ): Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
+
+    /**
+     * Delete zero or more Teamspaces.
+     * @param {TeamspaceDeleteManyArgs} args - Arguments to filter Teamspaces to delete.
+     * @example
+     * // Delete a few Teamspaces
+     * const { count } = await prisma.teamspace.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+    **/
+    deleteMany<T extends TeamspaceDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, TeamspaceDeleteManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Teamspaces.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamspaceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Teamspaces
+     * const teamspace = await prisma.teamspace.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    updateMany<T extends TeamspaceUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, TeamspaceUpdateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Teamspace.
+     * @param {TeamspaceUpsertArgs} args - Arguments to update or create a Teamspace.
+     * @example
+     * // Update or create a Teamspace
+     * const teamspace = await prisma.teamspace.upsert({
+     *   create: {
+     *     // ... data to create a Teamspace
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Teamspace we want to update
+     *   }
+     * })
+    **/
+    upsert<T extends TeamspaceUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, TeamspaceUpsertArgs<ExtArgs>>
+    ): Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
+
+    /**
+     * Count the number of Teamspaces.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamspaceCountArgs} args - Arguments to filter Teamspaces to count.
+     * @example
+     * // Count the number of Teamspaces
+     * const count = await prisma.teamspace.count({
+     *   where: {
+     *     // ... the filter for the Teamspaces we want to count
+     *   }
+     * })
+    **/
+    count<T extends TeamspaceCountArgs>(
+      args?: Subset<T, TeamspaceCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TeamspaceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Teamspace.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamspaceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TeamspaceAggregateArgs>(args: Subset<T, TeamspaceAggregateArgs>): Prisma.PrismaPromise<GetTeamspaceAggregateType<T>>
+
+    /**
+     * Group by Teamspace.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamspaceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TeamspaceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TeamspaceGroupByArgs['orderBy'] }
+        : { orderBy?: TeamspaceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TeamspaceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTeamspaceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Teamspace.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export class Prisma__TeamspaceClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
+    private readonly _dmmf;
+    private readonly _queryType;
+    private readonly _rootField;
+    private readonly _clientMethod;
+    private readonly _args;
+    private readonly _dataPath;
+    private readonly _errorFormat;
+    private readonly _measurePerformance?;
+    private _isList;
+    private _callsite;
+    private _requestPromise?;
+    readonly [Symbol.toStringTag]: 'PrismaPromise';
+    constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
+
+    workspace<T extends Teamspace$workspaceArgs<ExtArgs> = {}>(args?: Subset<T, Teamspace$workspaceArgs<ExtArgs>>): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    userOnTeamspace<T extends Teamspace$userOnTeamspaceArgs<ExtArgs> = {}>(args?: Subset<T, Teamspace$userOnTeamspaceArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'findMany', never>| Null>;
+
+    notebooks<T extends Teamspace$notebooksArgs<ExtArgs> = {}>(args?: Subset<T, Teamspace$notebooksArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findMany', never>| Null>;
+
+    private get _document();
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): Promise<T>;
+  }
+
+
+
+  // Custom InputTypes
+
+  /**
+   * Teamspace base type for findUnique actions
+   */
+  export type TeamspaceFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which Teamspace to fetch.
+     */
+    where: TeamspaceWhereUniqueInput
+  }
+
+  /**
+   * Teamspace findUnique
+   */
+  export interface TeamspaceFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends TeamspaceFindUniqueArgsBase<ExtArgs> {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * Teamspace findUniqueOrThrow
+   */
+  export type TeamspaceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which Teamspace to fetch.
+     */
+    where: TeamspaceWhereUniqueInput
+  }
+
+
+  /**
+   * Teamspace base type for findFirst actions
+   */
+  export type TeamspaceFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which Teamspace to fetch.
+     */
+    where?: TeamspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Teamspaces to fetch.
+     */
+    orderBy?: Enumerable<TeamspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Teamspaces.
+     */
+    cursor?: TeamspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Teamspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Teamspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Teamspaces.
+     */
+    distinct?: Enumerable<TeamspaceScalarFieldEnum>
+  }
+
+  /**
+   * Teamspace findFirst
+   */
+  export interface TeamspaceFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends TeamspaceFindFirstArgsBase<ExtArgs> {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * Teamspace findFirstOrThrow
+   */
+  export type TeamspaceFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which Teamspace to fetch.
+     */
+    where?: TeamspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Teamspaces to fetch.
+     */
+    orderBy?: Enumerable<TeamspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Teamspaces.
+     */
+    cursor?: TeamspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Teamspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Teamspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Teamspaces.
+     */
+    distinct?: Enumerable<TeamspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * Teamspace findMany
+   */
+  export type TeamspaceFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which Teamspaces to fetch.
+     */
+    where?: TeamspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Teamspaces to fetch.
+     */
+    orderBy?: Enumerable<TeamspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Teamspaces.
+     */
+    cursor?: TeamspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Teamspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Teamspaces.
+     */
+    skip?: number
+    distinct?: Enumerable<TeamspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * Teamspace create
+   */
+  export type TeamspaceCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Teamspace.
+     */
+    data: XOR<TeamspaceCreateInput, TeamspaceUncheckedCreateInput>
+  }
+
+
+  /**
+   * Teamspace createMany
+   */
+  export type TeamspaceCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Teamspaces.
+     */
+    data: Enumerable<TeamspaceCreateManyInput>
+    skipDuplicates?: boolean
+  }
+
+
+  /**
+   * Teamspace update
+   */
+  export type TeamspaceUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Teamspace.
+     */
+    data: XOR<TeamspaceUpdateInput, TeamspaceUncheckedUpdateInput>
+    /**
+     * Choose, which Teamspace to update.
+     */
+    where: TeamspaceWhereUniqueInput
+  }
+
+
+  /**
+   * Teamspace updateMany
+   */
+  export type TeamspaceUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Teamspaces.
+     */
+    data: XOR<TeamspaceUpdateManyMutationInput, TeamspaceUncheckedUpdateManyInput>
+    /**
+     * Filter which Teamspaces to update
+     */
+    where?: TeamspaceWhereInput
+  }
+
+
+  /**
+   * Teamspace upsert
+   */
+  export type TeamspaceUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Teamspace to update in case it exists.
+     */
+    where: TeamspaceWhereUniqueInput
+    /**
+     * In case the Teamspace found by the `where` argument doesn't exist, create a new Teamspace with this data.
+     */
+    create: XOR<TeamspaceCreateInput, TeamspaceUncheckedCreateInput>
+    /**
+     * In case the Teamspace was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TeamspaceUpdateInput, TeamspaceUncheckedUpdateInput>
+  }
+
+
+  /**
+   * Teamspace delete
+   */
+  export type TeamspaceDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter which Teamspace to delete.
+     */
+    where: TeamspaceWhereUniqueInput
+  }
+
+
+  /**
+   * Teamspace deleteMany
+   */
+  export type TeamspaceDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Teamspaces to delete
+     */
+    where?: TeamspaceWhereInput
+  }
+
+
+  /**
+   * Teamspace.workspace
+   */
+  export type Teamspace$workspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    where?: WorkspaceWhereInput
+  }
+
+
+  /**
+   * Teamspace.userOnTeamspace
+   */
+  export type Teamspace$userOnTeamspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    where?: UserOnTeamspaceWhereInput
+    orderBy?: Enumerable<UserOnTeamspaceOrderByWithRelationInput>
+    cursor?: UserOnTeamspaceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<UserOnTeamspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * Teamspace.notebooks
+   */
+  export type Teamspace$notebooksArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notebook
+     */
+    select?: NotebookSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: NotebookInclude<ExtArgs> | null
+    where?: NotebookWhereInput
+    orderBy?: Enumerable<NotebookOrderByWithRelationInput>
+    cursor?: NotebookWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<NotebookScalarFieldEnum>
+  }
+
+
+  /**
+   * Teamspace without action
+   */
+  export type TeamspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Teamspace
+     */
+    select?: TeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TeamspaceInclude<ExtArgs> | null
   }
 
 
@@ -7084,6 +9502,8 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     workspaceId: string | null
+    teamspaceId: string | null
+    createdBy: string | null
   }
 
   export type NotebookMaxAggregateOutputType = {
@@ -7094,6 +9514,8 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     workspaceId: string | null
+    teamspaceId: string | null
+    createdBy: string | null
   }
 
   export type NotebookCountAggregateOutputType = {
@@ -7104,6 +9526,8 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     workspaceId: number
+    teamspaceId: number
+    createdBy: number
     _all: number
   }
 
@@ -7116,6 +9540,8 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     workspaceId?: true
+    teamspaceId?: true
+    createdBy?: true
   }
 
   export type NotebookMaxAggregateInputType = {
@@ -7126,6 +9552,8 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     workspaceId?: true
+    teamspaceId?: true
+    createdBy?: true
   }
 
   export type NotebookCountAggregateInputType = {
@@ -7136,10 +9564,12 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     workspaceId?: true
+    teamspaceId?: true
+    createdBy?: true
     _all?: true
   }
 
-  export type NotebookAggregateArgs = {
+  export type NotebookAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Notebook to aggregate.
      */
@@ -7199,7 +9629,7 @@ export namespace Prisma {
 
 
 
-  export type NotebookGroupByArgs = {
+  export type NotebookGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     where?: NotebookWhereInput
     orderBy?: Enumerable<NotebookOrderByWithAggregationInput>
     by: NotebookScalarFieldEnum[]
@@ -7215,11 +9645,13 @@ export namespace Prisma {
   export type NotebookGroupByOutputType = {
     id: string
     title: string
-    description: string
+    description: string | null
     published: boolean
     createdAt: Date
     updatedAt: Date
     workspaceId: string
+    teamspaceId: string | null
+    createdBy: string
     _count: NotebookCountAggregateOutputType | null
     _min: NotebookMinAggregateOutputType | null
     _max: NotebookMaxAggregateOutputType | null
@@ -7239,7 +9671,7 @@ export namespace Prisma {
     >
 
 
-  export type NotebookSelect = {
+  export type NotebookSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
     description?: boolean
@@ -7247,46 +9679,45 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     workspaceId?: boolean
-    pages?: boolean | Notebook$pagesArgs
-    workspace?: boolean | WorkspaceArgs
-    _count?: boolean | NotebookCountOutputTypeArgs
+    teamspaceId?: boolean
+    createdBy?: boolean
+    pages?: boolean | Notebook$pagesArgs<ExtArgs>
+    workspace?: boolean | WorkspaceArgs<ExtArgs>
+    teamspace?: boolean | Notebook$teamspaceArgs<ExtArgs>
+    user?: boolean | UserArgs<ExtArgs>
+    _count?: boolean | NotebookCountOutputTypeArgs<ExtArgs>
+  }, ExtArgs["result"]["notebook"]>
+
+  export type NotebookSelectScalar = {
+    id?: boolean
+    title?: boolean
+    description?: boolean
+    published?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    workspaceId?: boolean
+    teamspaceId?: boolean
+    createdBy?: boolean
+  }
+
+  export type NotebookInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    pages?: boolean | Notebook$pagesArgs<ExtArgs>
+    workspace?: boolean | WorkspaceArgs<ExtArgs>
+    teamspace?: boolean | Notebook$teamspaceArgs<ExtArgs>
+    user?: boolean | UserArgs<ExtArgs>
+    _count?: boolean | NotebookCountOutputTypeArgs<ExtArgs>
   }
 
 
-  export type NotebookInclude = {
-    pages?: boolean | Notebook$pagesArgs
-    workspace?: boolean | WorkspaceArgs
-    _count?: boolean | NotebookCountOutputTypeArgs
-  }
+  type NotebookGetPayload<S extends boolean | null | undefined | NotebookArgs> = $Types.GetResult<NotebookPayload, S>
 
-  export type NotebookGetPayload<S extends boolean | null | undefined | NotebookArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? Notebook :
-    S extends undefined ? never :
-    S extends { include: any } & (NotebookArgs | NotebookFindManyArgs)
-    ? Notebook  & {
-    [P in TruthyKeys<S['include']>]:
-        P extends 'pages' ? Array < PageGetPayload<S['include'][P]>>  :
-        P extends 'workspace' ? WorkspaceGetPayload<S['include'][P]> :
-        P extends '_count' ? NotebookCountOutputTypeGetPayload<S['include'][P]> :  never
-  } 
-    : S extends { select: any } & (NotebookArgs | NotebookFindManyArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-        P extends 'pages' ? Array < PageGetPayload<S['select'][P]>>  :
-        P extends 'workspace' ? WorkspaceGetPayload<S['select'][P]> :
-        P extends '_count' ? NotebookCountOutputTypeGetPayload<S['select'][P]> :  P extends keyof Notebook ? Notebook[P] : never
-  } 
-      : Notebook
-
-
-  type NotebookCountArgs = 
+  type NotebookCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
     Omit<NotebookFindManyArgs, 'select' | 'include'> & {
       select?: NotebookCountAggregateInputType | true
     }
 
-  export interface NotebookDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
-
+  export interface NotebookDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Notebook'], meta: { name: 'Notebook' } }
     /**
      * Find zero or one Notebook that matches the filter.
      * @param {NotebookFindUniqueArgs} args - Arguments to find a Notebook
@@ -7298,9 +9729,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUnique<T extends NotebookFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, NotebookFindUniqueArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Notebook'> extends True ? Prisma__NotebookClient<NotebookGetPayload<T>> : Prisma__NotebookClient<NotebookGetPayload<T> | null, null>
+    findUnique<T extends NotebookFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, NotebookFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Notebook'> extends True ? Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
 
     /**
      * Find one Notebook that matches the filter or throw an error  with `error.code='P2025'` 
@@ -7314,9 +9745,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUniqueOrThrow<T extends NotebookFindUniqueOrThrowArgs>(
-      args?: SelectSubset<T, NotebookFindUniqueOrThrowArgs>
-    ): Prisma__NotebookClient<NotebookGetPayload<T>>
+    findUniqueOrThrow<T extends NotebookFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, NotebookFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
 
     /**
      * Find the first Notebook that matches the filter.
@@ -7331,9 +9762,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirst<T extends NotebookFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, NotebookFindFirstArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Notebook'> extends True ? Prisma__NotebookClient<NotebookGetPayload<T>> : Prisma__NotebookClient<NotebookGetPayload<T> | null, null>
+    findFirst<T extends NotebookFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, NotebookFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Notebook'> extends True ? Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
 
     /**
      * Find the first Notebook that matches the filter or
@@ -7349,9 +9780,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirstOrThrow<T extends NotebookFindFirstOrThrowArgs>(
-      args?: SelectSubset<T, NotebookFindFirstOrThrowArgs>
-    ): Prisma__NotebookClient<NotebookGetPayload<T>>
+    findFirstOrThrow<T extends NotebookFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, NotebookFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
 
     /**
      * Find zero or more Notebooks that matches the filter.
@@ -7369,9 +9800,9 @@ export namespace Prisma {
      * const notebookWithIdOnly = await prisma.notebook.findMany({ select: { id: true } })
      * 
     **/
-    findMany<T extends NotebookFindManyArgs>(
-      args?: SelectSubset<T, NotebookFindManyArgs>
-    ): Prisma.PrismaPromise<Array<NotebookGetPayload<T>>>
+    findMany<T extends NotebookFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, NotebookFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findMany', never>>
 
     /**
      * Create a Notebook.
@@ -7385,9 +9816,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    create<T extends NotebookCreateArgs>(
-      args: SelectSubset<T, NotebookCreateArgs>
-    ): Prisma__NotebookClient<NotebookGetPayload<T>>
+    create<T extends NotebookCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, NotebookCreateArgs<ExtArgs>>
+    ): Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
 
     /**
      * Create many Notebooks.
@@ -7401,8 +9832,8 @@ export namespace Prisma {
      *     })
      *     
     **/
-    createMany<T extends NotebookCreateManyArgs>(
-      args?: SelectSubset<T, NotebookCreateManyArgs>
+    createMany<T extends NotebookCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, NotebookCreateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -7417,9 +9848,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    delete<T extends NotebookDeleteArgs>(
-      args: SelectSubset<T, NotebookDeleteArgs>
-    ): Prisma__NotebookClient<NotebookGetPayload<T>>
+    delete<T extends NotebookDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, NotebookDeleteArgs<ExtArgs>>
+    ): Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
 
     /**
      * Update one Notebook.
@@ -7436,9 +9867,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    update<T extends NotebookUpdateArgs>(
-      args: SelectSubset<T, NotebookUpdateArgs>
-    ): Prisma__NotebookClient<NotebookGetPayload<T>>
+    update<T extends NotebookUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, NotebookUpdateArgs<ExtArgs>>
+    ): Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
 
     /**
      * Delete zero or more Notebooks.
@@ -7452,8 +9883,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    deleteMany<T extends NotebookDeleteManyArgs>(
-      args?: SelectSubset<T, NotebookDeleteManyArgs>
+    deleteMany<T extends NotebookDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, NotebookDeleteManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -7473,8 +9904,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    updateMany<T extends NotebookUpdateManyArgs>(
-      args: SelectSubset<T, NotebookUpdateManyArgs>
+    updateMany<T extends NotebookUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, NotebookUpdateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -7494,9 +9925,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    upsert<T extends NotebookUpsertArgs>(
-      args: SelectSubset<T, NotebookUpsertArgs>
-    ): Prisma__NotebookClient<NotebookGetPayload<T>>
+    upsert<T extends NotebookUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, NotebookUpsertArgs<ExtArgs>>
+    ): Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
 
     /**
      * Count the number of Notebooks.
@@ -7514,7 +9945,7 @@ export namespace Prisma {
     count<T extends NotebookCountArgs>(
       args?: Subset<T, NotebookCountArgs>,
     ): Prisma.PrismaPromise<
-      T extends _Record<'select', any>
+      T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], NotebookCountAggregateOutputType>
@@ -7632,7 +10063,7 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__NotebookClient<T, Null = never> implements Prisma.PrismaPromise<T> {
+  export class Prisma__NotebookClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
     private readonly _dmmf;
     private readonly _queryType;
     private readonly _rootField;
@@ -7647,9 +10078,13 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: 'PrismaPromise';
     constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
 
-    pages<T extends Notebook$pagesArgs= {}>(args?: Subset<T, Notebook$pagesArgs>): Prisma.PrismaPromise<Array<PageGetPayload<T>>| Null>;
+    pages<T extends Notebook$pagesArgs<ExtArgs> = {}>(args?: Subset<T, Notebook$pagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<PagePayload<ExtArgs>, T, 'findMany', never>| Null>;
 
-    workspace<T extends WorkspaceArgs= {}>(args?: Subset<T, WorkspaceArgs>): Prisma__WorkspaceClient<WorkspaceGetPayload<T> | Null>;
+    workspace<T extends WorkspaceArgs<ExtArgs> = {}>(args?: Subset<T, WorkspaceArgs<ExtArgs>>): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    teamspace<T extends Notebook$teamspaceArgs<ExtArgs> = {}>(args?: Subset<T, Notebook$teamspaceArgs<ExtArgs>>): Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    user<T extends UserArgs<ExtArgs> = {}>(args?: Subset<T, UserArgs<ExtArgs>>): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
 
     private get _document();
     /**
@@ -7681,15 +10116,15 @@ export namespace Prisma {
   /**
    * Notebook base type for findUnique actions
    */
-  export type NotebookFindUniqueArgsBase = {
+  export type NotebookFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Notebook
      */
-    select?: NotebookSelect | null
+    select?: NotebookSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: NotebookInclude<ExtArgs> | null
     /**
      * Filter, which Notebook to fetch.
      */
@@ -7699,7 +10134,7 @@ export namespace Prisma {
   /**
    * Notebook findUnique
    */
-  export interface NotebookFindUniqueArgs extends NotebookFindUniqueArgsBase {
+  export interface NotebookFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends NotebookFindUniqueArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
@@ -7711,15 +10146,15 @@ export namespace Prisma {
   /**
    * Notebook findUniqueOrThrow
    */
-  export type NotebookFindUniqueOrThrowArgs = {
+  export type NotebookFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Notebook
      */
-    select?: NotebookSelect | null
+    select?: NotebookSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: NotebookInclude<ExtArgs> | null
     /**
      * Filter, which Notebook to fetch.
      */
@@ -7730,15 +10165,15 @@ export namespace Prisma {
   /**
    * Notebook base type for findFirst actions
    */
-  export type NotebookFindFirstArgsBase = {
+  export type NotebookFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Notebook
      */
-    select?: NotebookSelect | null
+    select?: NotebookSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: NotebookInclude<ExtArgs> | null
     /**
      * Filter, which Notebook to fetch.
      */
@@ -7778,7 +10213,7 @@ export namespace Prisma {
   /**
    * Notebook findFirst
    */
-  export interface NotebookFindFirstArgs extends NotebookFindFirstArgsBase {
+  export interface NotebookFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends NotebookFindFirstArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
@@ -7790,15 +10225,15 @@ export namespace Prisma {
   /**
    * Notebook findFirstOrThrow
    */
-  export type NotebookFindFirstOrThrowArgs = {
+  export type NotebookFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Notebook
      */
-    select?: NotebookSelect | null
+    select?: NotebookSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: NotebookInclude<ExtArgs> | null
     /**
      * Filter, which Notebook to fetch.
      */
@@ -7839,15 +10274,15 @@ export namespace Prisma {
   /**
    * Notebook findMany
    */
-  export type NotebookFindManyArgs = {
+  export type NotebookFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Notebook
      */
-    select?: NotebookSelect | null
+    select?: NotebookSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: NotebookInclude<ExtArgs> | null
     /**
      * Filter, which Notebooks to fetch.
      */
@@ -7883,15 +10318,15 @@ export namespace Prisma {
   /**
    * Notebook create
    */
-  export type NotebookCreateArgs = {
+  export type NotebookCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Notebook
      */
-    select?: NotebookSelect | null
+    select?: NotebookSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: NotebookInclude<ExtArgs> | null
     /**
      * The data needed to create a Notebook.
      */
@@ -7902,7 +10337,7 @@ export namespace Prisma {
   /**
    * Notebook createMany
    */
-  export type NotebookCreateManyArgs = {
+  export type NotebookCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to create many Notebooks.
      */
@@ -7914,15 +10349,15 @@ export namespace Prisma {
   /**
    * Notebook update
    */
-  export type NotebookUpdateArgs = {
+  export type NotebookUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Notebook
      */
-    select?: NotebookSelect | null
+    select?: NotebookSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: NotebookInclude<ExtArgs> | null
     /**
      * The data needed to update a Notebook.
      */
@@ -7937,7 +10372,7 @@ export namespace Prisma {
   /**
    * Notebook updateMany
    */
-  export type NotebookUpdateManyArgs = {
+  export type NotebookUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to update Notebooks.
      */
@@ -7952,15 +10387,15 @@ export namespace Prisma {
   /**
    * Notebook upsert
    */
-  export type NotebookUpsertArgs = {
+  export type NotebookUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Notebook
      */
-    select?: NotebookSelect | null
+    select?: NotebookSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: NotebookInclude<ExtArgs> | null
     /**
      * The filter to search for the Notebook to update in case it exists.
      */
@@ -7979,15 +10414,15 @@ export namespace Prisma {
   /**
    * Notebook delete
    */
-  export type NotebookDeleteArgs = {
+  export type NotebookDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Notebook
      */
-    select?: NotebookSelect | null
+    select?: NotebookSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: NotebookInclude<ExtArgs> | null
     /**
      * Filter which Notebook to delete.
      */
@@ -7998,7 +10433,7 @@ export namespace Prisma {
   /**
    * Notebook deleteMany
    */
-  export type NotebookDeleteManyArgs = {
+  export type NotebookDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Notebooks to delete
      */
@@ -8009,15 +10444,15 @@ export namespace Prisma {
   /**
    * Notebook.pages
    */
-  export type Notebook$pagesArgs = {
+  export type Notebook$pagesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Page
      */
-    select?: PageSelect | null
+    select?: PageSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: PageInclude<ExtArgs> | null
     where?: PageWhereInput
     orderBy?: Enumerable<PageOrderByWithRelationInput>
     cursor?: PageWhereUniqueInput
@@ -8028,17 +10463,33 @@ export namespace Prisma {
 
 
   /**
-   * Notebook without action
+   * Notebook.teamspace
    */
-  export type NotebookArgs = {
+  export type Notebook$teamspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Notebook
+     * Select specific fields to fetch from the Teamspace
      */
-    select?: NotebookSelect | null
+    select?: TeamspaceSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: NotebookInclude | null
+    include?: TeamspaceInclude<ExtArgs> | null
+    where?: TeamspaceWhereInput
+  }
+
+
+  /**
+   * Notebook without action
+   */
+  export type NotebookArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notebook
+     */
+    select?: NotebookSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: NotebookInclude<ExtArgs> | null
   }
 
 
@@ -8059,11 +10510,12 @@ export namespace Prisma {
     title: string | null
     published: boolean | null
     createdAt: Date | null
-    updatedBy: string | null
     updatedAt: Date | null
-    deletedBy: string | null
     deletedAt: Date | null
     notebookId: string | null
+    createdBy: string | null
+    deletedBy: string | null
+    updatedBy: string | null
   }
 
   export type PageMaxAggregateOutputType = {
@@ -8071,11 +10523,12 @@ export namespace Prisma {
     title: string | null
     published: boolean | null
     createdAt: Date | null
-    updatedBy: string | null
     updatedAt: Date | null
-    deletedBy: string | null
     deletedAt: Date | null
     notebookId: string | null
+    createdBy: string | null
+    deletedBy: string | null
+    updatedBy: string | null
   }
 
   export type PageCountAggregateOutputType = {
@@ -8084,11 +10537,12 @@ export namespace Prisma {
     content: number
     published: number
     createdAt: number
-    updatedBy: number
     updatedAt: number
-    deletedBy: number
     deletedAt: number
     notebookId: number
+    createdBy: number
+    deletedBy: number
+    updatedBy: number
     _all: number
   }
 
@@ -8098,11 +10552,12 @@ export namespace Prisma {
     title?: true
     published?: true
     createdAt?: true
-    updatedBy?: true
     updatedAt?: true
-    deletedBy?: true
     deletedAt?: true
     notebookId?: true
+    createdBy?: true
+    deletedBy?: true
+    updatedBy?: true
   }
 
   export type PageMaxAggregateInputType = {
@@ -8110,11 +10565,12 @@ export namespace Prisma {
     title?: true
     published?: true
     createdAt?: true
-    updatedBy?: true
     updatedAt?: true
-    deletedBy?: true
     deletedAt?: true
     notebookId?: true
+    createdBy?: true
+    deletedBy?: true
+    updatedBy?: true
   }
 
   export type PageCountAggregateInputType = {
@@ -8123,15 +10579,16 @@ export namespace Prisma {
     content?: true
     published?: true
     createdAt?: true
-    updatedBy?: true
     updatedAt?: true
-    deletedBy?: true
     deletedAt?: true
     notebookId?: true
+    createdBy?: true
+    deletedBy?: true
+    updatedBy?: true
     _all?: true
   }
 
-  export type PageAggregateArgs = {
+  export type PageAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Page to aggregate.
      */
@@ -8191,7 +10648,7 @@ export namespace Prisma {
 
 
 
-  export type PageGroupByArgs = {
+  export type PageGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     where?: PageWhereInput
     orderBy?: Enumerable<PageOrderByWithAggregationInput>
     by: PageScalarFieldEnum[]
@@ -8210,11 +10667,12 @@ export namespace Prisma {
     content: JsonValue | null
     published: boolean
     createdAt: Date
-    updatedBy: string | null
     updatedAt: Date
-    deletedBy: string | null
     deletedAt: Date | null
     notebookId: string
+    createdBy: string
+    deletedBy: string | null
+    updatedBy: string
     _count: PageCountAggregateOutputType | null
     _min: PageMinAggregateOutputType | null
     _max: PageMaxAggregateOutputType | null
@@ -8234,57 +10692,59 @@ export namespace Prisma {
     >
 
 
-  export type PageSelect = {
+  export type PageSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
     content?: boolean
     published?: boolean
     createdAt?: boolean
-    updatedBy?: boolean
     updatedAt?: boolean
-    deletedBy?: boolean
     deletedAt?: boolean
     notebookId?: boolean
-    updatedByUser?: boolean | UserArgs
-    deletedByUser?: boolean | UserArgs
-    notebook?: boolean | NotebookArgs
+    createdBy?: boolean
+    deletedBy?: boolean
+    updatedBy?: boolean
+    notebook?: boolean | NotebookArgs<ExtArgs>
+    createdByUser?: boolean | UserArgs<ExtArgs>
+    deletedByUser?: boolean | Page$deletedByUserArgs<ExtArgs>
+    updatedByUser?: boolean | UserArgs<ExtArgs>
+    favorites?: boolean | Page$favoritesArgs<ExtArgs>
+    _count?: boolean | PageCountOutputTypeArgs<ExtArgs>
+  }, ExtArgs["result"]["page"]>
+
+  export type PageSelectScalar = {
+    id?: boolean
+    title?: boolean
+    content?: boolean
+    published?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    deletedAt?: boolean
+    notebookId?: boolean
+    createdBy?: boolean
+    deletedBy?: boolean
+    updatedBy?: boolean
+  }
+
+  export type PageInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    notebook?: boolean | NotebookArgs<ExtArgs>
+    createdByUser?: boolean | UserArgs<ExtArgs>
+    deletedByUser?: boolean | Page$deletedByUserArgs<ExtArgs>
+    updatedByUser?: boolean | UserArgs<ExtArgs>
+    favorites?: boolean | Page$favoritesArgs<ExtArgs>
+    _count?: boolean | PageCountOutputTypeArgs<ExtArgs>
   }
 
 
-  export type PageInclude = {
-    updatedByUser?: boolean | UserArgs
-    deletedByUser?: boolean | UserArgs
-    notebook?: boolean | NotebookArgs
-  }
+  type PageGetPayload<S extends boolean | null | undefined | PageArgs> = $Types.GetResult<PagePayload, S>
 
-  export type PageGetPayload<S extends boolean | null | undefined | PageArgs> =
-    S extends { select: any, include: any } ? 'Please either choose `select` or `include`' :
-    S extends true ? Page :
-    S extends undefined ? never :
-    S extends { include: any } & (PageArgs | PageFindManyArgs)
-    ? Page  & {
-    [P in TruthyKeys<S['include']>]:
-        P extends 'updatedByUser' ? UserGetPayload<S['include'][P]> | null :
-        P extends 'deletedByUser' ? UserGetPayload<S['include'][P]> | null :
-        P extends 'notebook' ? NotebookGetPayload<S['include'][P]> :  never
-  } 
-    : S extends { select: any } & (PageArgs | PageFindManyArgs)
-      ? {
-    [P in TruthyKeys<S['select']>]:
-        P extends 'updatedByUser' ? UserGetPayload<S['select'][P]> | null :
-        P extends 'deletedByUser' ? UserGetPayload<S['select'][P]> | null :
-        P extends 'notebook' ? NotebookGetPayload<S['select'][P]> :  P extends keyof Page ? Page[P] : never
-  } 
-      : Page
-
-
-  type PageCountArgs = 
+  type PageCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
     Omit<PageFindManyArgs, 'select' | 'include'> & {
       select?: PageCountAggregateInputType | true
     }
 
-  export interface PageDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined> {
-
+  export interface PageDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Page'], meta: { name: 'Page' } }
     /**
      * Find zero or one Page that matches the filter.
      * @param {PageFindUniqueArgs} args - Arguments to find a Page
@@ -8296,9 +10756,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUnique<T extends PageFindUniqueArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, PageFindUniqueArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Page'> extends True ? Prisma__PageClient<PageGetPayload<T>> : Prisma__PageClient<PageGetPayload<T> | null, null>
+    findUnique<T extends PageFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, PageFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Page'> extends True ? Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
 
     /**
      * Find one Page that matches the filter or throw an error  with `error.code='P2025'` 
@@ -8312,9 +10772,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findUniqueOrThrow<T extends PageFindUniqueOrThrowArgs>(
-      args?: SelectSubset<T, PageFindUniqueOrThrowArgs>
-    ): Prisma__PageClient<PageGetPayload<T>>
+    findUniqueOrThrow<T extends PageFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, PageFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
 
     /**
      * Find the first Page that matches the filter.
@@ -8329,9 +10789,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirst<T extends PageFindFirstArgs,  LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, PageFindFirstArgs>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Page'> extends True ? Prisma__PageClient<PageGetPayload<T>> : Prisma__PageClient<PageGetPayload<T> | null, null>
+    findFirst<T extends PageFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, PageFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Page'> extends True ? Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
 
     /**
      * Find the first Page that matches the filter or
@@ -8347,9 +10807,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    findFirstOrThrow<T extends PageFindFirstOrThrowArgs>(
-      args?: SelectSubset<T, PageFindFirstOrThrowArgs>
-    ): Prisma__PageClient<PageGetPayload<T>>
+    findFirstOrThrow<T extends PageFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, PageFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
 
     /**
      * Find zero or more Pages that matches the filter.
@@ -8367,9 +10827,9 @@ export namespace Prisma {
      * const pageWithIdOnly = await prisma.page.findMany({ select: { id: true } })
      * 
     **/
-    findMany<T extends PageFindManyArgs>(
-      args?: SelectSubset<T, PageFindManyArgs>
-    ): Prisma.PrismaPromise<Array<PageGetPayload<T>>>
+    findMany<T extends PageFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, PageFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<PagePayload<ExtArgs>, T, 'findMany', never>>
 
     /**
      * Create a Page.
@@ -8383,9 +10843,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    create<T extends PageCreateArgs>(
-      args: SelectSubset<T, PageCreateArgs>
-    ): Prisma__PageClient<PageGetPayload<T>>
+    create<T extends PageCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, PageCreateArgs<ExtArgs>>
+    ): Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
 
     /**
      * Create many Pages.
@@ -8399,8 +10859,8 @@ export namespace Prisma {
      *     })
      *     
     **/
-    createMany<T extends PageCreateManyArgs>(
-      args?: SelectSubset<T, PageCreateManyArgs>
+    createMany<T extends PageCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, PageCreateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -8415,9 +10875,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    delete<T extends PageDeleteArgs>(
-      args: SelectSubset<T, PageDeleteArgs>
-    ): Prisma__PageClient<PageGetPayload<T>>
+    delete<T extends PageDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, PageDeleteArgs<ExtArgs>>
+    ): Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
 
     /**
      * Update one Page.
@@ -8434,9 +10894,9 @@ export namespace Prisma {
      * })
      * 
     **/
-    update<T extends PageUpdateArgs>(
-      args: SelectSubset<T, PageUpdateArgs>
-    ): Prisma__PageClient<PageGetPayload<T>>
+    update<T extends PageUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, PageUpdateArgs<ExtArgs>>
+    ): Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
 
     /**
      * Delete zero or more Pages.
@@ -8450,8 +10910,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    deleteMany<T extends PageDeleteManyArgs>(
-      args?: SelectSubset<T, PageDeleteManyArgs>
+    deleteMany<T extends PageDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, PageDeleteManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -8471,8 +10931,8 @@ export namespace Prisma {
      * })
      * 
     **/
-    updateMany<T extends PageUpdateManyArgs>(
-      args: SelectSubset<T, PageUpdateManyArgs>
+    updateMany<T extends PageUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, PageUpdateManyArgs<ExtArgs>>
     ): Prisma.PrismaPromise<BatchPayload>
 
     /**
@@ -8492,9 +10952,9 @@ export namespace Prisma {
      *   }
      * })
     **/
-    upsert<T extends PageUpsertArgs>(
-      args: SelectSubset<T, PageUpsertArgs>
-    ): Prisma__PageClient<PageGetPayload<T>>
+    upsert<T extends PageUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, PageUpsertArgs<ExtArgs>>
+    ): Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
 
     /**
      * Count the number of Pages.
@@ -8512,7 +10972,7 @@ export namespace Prisma {
     count<T extends PageCountArgs>(
       args?: Subset<T, PageCountArgs>,
     ): Prisma.PrismaPromise<
-      T extends _Record<'select', any>
+      T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
           : GetScalarType<T['select'], PageCountAggregateOutputType>
@@ -8630,7 +11090,7 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export class Prisma__PageClient<T, Null = never> implements Prisma.PrismaPromise<T> {
+  export class Prisma__PageClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
     private readonly _dmmf;
     private readonly _queryType;
     private readonly _rootField;
@@ -8645,11 +11105,15 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: 'PrismaPromise';
     constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
 
-    updatedByUser<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+    notebook<T extends NotebookArgs<ExtArgs> = {}>(args?: Subset<T, NotebookArgs<ExtArgs>>): Prisma__NotebookClient<$Types.GetResult<NotebookPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
 
-    deletedByUser<T extends UserArgs= {}>(args?: Subset<T, UserArgs>): Prisma__UserClient<UserGetPayload<T> | Null>;
+    createdByUser<T extends UserArgs<ExtArgs> = {}>(args?: Subset<T, UserArgs<ExtArgs>>): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
 
-    notebook<T extends NotebookArgs= {}>(args?: Subset<T, NotebookArgs>): Prisma__NotebookClient<NotebookGetPayload<T> | Null>;
+    deletedByUser<T extends Page$deletedByUserArgs<ExtArgs> = {}>(args?: Subset<T, Page$deletedByUserArgs<ExtArgs>>): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    updatedByUser<T extends UserArgs<ExtArgs> = {}>(args?: Subset<T, UserArgs<ExtArgs>>): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    favorites<T extends Page$favoritesArgs<ExtArgs> = {}>(args?: Subset<T, Page$favoritesArgs<ExtArgs>>): Prisma.PrismaPromise<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'findMany', never>| Null>;
 
     private get _document();
     /**
@@ -8681,15 +11145,15 @@ export namespace Prisma {
   /**
    * Page base type for findUnique actions
    */
-  export type PageFindUniqueArgsBase = {
+  export type PageFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Page
      */
-    select?: PageSelect | null
+    select?: PageSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: PageInclude<ExtArgs> | null
     /**
      * Filter, which Page to fetch.
      */
@@ -8699,7 +11163,7 @@ export namespace Prisma {
   /**
    * Page findUnique
    */
-  export interface PageFindUniqueArgs extends PageFindUniqueArgsBase {
+  export interface PageFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends PageFindUniqueArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
@@ -8711,15 +11175,15 @@ export namespace Prisma {
   /**
    * Page findUniqueOrThrow
    */
-  export type PageFindUniqueOrThrowArgs = {
+  export type PageFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Page
      */
-    select?: PageSelect | null
+    select?: PageSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: PageInclude<ExtArgs> | null
     /**
      * Filter, which Page to fetch.
      */
@@ -8730,15 +11194,15 @@ export namespace Prisma {
   /**
    * Page base type for findFirst actions
    */
-  export type PageFindFirstArgsBase = {
+  export type PageFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Page
      */
-    select?: PageSelect | null
+    select?: PageSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: PageInclude<ExtArgs> | null
     /**
      * Filter, which Page to fetch.
      */
@@ -8778,7 +11242,7 @@ export namespace Prisma {
   /**
    * Page findFirst
    */
-  export interface PageFindFirstArgs extends PageFindFirstArgsBase {
+  export interface PageFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends PageFindFirstArgsBase<ExtArgs> {
    /**
     * Throw an Error if query returns no results
     * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
@@ -8790,15 +11254,15 @@ export namespace Prisma {
   /**
    * Page findFirstOrThrow
    */
-  export type PageFindFirstOrThrowArgs = {
+  export type PageFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Page
      */
-    select?: PageSelect | null
+    select?: PageSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: PageInclude<ExtArgs> | null
     /**
      * Filter, which Page to fetch.
      */
@@ -8839,15 +11303,15 @@ export namespace Prisma {
   /**
    * Page findMany
    */
-  export type PageFindManyArgs = {
+  export type PageFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Page
      */
-    select?: PageSelect | null
+    select?: PageSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: PageInclude<ExtArgs> | null
     /**
      * Filter, which Pages to fetch.
      */
@@ -8883,15 +11347,15 @@ export namespace Prisma {
   /**
    * Page create
    */
-  export type PageCreateArgs = {
+  export type PageCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Page
      */
-    select?: PageSelect | null
+    select?: PageSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: PageInclude<ExtArgs> | null
     /**
      * The data needed to create a Page.
      */
@@ -8902,7 +11366,7 @@ export namespace Prisma {
   /**
    * Page createMany
    */
-  export type PageCreateManyArgs = {
+  export type PageCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to create many Pages.
      */
@@ -8914,15 +11378,15 @@ export namespace Prisma {
   /**
    * Page update
    */
-  export type PageUpdateArgs = {
+  export type PageUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Page
      */
-    select?: PageSelect | null
+    select?: PageSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: PageInclude<ExtArgs> | null
     /**
      * The data needed to update a Page.
      */
@@ -8937,7 +11401,7 @@ export namespace Prisma {
   /**
    * Page updateMany
    */
-  export type PageUpdateManyArgs = {
+  export type PageUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * The data used to update Pages.
      */
@@ -8952,15 +11416,15 @@ export namespace Prisma {
   /**
    * Page upsert
    */
-  export type PageUpsertArgs = {
+  export type PageUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Page
      */
-    select?: PageSelect | null
+    select?: PageSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: PageInclude<ExtArgs> | null
     /**
      * The filter to search for the Page to update in case it exists.
      */
@@ -8979,15 +11443,15 @@ export namespace Prisma {
   /**
    * Page delete
    */
-  export type PageDeleteArgs = {
+  export type PageDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Page
      */
-    select?: PageSelect | null
+    select?: PageSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: PageInclude<ExtArgs> | null
     /**
      * Filter which Page to delete.
      */
@@ -8998,7 +11462,7 @@ export namespace Prisma {
   /**
    * Page deleteMany
    */
-  export type PageDeleteManyArgs = {
+  export type PageDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
      * Filter which Pages to delete
      */
@@ -9007,17 +11471,2969 @@ export namespace Prisma {
 
 
   /**
-   * Page without action
+   * Page.deletedByUser
    */
-  export type PageArgs = {
+  export type Page$deletedByUserArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Page
+     * Select specific fields to fetch from the User
      */
-    select?: PageSelect | null
+    select?: UserSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well.
      */
-    include?: PageInclude | null
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+
+  /**
+   * Page.favorites
+   */
+  export type Page$favoritesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    where?: FavoriteWhereInput
+    orderBy?: Enumerable<FavoriteOrderByWithRelationInput>
+    cursor?: FavoriteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Enumerable<FavoriteScalarFieldEnum>
+  }
+
+
+  /**
+   * Page without action
+   */
+  export type PageArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Page
+     */
+    select?: PageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: PageInclude<ExtArgs> | null
+  }
+
+
+
+  /**
+   * Model Favorite
+   */
+
+
+  export type AggregateFavorite = {
+    _count: FavoriteCountAggregateOutputType | null
+    _min: FavoriteMinAggregateOutputType | null
+    _max: FavoriteMaxAggregateOutputType | null
+  }
+
+  export type FavoriteMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    userId: string | null
+    workspaceId: string | null
+    pageId: string | null
+  }
+
+  export type FavoriteMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    userId: string | null
+    workspaceId: string | null
+    pageId: string | null
+  }
+
+  export type FavoriteCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    userId: number
+    workspaceId: number
+    pageId: number
+    _all: number
+  }
+
+
+  export type FavoriteMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+    workspaceId?: true
+    pageId?: true
+  }
+
+  export type FavoriteMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+    workspaceId?: true
+    pageId?: true
+  }
+
+  export type FavoriteCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+    workspaceId?: true
+    pageId?: true
+    _all?: true
+  }
+
+  export type FavoriteAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Favorite to aggregate.
+     */
+    where?: FavoriteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Favorites to fetch.
+     */
+    orderBy?: Enumerable<FavoriteOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FavoriteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Favorites from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Favorites.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Favorites
+    **/
+    _count?: true | FavoriteCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FavoriteMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FavoriteMaxAggregateInputType
+  }
+
+  export type GetFavoriteAggregateType<T extends FavoriteAggregateArgs> = {
+        [P in keyof T & keyof AggregateFavorite]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFavorite[P]>
+      : GetScalarType<T[P], AggregateFavorite[P]>
+  }
+
+
+
+
+  export type FavoriteGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: FavoriteWhereInput
+    orderBy?: Enumerable<FavoriteOrderByWithAggregationInput>
+    by: FavoriteScalarFieldEnum[]
+    having?: FavoriteScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FavoriteCountAggregateInputType | true
+    _min?: FavoriteMinAggregateInputType
+    _max?: FavoriteMaxAggregateInputType
+  }
+
+
+  export type FavoriteGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    userId: string
+    workspaceId: string
+    pageId: string
+    _count: FavoriteCountAggregateOutputType | null
+    _min: FavoriteMinAggregateOutputType | null
+    _max: FavoriteMaxAggregateOutputType | null
+  }
+
+  type GetFavoriteGroupByPayload<T extends FavoriteGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickArray<FavoriteGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FavoriteGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FavoriteGroupByOutputType[P]>
+            : GetScalarType<T[P], FavoriteGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FavoriteSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+    workspaceId?: boolean
+    pageId?: boolean
+    user?: boolean | UserArgs<ExtArgs>
+    workspace?: boolean | Favorite$workspaceArgs<ExtArgs>
+    page?: boolean | Favorite$pageArgs<ExtArgs>
+  }, ExtArgs["result"]["favorite"]>
+
+  export type FavoriteSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+    workspaceId?: boolean
+    pageId?: boolean
+  }
+
+  export type FavoriteInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    user?: boolean | UserArgs<ExtArgs>
+    workspace?: boolean | Favorite$workspaceArgs<ExtArgs>
+    page?: boolean | Favorite$pageArgs<ExtArgs>
+  }
+
+
+  type FavoriteGetPayload<S extends boolean | null | undefined | FavoriteArgs> = $Types.GetResult<FavoritePayload, S>
+
+  type FavoriteCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
+    Omit<FavoriteFindManyArgs, 'select' | 'include'> & {
+      select?: FavoriteCountAggregateInputType | true
+    }
+
+  export interface FavoriteDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Favorite'], meta: { name: 'Favorite' } }
+    /**
+     * Find zero or one Favorite that matches the filter.
+     * @param {FavoriteFindUniqueArgs} args - Arguments to find a Favorite
+     * @example
+     * // Get one Favorite
+     * const favorite = await prisma.favorite.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUnique<T extends FavoriteFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, FavoriteFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'Favorite'> extends True ? Prisma__FavoriteClient<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__FavoriteClient<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
+
+    /**
+     * Find one Favorite that matches the filter or throw an error  with `error.code='P2025'` 
+     *     if no matches were found.
+     * @param {FavoriteFindUniqueOrThrowArgs} args - Arguments to find a Favorite
+     * @example
+     * // Get one Favorite
+     * const favorite = await prisma.favorite.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUniqueOrThrow<T extends FavoriteFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, FavoriteFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__FavoriteClient<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
+
+    /**
+     * Find the first Favorite that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FavoriteFindFirstArgs} args - Arguments to find a Favorite
+     * @example
+     * // Get one Favorite
+     * const favorite = await prisma.favorite.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirst<T extends FavoriteFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, FavoriteFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'Favorite'> extends True ? Prisma__FavoriteClient<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__FavoriteClient<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
+
+    /**
+     * Find the first Favorite that matches the filter or
+     * throw `NotFoundError` if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FavoriteFindFirstOrThrowArgs} args - Arguments to find a Favorite
+     * @example
+     * // Get one Favorite
+     * const favorite = await prisma.favorite.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirstOrThrow<T extends FavoriteFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, FavoriteFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__FavoriteClient<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
+
+    /**
+     * Find zero or more Favorites that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FavoriteFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Favorites
+     * const favorites = await prisma.favorite.findMany()
+     * 
+     * // Get first 10 Favorites
+     * const favorites = await prisma.favorite.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const favoriteWithIdOnly = await prisma.favorite.findMany({ select: { id: true } })
+     * 
+    **/
+    findMany<T extends FavoriteFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, FavoriteFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'findMany', never>>
+
+    /**
+     * Create a Favorite.
+     * @param {FavoriteCreateArgs} args - Arguments to create a Favorite.
+     * @example
+     * // Create one Favorite
+     * const Favorite = await prisma.favorite.create({
+     *   data: {
+     *     // ... data to create a Favorite
+     *   }
+     * })
+     * 
+    **/
+    create<T extends FavoriteCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, FavoriteCreateArgs<ExtArgs>>
+    ): Prisma__FavoriteClient<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
+
+    /**
+     * Create many Favorites.
+     *     @param {FavoriteCreateManyArgs} args - Arguments to create many Favorites.
+     *     @example
+     *     // Create many Favorites
+     *     const favorite = await prisma.favorite.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends FavoriteCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, FavoriteCreateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Favorite.
+     * @param {FavoriteDeleteArgs} args - Arguments to delete one Favorite.
+     * @example
+     * // Delete one Favorite
+     * const Favorite = await prisma.favorite.delete({
+     *   where: {
+     *     // ... filter to delete one Favorite
+     *   }
+     * })
+     * 
+    **/
+    delete<T extends FavoriteDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, FavoriteDeleteArgs<ExtArgs>>
+    ): Prisma__FavoriteClient<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
+
+    /**
+     * Update one Favorite.
+     * @param {FavoriteUpdateArgs} args - Arguments to update one Favorite.
+     * @example
+     * // Update one Favorite
+     * const favorite = await prisma.favorite.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    update<T extends FavoriteUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, FavoriteUpdateArgs<ExtArgs>>
+    ): Prisma__FavoriteClient<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
+
+    /**
+     * Delete zero or more Favorites.
+     * @param {FavoriteDeleteManyArgs} args - Arguments to filter Favorites to delete.
+     * @example
+     * // Delete a few Favorites
+     * const { count } = await prisma.favorite.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+    **/
+    deleteMany<T extends FavoriteDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, FavoriteDeleteManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Favorites.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FavoriteUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Favorites
+     * const favorite = await prisma.favorite.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    updateMany<T extends FavoriteUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, FavoriteUpdateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Favorite.
+     * @param {FavoriteUpsertArgs} args - Arguments to update or create a Favorite.
+     * @example
+     * // Update or create a Favorite
+     * const favorite = await prisma.favorite.upsert({
+     *   create: {
+     *     // ... data to create a Favorite
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Favorite we want to update
+     *   }
+     * })
+    **/
+    upsert<T extends FavoriteUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, FavoriteUpsertArgs<ExtArgs>>
+    ): Prisma__FavoriteClient<$Types.GetResult<FavoritePayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
+
+    /**
+     * Count the number of Favorites.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FavoriteCountArgs} args - Arguments to filter Favorites to count.
+     * @example
+     * // Count the number of Favorites
+     * const count = await prisma.favorite.count({
+     *   where: {
+     *     // ... the filter for the Favorites we want to count
+     *   }
+     * })
+    **/
+    count<T extends FavoriteCountArgs>(
+      args?: Subset<T, FavoriteCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FavoriteCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Favorite.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FavoriteAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FavoriteAggregateArgs>(args: Subset<T, FavoriteAggregateArgs>): Prisma.PrismaPromise<GetFavoriteAggregateType<T>>
+
+    /**
+     * Group by Favorite.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FavoriteGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FavoriteGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FavoriteGroupByArgs['orderBy'] }
+        : { orderBy?: FavoriteGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FavoriteGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFavoriteGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Favorite.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export class Prisma__FavoriteClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
+    private readonly _dmmf;
+    private readonly _queryType;
+    private readonly _rootField;
+    private readonly _clientMethod;
+    private readonly _args;
+    private readonly _dataPath;
+    private readonly _errorFormat;
+    private readonly _measurePerformance?;
+    private _isList;
+    private _callsite;
+    private _requestPromise?;
+    readonly [Symbol.toStringTag]: 'PrismaPromise';
+    constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
+
+    user<T extends UserArgs<ExtArgs> = {}>(args?: Subset<T, UserArgs<ExtArgs>>): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    workspace<T extends Favorite$workspaceArgs<ExtArgs> = {}>(args?: Subset<T, Favorite$workspaceArgs<ExtArgs>>): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    page<T extends Favorite$pageArgs<ExtArgs> = {}>(args?: Subset<T, Favorite$pageArgs<ExtArgs>>): Prisma__PageClient<$Types.GetResult<PagePayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    private get _document();
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): Promise<T>;
+  }
+
+
+
+  // Custom InputTypes
+
+  /**
+   * Favorite base type for findUnique actions
+   */
+  export type FavoriteFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    /**
+     * Filter, which Favorite to fetch.
+     */
+    where: FavoriteWhereUniqueInput
+  }
+
+  /**
+   * Favorite findUnique
+   */
+  export interface FavoriteFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends FavoriteFindUniqueArgsBase<ExtArgs> {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * Favorite findUniqueOrThrow
+   */
+  export type FavoriteFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    /**
+     * Filter, which Favorite to fetch.
+     */
+    where: FavoriteWhereUniqueInput
+  }
+
+
+  /**
+   * Favorite base type for findFirst actions
+   */
+  export type FavoriteFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    /**
+     * Filter, which Favorite to fetch.
+     */
+    where?: FavoriteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Favorites to fetch.
+     */
+    orderBy?: Enumerable<FavoriteOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Favorites.
+     */
+    cursor?: FavoriteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Favorites from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Favorites.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Favorites.
+     */
+    distinct?: Enumerable<FavoriteScalarFieldEnum>
+  }
+
+  /**
+   * Favorite findFirst
+   */
+  export interface FavoriteFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends FavoriteFindFirstArgsBase<ExtArgs> {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * Favorite findFirstOrThrow
+   */
+  export type FavoriteFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    /**
+     * Filter, which Favorite to fetch.
+     */
+    where?: FavoriteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Favorites to fetch.
+     */
+    orderBy?: Enumerable<FavoriteOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Favorites.
+     */
+    cursor?: FavoriteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Favorites from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Favorites.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Favorites.
+     */
+    distinct?: Enumerable<FavoriteScalarFieldEnum>
+  }
+
+
+  /**
+   * Favorite findMany
+   */
+  export type FavoriteFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    /**
+     * Filter, which Favorites to fetch.
+     */
+    where?: FavoriteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Favorites to fetch.
+     */
+    orderBy?: Enumerable<FavoriteOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Favorites.
+     */
+    cursor?: FavoriteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Favorites from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Favorites.
+     */
+    skip?: number
+    distinct?: Enumerable<FavoriteScalarFieldEnum>
+  }
+
+
+  /**
+   * Favorite create
+   */
+  export type FavoriteCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Favorite.
+     */
+    data: XOR<FavoriteCreateInput, FavoriteUncheckedCreateInput>
+  }
+
+
+  /**
+   * Favorite createMany
+   */
+  export type FavoriteCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Favorites.
+     */
+    data: Enumerable<FavoriteCreateManyInput>
+    skipDuplicates?: boolean
+  }
+
+
+  /**
+   * Favorite update
+   */
+  export type FavoriteUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Favorite.
+     */
+    data: XOR<FavoriteUpdateInput, FavoriteUncheckedUpdateInput>
+    /**
+     * Choose, which Favorite to update.
+     */
+    where: FavoriteWhereUniqueInput
+  }
+
+
+  /**
+   * Favorite updateMany
+   */
+  export type FavoriteUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Favorites.
+     */
+    data: XOR<FavoriteUpdateManyMutationInput, FavoriteUncheckedUpdateManyInput>
+    /**
+     * Filter which Favorites to update
+     */
+    where?: FavoriteWhereInput
+  }
+
+
+  /**
+   * Favorite upsert
+   */
+  export type FavoriteUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Favorite to update in case it exists.
+     */
+    where: FavoriteWhereUniqueInput
+    /**
+     * In case the Favorite found by the `where` argument doesn't exist, create a new Favorite with this data.
+     */
+    create: XOR<FavoriteCreateInput, FavoriteUncheckedCreateInput>
+    /**
+     * In case the Favorite was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FavoriteUpdateInput, FavoriteUncheckedUpdateInput>
+  }
+
+
+  /**
+   * Favorite delete
+   */
+  export type FavoriteDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+    /**
+     * Filter which Favorite to delete.
+     */
+    where: FavoriteWhereUniqueInput
+  }
+
+
+  /**
+   * Favorite deleteMany
+   */
+  export type FavoriteDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Favorites to delete
+     */
+    where?: FavoriteWhereInput
+  }
+
+
+  /**
+   * Favorite.workspace
+   */
+  export type Favorite$workspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    where?: WorkspaceWhereInput
+  }
+
+
+  /**
+   * Favorite.page
+   */
+  export type Favorite$pageArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Page
+     */
+    select?: PageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: PageInclude<ExtArgs> | null
+    where?: PageWhereInput
+  }
+
+
+  /**
+   * Favorite without action
+   */
+  export type FavoriteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Favorite
+     */
+    select?: FavoriteSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: FavoriteInclude<ExtArgs> | null
+  }
+
+
+
+  /**
+   * Model UserOnWorkspace
+   */
+
+
+  export type AggregateUserOnWorkspace = {
+    _count: UserOnWorkspaceCountAggregateOutputType | null
+    _avg: UserOnWorkspaceAvgAggregateOutputType | null
+    _sum: UserOnWorkspaceSumAggregateOutputType | null
+    _min: UserOnWorkspaceMinAggregateOutputType | null
+    _max: UserOnWorkspaceMaxAggregateOutputType | null
+  }
+
+  export type UserOnWorkspaceAvgAggregateOutputType = {
+    role: number | null
+  }
+
+  export type UserOnWorkspaceSumAggregateOutputType = {
+    role: number | null
+  }
+
+  export type UserOnWorkspaceMinAggregateOutputType = {
+    id: string | null
+    role: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    userId: string | null
+    workspaceId: string | null
+  }
+
+  export type UserOnWorkspaceMaxAggregateOutputType = {
+    id: string | null
+    role: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    userId: string | null
+    workspaceId: string | null
+  }
+
+  export type UserOnWorkspaceCountAggregateOutputType = {
+    id: number
+    role: number
+    createdAt: number
+    updatedAt: number
+    userId: number
+    workspaceId: number
+    _all: number
+  }
+
+
+  export type UserOnWorkspaceAvgAggregateInputType = {
+    role?: true
+  }
+
+  export type UserOnWorkspaceSumAggregateInputType = {
+    role?: true
+  }
+
+  export type UserOnWorkspaceMinAggregateInputType = {
+    id?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+    workspaceId?: true
+  }
+
+  export type UserOnWorkspaceMaxAggregateInputType = {
+    id?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+    workspaceId?: true
+  }
+
+  export type UserOnWorkspaceCountAggregateInputType = {
+    id?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+    workspaceId?: true
+    _all?: true
+  }
+
+  export type UserOnWorkspaceAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserOnWorkspace to aggregate.
+     */
+    where?: UserOnWorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnWorkspaces to fetch.
+     */
+    orderBy?: Enumerable<UserOnWorkspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: UserOnWorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnWorkspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnWorkspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned UserOnWorkspaces
+    **/
+    _count?: true | UserOnWorkspaceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: UserOnWorkspaceAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserOnWorkspaceSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: UserOnWorkspaceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: UserOnWorkspaceMaxAggregateInputType
+  }
+
+  export type GetUserOnWorkspaceAggregateType<T extends UserOnWorkspaceAggregateArgs> = {
+        [P in keyof T & keyof AggregateUserOnWorkspace]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateUserOnWorkspace[P]>
+      : GetScalarType<T[P], AggregateUserOnWorkspace[P]>
+  }
+
+
+
+
+  export type UserOnWorkspaceGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: UserOnWorkspaceWhereInput
+    orderBy?: Enumerable<UserOnWorkspaceOrderByWithAggregationInput>
+    by: UserOnWorkspaceScalarFieldEnum[]
+    having?: UserOnWorkspaceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: UserOnWorkspaceCountAggregateInputType | true
+    _avg?: UserOnWorkspaceAvgAggregateInputType
+    _sum?: UserOnWorkspaceSumAggregateInputType
+    _min?: UserOnWorkspaceMinAggregateInputType
+    _max?: UserOnWorkspaceMaxAggregateInputType
+  }
+
+
+  export type UserOnWorkspaceGroupByOutputType = {
+    id: string
+    role: number
+    createdAt: Date
+    updatedAt: Date
+    userId: string
+    workspaceId: string
+    _count: UserOnWorkspaceCountAggregateOutputType | null
+    _avg: UserOnWorkspaceAvgAggregateOutputType | null
+    _sum: UserOnWorkspaceSumAggregateOutputType | null
+    _min: UserOnWorkspaceMinAggregateOutputType | null
+    _max: UserOnWorkspaceMaxAggregateOutputType | null
+  }
+
+  type GetUserOnWorkspaceGroupByPayload<T extends UserOnWorkspaceGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickArray<UserOnWorkspaceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof UserOnWorkspaceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], UserOnWorkspaceGroupByOutputType[P]>
+            : GetScalarType<T[P], UserOnWorkspaceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type UserOnWorkspaceSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+    workspaceId?: boolean
+    user?: boolean | UserArgs<ExtArgs>
+    workspace?: boolean | WorkspaceArgs<ExtArgs>
+  }, ExtArgs["result"]["userOnWorkspace"]>
+
+  export type UserOnWorkspaceSelectScalar = {
+    id?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+    workspaceId?: boolean
+  }
+
+  export type UserOnWorkspaceInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    user?: boolean | UserArgs<ExtArgs>
+    workspace?: boolean | WorkspaceArgs<ExtArgs>
+  }
+
+
+  type UserOnWorkspaceGetPayload<S extends boolean | null | undefined | UserOnWorkspaceArgs> = $Types.GetResult<UserOnWorkspacePayload, S>
+
+  type UserOnWorkspaceCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
+    Omit<UserOnWorkspaceFindManyArgs, 'select' | 'include'> & {
+      select?: UserOnWorkspaceCountAggregateInputType | true
+    }
+
+  export interface UserOnWorkspaceDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['UserOnWorkspace'], meta: { name: 'UserOnWorkspace' } }
+    /**
+     * Find zero or one UserOnWorkspace that matches the filter.
+     * @param {UserOnWorkspaceFindUniqueArgs} args - Arguments to find a UserOnWorkspace
+     * @example
+     * // Get one UserOnWorkspace
+     * const userOnWorkspace = await prisma.userOnWorkspace.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUnique<T extends UserOnWorkspaceFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, UserOnWorkspaceFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'UserOnWorkspace'> extends True ? Prisma__UserOnWorkspaceClient<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__UserOnWorkspaceClient<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
+
+    /**
+     * Find one UserOnWorkspace that matches the filter or throw an error  with `error.code='P2025'` 
+     *     if no matches were found.
+     * @param {UserOnWorkspaceFindUniqueOrThrowArgs} args - Arguments to find a UserOnWorkspace
+     * @example
+     * // Get one UserOnWorkspace
+     * const userOnWorkspace = await prisma.userOnWorkspace.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUniqueOrThrow<T extends UserOnWorkspaceFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserOnWorkspaceFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__UserOnWorkspaceClient<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
+
+    /**
+     * Find the first UserOnWorkspace that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnWorkspaceFindFirstArgs} args - Arguments to find a UserOnWorkspace
+     * @example
+     * // Get one UserOnWorkspace
+     * const userOnWorkspace = await prisma.userOnWorkspace.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirst<T extends UserOnWorkspaceFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, UserOnWorkspaceFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'UserOnWorkspace'> extends True ? Prisma__UserOnWorkspaceClient<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__UserOnWorkspaceClient<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
+
+    /**
+     * Find the first UserOnWorkspace that matches the filter or
+     * throw `NotFoundError` if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnWorkspaceFindFirstOrThrowArgs} args - Arguments to find a UserOnWorkspace
+     * @example
+     * // Get one UserOnWorkspace
+     * const userOnWorkspace = await prisma.userOnWorkspace.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirstOrThrow<T extends UserOnWorkspaceFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserOnWorkspaceFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__UserOnWorkspaceClient<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
+
+    /**
+     * Find zero or more UserOnWorkspaces that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnWorkspaceFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all UserOnWorkspaces
+     * const userOnWorkspaces = await prisma.userOnWorkspace.findMany()
+     * 
+     * // Get first 10 UserOnWorkspaces
+     * const userOnWorkspaces = await prisma.userOnWorkspace.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const userOnWorkspaceWithIdOnly = await prisma.userOnWorkspace.findMany({ select: { id: true } })
+     * 
+    **/
+    findMany<T extends UserOnWorkspaceFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserOnWorkspaceFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'findMany', never>>
+
+    /**
+     * Create a UserOnWorkspace.
+     * @param {UserOnWorkspaceCreateArgs} args - Arguments to create a UserOnWorkspace.
+     * @example
+     * // Create one UserOnWorkspace
+     * const UserOnWorkspace = await prisma.userOnWorkspace.create({
+     *   data: {
+     *     // ... data to create a UserOnWorkspace
+     *   }
+     * })
+     * 
+    **/
+    create<T extends UserOnWorkspaceCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, UserOnWorkspaceCreateArgs<ExtArgs>>
+    ): Prisma__UserOnWorkspaceClient<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
+
+    /**
+     * Create many UserOnWorkspaces.
+     *     @param {UserOnWorkspaceCreateManyArgs} args - Arguments to create many UserOnWorkspaces.
+     *     @example
+     *     // Create many UserOnWorkspaces
+     *     const userOnWorkspace = await prisma.userOnWorkspace.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends UserOnWorkspaceCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserOnWorkspaceCreateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a UserOnWorkspace.
+     * @param {UserOnWorkspaceDeleteArgs} args - Arguments to delete one UserOnWorkspace.
+     * @example
+     * // Delete one UserOnWorkspace
+     * const UserOnWorkspace = await prisma.userOnWorkspace.delete({
+     *   where: {
+     *     // ... filter to delete one UserOnWorkspace
+     *   }
+     * })
+     * 
+    **/
+    delete<T extends UserOnWorkspaceDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, UserOnWorkspaceDeleteArgs<ExtArgs>>
+    ): Prisma__UserOnWorkspaceClient<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
+
+    /**
+     * Update one UserOnWorkspace.
+     * @param {UserOnWorkspaceUpdateArgs} args - Arguments to update one UserOnWorkspace.
+     * @example
+     * // Update one UserOnWorkspace
+     * const userOnWorkspace = await prisma.userOnWorkspace.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    update<T extends UserOnWorkspaceUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, UserOnWorkspaceUpdateArgs<ExtArgs>>
+    ): Prisma__UserOnWorkspaceClient<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
+
+    /**
+     * Delete zero or more UserOnWorkspaces.
+     * @param {UserOnWorkspaceDeleteManyArgs} args - Arguments to filter UserOnWorkspaces to delete.
+     * @example
+     * // Delete a few UserOnWorkspaces
+     * const { count } = await prisma.userOnWorkspace.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+    **/
+    deleteMany<T extends UserOnWorkspaceDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserOnWorkspaceDeleteManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserOnWorkspaces.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnWorkspaceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many UserOnWorkspaces
+     * const userOnWorkspace = await prisma.userOnWorkspace.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    updateMany<T extends UserOnWorkspaceUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, UserOnWorkspaceUpdateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one UserOnWorkspace.
+     * @param {UserOnWorkspaceUpsertArgs} args - Arguments to update or create a UserOnWorkspace.
+     * @example
+     * // Update or create a UserOnWorkspace
+     * const userOnWorkspace = await prisma.userOnWorkspace.upsert({
+     *   create: {
+     *     // ... data to create a UserOnWorkspace
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the UserOnWorkspace we want to update
+     *   }
+     * })
+    **/
+    upsert<T extends UserOnWorkspaceUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, UserOnWorkspaceUpsertArgs<ExtArgs>>
+    ): Prisma__UserOnWorkspaceClient<$Types.GetResult<UserOnWorkspacePayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
+
+    /**
+     * Count the number of UserOnWorkspaces.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnWorkspaceCountArgs} args - Arguments to filter UserOnWorkspaces to count.
+     * @example
+     * // Count the number of UserOnWorkspaces
+     * const count = await prisma.userOnWorkspace.count({
+     *   where: {
+     *     // ... the filter for the UserOnWorkspaces we want to count
+     *   }
+     * })
+    **/
+    count<T extends UserOnWorkspaceCountArgs>(
+      args?: Subset<T, UserOnWorkspaceCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], UserOnWorkspaceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a UserOnWorkspace.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnWorkspaceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends UserOnWorkspaceAggregateArgs>(args: Subset<T, UserOnWorkspaceAggregateArgs>): Prisma.PrismaPromise<GetUserOnWorkspaceAggregateType<T>>
+
+    /**
+     * Group by UserOnWorkspace.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnWorkspaceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends UserOnWorkspaceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: UserOnWorkspaceGroupByArgs['orderBy'] }
+        : { orderBy?: UserOnWorkspaceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, UserOnWorkspaceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUserOnWorkspaceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for UserOnWorkspace.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export class Prisma__UserOnWorkspaceClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
+    private readonly _dmmf;
+    private readonly _queryType;
+    private readonly _rootField;
+    private readonly _clientMethod;
+    private readonly _args;
+    private readonly _dataPath;
+    private readonly _errorFormat;
+    private readonly _measurePerformance?;
+    private _isList;
+    private _callsite;
+    private _requestPromise?;
+    readonly [Symbol.toStringTag]: 'PrismaPromise';
+    constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
+
+    user<T extends UserArgs<ExtArgs> = {}>(args?: Subset<T, UserArgs<ExtArgs>>): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    workspace<T extends WorkspaceArgs<ExtArgs> = {}>(args?: Subset<T, WorkspaceArgs<ExtArgs>>): Prisma__WorkspaceClient<$Types.GetResult<WorkspacePayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    private get _document();
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): Promise<T>;
+  }
+
+
+
+  // Custom InputTypes
+
+  /**
+   * UserOnWorkspace base type for findUnique actions
+   */
+  export type UserOnWorkspaceFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnWorkspace to fetch.
+     */
+    where: UserOnWorkspaceWhereUniqueInput
+  }
+
+  /**
+   * UserOnWorkspace findUnique
+   */
+  export interface UserOnWorkspaceFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends UserOnWorkspaceFindUniqueArgsBase<ExtArgs> {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * UserOnWorkspace findUniqueOrThrow
+   */
+  export type UserOnWorkspaceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnWorkspace to fetch.
+     */
+    where: UserOnWorkspaceWhereUniqueInput
+  }
+
+
+  /**
+   * UserOnWorkspace base type for findFirst actions
+   */
+  export type UserOnWorkspaceFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnWorkspace to fetch.
+     */
+    where?: UserOnWorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnWorkspaces to fetch.
+     */
+    orderBy?: Enumerable<UserOnWorkspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserOnWorkspaces.
+     */
+    cursor?: UserOnWorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnWorkspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnWorkspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserOnWorkspaces.
+     */
+    distinct?: Enumerable<UserOnWorkspaceScalarFieldEnum>
+  }
+
+  /**
+   * UserOnWorkspace findFirst
+   */
+  export interface UserOnWorkspaceFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends UserOnWorkspaceFindFirstArgsBase<ExtArgs> {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * UserOnWorkspace findFirstOrThrow
+   */
+  export type UserOnWorkspaceFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnWorkspace to fetch.
+     */
+    where?: UserOnWorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnWorkspaces to fetch.
+     */
+    orderBy?: Enumerable<UserOnWorkspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserOnWorkspaces.
+     */
+    cursor?: UserOnWorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnWorkspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnWorkspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserOnWorkspaces.
+     */
+    distinct?: Enumerable<UserOnWorkspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * UserOnWorkspace findMany
+   */
+  export type UserOnWorkspaceFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnWorkspaces to fetch.
+     */
+    where?: UserOnWorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnWorkspaces to fetch.
+     */
+    orderBy?: Enumerable<UserOnWorkspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing UserOnWorkspaces.
+     */
+    cursor?: UserOnWorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnWorkspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnWorkspaces.
+     */
+    skip?: number
+    distinct?: Enumerable<UserOnWorkspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * UserOnWorkspace create
+   */
+  export type UserOnWorkspaceCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    /**
+     * The data needed to create a UserOnWorkspace.
+     */
+    data: XOR<UserOnWorkspaceCreateInput, UserOnWorkspaceUncheckedCreateInput>
+  }
+
+
+  /**
+   * UserOnWorkspace createMany
+   */
+  export type UserOnWorkspaceCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many UserOnWorkspaces.
+     */
+    data: Enumerable<UserOnWorkspaceCreateManyInput>
+    skipDuplicates?: boolean
+  }
+
+
+  /**
+   * UserOnWorkspace update
+   */
+  export type UserOnWorkspaceUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    /**
+     * The data needed to update a UserOnWorkspace.
+     */
+    data: XOR<UserOnWorkspaceUpdateInput, UserOnWorkspaceUncheckedUpdateInput>
+    /**
+     * Choose, which UserOnWorkspace to update.
+     */
+    where: UserOnWorkspaceWhereUniqueInput
+  }
+
+
+  /**
+   * UserOnWorkspace updateMany
+   */
+  export type UserOnWorkspaceUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update UserOnWorkspaces.
+     */
+    data: XOR<UserOnWorkspaceUpdateManyMutationInput, UserOnWorkspaceUncheckedUpdateManyInput>
+    /**
+     * Filter which UserOnWorkspaces to update
+     */
+    where?: UserOnWorkspaceWhereInput
+  }
+
+
+  /**
+   * UserOnWorkspace upsert
+   */
+  export type UserOnWorkspaceUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    /**
+     * The filter to search for the UserOnWorkspace to update in case it exists.
+     */
+    where: UserOnWorkspaceWhereUniqueInput
+    /**
+     * In case the UserOnWorkspace found by the `where` argument doesn't exist, create a new UserOnWorkspace with this data.
+     */
+    create: XOR<UserOnWorkspaceCreateInput, UserOnWorkspaceUncheckedCreateInput>
+    /**
+     * In case the UserOnWorkspace was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<UserOnWorkspaceUpdateInput, UserOnWorkspaceUncheckedUpdateInput>
+  }
+
+
+  /**
+   * UserOnWorkspace delete
+   */
+  export type UserOnWorkspaceDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter which UserOnWorkspace to delete.
+     */
+    where: UserOnWorkspaceWhereUniqueInput
+  }
+
+
+  /**
+   * UserOnWorkspace deleteMany
+   */
+  export type UserOnWorkspaceDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserOnWorkspaces to delete
+     */
+    where?: UserOnWorkspaceWhereInput
+  }
+
+
+  /**
+   * UserOnWorkspace without action
+   */
+  export type UserOnWorkspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnWorkspace
+     */
+    select?: UserOnWorkspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnWorkspaceInclude<ExtArgs> | null
+  }
+
+
+
+  /**
+   * Model UserOnTeamspace
+   */
+
+
+  export type AggregateUserOnTeamspace = {
+    _count: UserOnTeamspaceCountAggregateOutputType | null
+    _avg: UserOnTeamspaceAvgAggregateOutputType | null
+    _sum: UserOnTeamspaceSumAggregateOutputType | null
+    _min: UserOnTeamspaceMinAggregateOutputType | null
+    _max: UserOnTeamspaceMaxAggregateOutputType | null
+  }
+
+  export type UserOnTeamspaceAvgAggregateOutputType = {
+    operation: number | null
+  }
+
+  export type UserOnTeamspaceSumAggregateOutputType = {
+    operation: number | null
+  }
+
+  export type UserOnTeamspaceMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    operation: number | null
+    userId: string | null
+    teamspaceId: string | null
+  }
+
+  export type UserOnTeamspaceMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    operation: number | null
+    userId: string | null
+    teamspaceId: string | null
+  }
+
+  export type UserOnTeamspaceCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    operation: number
+    userId: number
+    teamspaceId: number
+    _all: number
+  }
+
+
+  export type UserOnTeamspaceAvgAggregateInputType = {
+    operation?: true
+  }
+
+  export type UserOnTeamspaceSumAggregateInputType = {
+    operation?: true
+  }
+
+  export type UserOnTeamspaceMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    operation?: true
+    userId?: true
+    teamspaceId?: true
+  }
+
+  export type UserOnTeamspaceMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    operation?: true
+    userId?: true
+    teamspaceId?: true
+  }
+
+  export type UserOnTeamspaceCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    operation?: true
+    userId?: true
+    teamspaceId?: true
+    _all?: true
+  }
+
+  export type UserOnTeamspaceAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserOnTeamspace to aggregate.
+     */
+    where?: UserOnTeamspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnTeamspaces to fetch.
+     */
+    orderBy?: Enumerable<UserOnTeamspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: UserOnTeamspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnTeamspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnTeamspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned UserOnTeamspaces
+    **/
+    _count?: true | UserOnTeamspaceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: UserOnTeamspaceAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserOnTeamspaceSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: UserOnTeamspaceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: UserOnTeamspaceMaxAggregateInputType
+  }
+
+  export type GetUserOnTeamspaceAggregateType<T extends UserOnTeamspaceAggregateArgs> = {
+        [P in keyof T & keyof AggregateUserOnTeamspace]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateUserOnTeamspace[P]>
+      : GetScalarType<T[P], AggregateUserOnTeamspace[P]>
+  }
+
+
+
+
+  export type UserOnTeamspaceGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: UserOnTeamspaceWhereInput
+    orderBy?: Enumerable<UserOnTeamspaceOrderByWithAggregationInput>
+    by: UserOnTeamspaceScalarFieldEnum[]
+    having?: UserOnTeamspaceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: UserOnTeamspaceCountAggregateInputType | true
+    _avg?: UserOnTeamspaceAvgAggregateInputType
+    _sum?: UserOnTeamspaceSumAggregateInputType
+    _min?: UserOnTeamspaceMinAggregateInputType
+    _max?: UserOnTeamspaceMaxAggregateInputType
+  }
+
+
+  export type UserOnTeamspaceGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    operation: number
+    userId: string
+    teamspaceId: string
+    _count: UserOnTeamspaceCountAggregateOutputType | null
+    _avg: UserOnTeamspaceAvgAggregateOutputType | null
+    _sum: UserOnTeamspaceSumAggregateOutputType | null
+    _min: UserOnTeamspaceMinAggregateOutputType | null
+    _max: UserOnTeamspaceMaxAggregateOutputType | null
+  }
+
+  type GetUserOnTeamspaceGroupByPayload<T extends UserOnTeamspaceGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickArray<UserOnTeamspaceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof UserOnTeamspaceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], UserOnTeamspaceGroupByOutputType[P]>
+            : GetScalarType<T[P], UserOnTeamspaceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type UserOnTeamspaceSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    operation?: boolean
+    userId?: boolean
+    teamspaceId?: boolean
+    user?: boolean | UserArgs<ExtArgs>
+    teamspace?: boolean | TeamspaceArgs<ExtArgs>
+  }, ExtArgs["result"]["userOnTeamspace"]>
+
+  export type UserOnTeamspaceSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    operation?: boolean
+    userId?: boolean
+    teamspaceId?: boolean
+  }
+
+  export type UserOnTeamspaceInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    user?: boolean | UserArgs<ExtArgs>
+    teamspace?: boolean | TeamspaceArgs<ExtArgs>
+  }
+
+
+  type UserOnTeamspaceGetPayload<S extends boolean | null | undefined | UserOnTeamspaceArgs> = $Types.GetResult<UserOnTeamspacePayload, S>
+
+  type UserOnTeamspaceCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
+    Omit<UserOnTeamspaceFindManyArgs, 'select' | 'include'> & {
+      select?: UserOnTeamspaceCountAggregateInputType | true
+    }
+
+  export interface UserOnTeamspaceDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['UserOnTeamspace'], meta: { name: 'UserOnTeamspace' } }
+    /**
+     * Find zero or one UserOnTeamspace that matches the filter.
+     * @param {UserOnTeamspaceFindUniqueArgs} args - Arguments to find a UserOnTeamspace
+     * @example
+     * // Get one UserOnTeamspace
+     * const userOnTeamspace = await prisma.userOnTeamspace.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUnique<T extends UserOnTeamspaceFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, UserOnTeamspaceFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'UserOnTeamspace'> extends True ? Prisma__UserOnTeamspaceClient<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__UserOnTeamspaceClient<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
+
+    /**
+     * Find one UserOnTeamspace that matches the filter or throw an error  with `error.code='P2025'` 
+     *     if no matches were found.
+     * @param {UserOnTeamspaceFindUniqueOrThrowArgs} args - Arguments to find a UserOnTeamspace
+     * @example
+     * // Get one UserOnTeamspace
+     * const userOnTeamspace = await prisma.userOnTeamspace.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUniqueOrThrow<T extends UserOnTeamspaceFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserOnTeamspaceFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__UserOnTeamspaceClient<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
+
+    /**
+     * Find the first UserOnTeamspace that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnTeamspaceFindFirstArgs} args - Arguments to find a UserOnTeamspace
+     * @example
+     * // Get one UserOnTeamspace
+     * const userOnTeamspace = await prisma.userOnTeamspace.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirst<T extends UserOnTeamspaceFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, UserOnTeamspaceFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'UserOnTeamspace'> extends True ? Prisma__UserOnTeamspaceClient<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__UserOnTeamspaceClient<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
+
+    /**
+     * Find the first UserOnTeamspace that matches the filter or
+     * throw `NotFoundError` if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnTeamspaceFindFirstOrThrowArgs} args - Arguments to find a UserOnTeamspace
+     * @example
+     * // Get one UserOnTeamspace
+     * const userOnTeamspace = await prisma.userOnTeamspace.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirstOrThrow<T extends UserOnTeamspaceFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserOnTeamspaceFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__UserOnTeamspaceClient<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
+
+    /**
+     * Find zero or more UserOnTeamspaces that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnTeamspaceFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all UserOnTeamspaces
+     * const userOnTeamspaces = await prisma.userOnTeamspace.findMany()
+     * 
+     * // Get first 10 UserOnTeamspaces
+     * const userOnTeamspaces = await prisma.userOnTeamspace.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const userOnTeamspaceWithIdOnly = await prisma.userOnTeamspace.findMany({ select: { id: true } })
+     * 
+    **/
+    findMany<T extends UserOnTeamspaceFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserOnTeamspaceFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'findMany', never>>
+
+    /**
+     * Create a UserOnTeamspace.
+     * @param {UserOnTeamspaceCreateArgs} args - Arguments to create a UserOnTeamspace.
+     * @example
+     * // Create one UserOnTeamspace
+     * const UserOnTeamspace = await prisma.userOnTeamspace.create({
+     *   data: {
+     *     // ... data to create a UserOnTeamspace
+     *   }
+     * })
+     * 
+    **/
+    create<T extends UserOnTeamspaceCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, UserOnTeamspaceCreateArgs<ExtArgs>>
+    ): Prisma__UserOnTeamspaceClient<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
+
+    /**
+     * Create many UserOnTeamspaces.
+     *     @param {UserOnTeamspaceCreateManyArgs} args - Arguments to create many UserOnTeamspaces.
+     *     @example
+     *     // Create many UserOnTeamspaces
+     *     const userOnTeamspace = await prisma.userOnTeamspace.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends UserOnTeamspaceCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserOnTeamspaceCreateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a UserOnTeamspace.
+     * @param {UserOnTeamspaceDeleteArgs} args - Arguments to delete one UserOnTeamspace.
+     * @example
+     * // Delete one UserOnTeamspace
+     * const UserOnTeamspace = await prisma.userOnTeamspace.delete({
+     *   where: {
+     *     // ... filter to delete one UserOnTeamspace
+     *   }
+     * })
+     * 
+    **/
+    delete<T extends UserOnTeamspaceDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, UserOnTeamspaceDeleteArgs<ExtArgs>>
+    ): Prisma__UserOnTeamspaceClient<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
+
+    /**
+     * Update one UserOnTeamspace.
+     * @param {UserOnTeamspaceUpdateArgs} args - Arguments to update one UserOnTeamspace.
+     * @example
+     * // Update one UserOnTeamspace
+     * const userOnTeamspace = await prisma.userOnTeamspace.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    update<T extends UserOnTeamspaceUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, UserOnTeamspaceUpdateArgs<ExtArgs>>
+    ): Prisma__UserOnTeamspaceClient<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
+
+    /**
+     * Delete zero or more UserOnTeamspaces.
+     * @param {UserOnTeamspaceDeleteManyArgs} args - Arguments to filter UserOnTeamspaces to delete.
+     * @example
+     * // Delete a few UserOnTeamspaces
+     * const { count } = await prisma.userOnTeamspace.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+    **/
+    deleteMany<T extends UserOnTeamspaceDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, UserOnTeamspaceDeleteManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserOnTeamspaces.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnTeamspaceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many UserOnTeamspaces
+     * const userOnTeamspace = await prisma.userOnTeamspace.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    updateMany<T extends UserOnTeamspaceUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, UserOnTeamspaceUpdateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one UserOnTeamspace.
+     * @param {UserOnTeamspaceUpsertArgs} args - Arguments to update or create a UserOnTeamspace.
+     * @example
+     * // Update or create a UserOnTeamspace
+     * const userOnTeamspace = await prisma.userOnTeamspace.upsert({
+     *   create: {
+     *     // ... data to create a UserOnTeamspace
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the UserOnTeamspace we want to update
+     *   }
+     * })
+    **/
+    upsert<T extends UserOnTeamspaceUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, UserOnTeamspaceUpsertArgs<ExtArgs>>
+    ): Prisma__UserOnTeamspaceClient<$Types.GetResult<UserOnTeamspacePayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
+
+    /**
+     * Count the number of UserOnTeamspaces.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnTeamspaceCountArgs} args - Arguments to filter UserOnTeamspaces to count.
+     * @example
+     * // Count the number of UserOnTeamspaces
+     * const count = await prisma.userOnTeamspace.count({
+     *   where: {
+     *     // ... the filter for the UserOnTeamspaces we want to count
+     *   }
+     * })
+    **/
+    count<T extends UserOnTeamspaceCountArgs>(
+      args?: Subset<T, UserOnTeamspaceCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], UserOnTeamspaceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a UserOnTeamspace.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnTeamspaceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends UserOnTeamspaceAggregateArgs>(args: Subset<T, UserOnTeamspaceAggregateArgs>): Prisma.PrismaPromise<GetUserOnTeamspaceAggregateType<T>>
+
+    /**
+     * Group by UserOnTeamspace.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnTeamspaceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends UserOnTeamspaceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: UserOnTeamspaceGroupByArgs['orderBy'] }
+        : { orderBy?: UserOnTeamspaceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, UserOnTeamspaceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUserOnTeamspaceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for UserOnTeamspace.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export class Prisma__UserOnTeamspaceClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
+    private readonly _dmmf;
+    private readonly _queryType;
+    private readonly _rootField;
+    private readonly _clientMethod;
+    private readonly _args;
+    private readonly _dataPath;
+    private readonly _errorFormat;
+    private readonly _measurePerformance?;
+    private _isList;
+    private _callsite;
+    private _requestPromise?;
+    readonly [Symbol.toStringTag]: 'PrismaPromise';
+    constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
+
+    user<T extends UserArgs<ExtArgs> = {}>(args?: Subset<T, UserArgs<ExtArgs>>): Prisma__UserClient<$Types.GetResult<UserPayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    teamspace<T extends TeamspaceArgs<ExtArgs> = {}>(args?: Subset<T, TeamspaceArgs<ExtArgs>>): Prisma__TeamspaceClient<$Types.GetResult<TeamspacePayload<ExtArgs>, T, 'findUnique', never> | Null, never, ExtArgs>;
+
+    private get _document();
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): Promise<T>;
+  }
+
+
+
+  // Custom InputTypes
+
+  /**
+   * UserOnTeamspace base type for findUnique actions
+   */
+  export type UserOnTeamspaceFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnTeamspace to fetch.
+     */
+    where: UserOnTeamspaceWhereUniqueInput
+  }
+
+  /**
+   * UserOnTeamspace findUnique
+   */
+  export interface UserOnTeamspaceFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends UserOnTeamspaceFindUniqueArgsBase<ExtArgs> {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * UserOnTeamspace findUniqueOrThrow
+   */
+  export type UserOnTeamspaceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnTeamspace to fetch.
+     */
+    where: UserOnTeamspaceWhereUniqueInput
+  }
+
+
+  /**
+   * UserOnTeamspace base type for findFirst actions
+   */
+  export type UserOnTeamspaceFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnTeamspace to fetch.
+     */
+    where?: UserOnTeamspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnTeamspaces to fetch.
+     */
+    orderBy?: Enumerable<UserOnTeamspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserOnTeamspaces.
+     */
+    cursor?: UserOnTeamspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnTeamspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnTeamspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserOnTeamspaces.
+     */
+    distinct?: Enumerable<UserOnTeamspaceScalarFieldEnum>
+  }
+
+  /**
+   * UserOnTeamspace findFirst
+   */
+  export interface UserOnTeamspaceFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends UserOnTeamspaceFindFirstArgsBase<ExtArgs> {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * UserOnTeamspace findFirstOrThrow
+   */
+  export type UserOnTeamspaceFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnTeamspace to fetch.
+     */
+    where?: UserOnTeamspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnTeamspaces to fetch.
+     */
+    orderBy?: Enumerable<UserOnTeamspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserOnTeamspaces.
+     */
+    cursor?: UserOnTeamspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnTeamspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnTeamspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserOnTeamspaces.
+     */
+    distinct?: Enumerable<UserOnTeamspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * UserOnTeamspace findMany
+   */
+  export type UserOnTeamspaceFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnTeamspaces to fetch.
+     */
+    where?: UserOnTeamspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnTeamspaces to fetch.
+     */
+    orderBy?: Enumerable<UserOnTeamspaceOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing UserOnTeamspaces.
+     */
+    cursor?: UserOnTeamspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnTeamspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnTeamspaces.
+     */
+    skip?: number
+    distinct?: Enumerable<UserOnTeamspaceScalarFieldEnum>
+  }
+
+
+  /**
+   * UserOnTeamspace create
+   */
+  export type UserOnTeamspaceCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    /**
+     * The data needed to create a UserOnTeamspace.
+     */
+    data: XOR<UserOnTeamspaceCreateInput, UserOnTeamspaceUncheckedCreateInput>
+  }
+
+
+  /**
+   * UserOnTeamspace createMany
+   */
+  export type UserOnTeamspaceCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many UserOnTeamspaces.
+     */
+    data: Enumerable<UserOnTeamspaceCreateManyInput>
+    skipDuplicates?: boolean
+  }
+
+
+  /**
+   * UserOnTeamspace update
+   */
+  export type UserOnTeamspaceUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    /**
+     * The data needed to update a UserOnTeamspace.
+     */
+    data: XOR<UserOnTeamspaceUpdateInput, UserOnTeamspaceUncheckedUpdateInput>
+    /**
+     * Choose, which UserOnTeamspace to update.
+     */
+    where: UserOnTeamspaceWhereUniqueInput
+  }
+
+
+  /**
+   * UserOnTeamspace updateMany
+   */
+  export type UserOnTeamspaceUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update UserOnTeamspaces.
+     */
+    data: XOR<UserOnTeamspaceUpdateManyMutationInput, UserOnTeamspaceUncheckedUpdateManyInput>
+    /**
+     * Filter which UserOnTeamspaces to update
+     */
+    where?: UserOnTeamspaceWhereInput
+  }
+
+
+  /**
+   * UserOnTeamspace upsert
+   */
+  export type UserOnTeamspaceUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    /**
+     * The filter to search for the UserOnTeamspace to update in case it exists.
+     */
+    where: UserOnTeamspaceWhereUniqueInput
+    /**
+     * In case the UserOnTeamspace found by the `where` argument doesn't exist, create a new UserOnTeamspace with this data.
+     */
+    create: XOR<UserOnTeamspaceCreateInput, UserOnTeamspaceUncheckedCreateInput>
+    /**
+     * In case the UserOnTeamspace was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<UserOnTeamspaceUpdateInput, UserOnTeamspaceUncheckedUpdateInput>
+  }
+
+
+  /**
+   * UserOnTeamspace delete
+   */
+  export type UserOnTeamspaceDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
+    /**
+     * Filter which UserOnTeamspace to delete.
+     */
+    where: UserOnTeamspaceWhereUniqueInput
+  }
+
+
+  /**
+   * UserOnTeamspace deleteMany
+   */
+  export type UserOnTeamspaceDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserOnTeamspaces to delete
+     */
+    where?: UserOnTeamspaceWhereInput
+  }
+
+
+  /**
+   * UserOnTeamspace without action
+   */
+  export type UserOnTeamspaceArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnTeamspace
+     */
+    select?: UserOnTeamspaceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: UserOnTeamspaceInclude<ExtArgs> | null
   }
 
 
@@ -9026,12 +14442,18 @@ export namespace Prisma {
    * Enums
    */
 
-  // Based on
-  // https://github.com/microsoft/TypeScript/issues/3192#issuecomment-261720275
+  export const TransactionIsolationLevel: {
+    ReadUncommitted: 'ReadUncommitted',
+    ReadCommitted: 'ReadCommitted',
+    RepeatableRead: 'RepeatableRead',
+    Serializable: 'Serializable'
+  };
+
+  export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
 
   export const AccountScalarFieldEnum: {
     id: 'id',
-    userId: 'userId',
     type: 'type',
     provider: 'provider',
     providerAccountId: 'providerAccountId',
@@ -9043,56 +14465,11 @@ export namespace Prisma {
     id_token: 'id_token',
     session_state: 'session_state',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    userId: 'userId'
   };
 
   export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
-
-
-  export const JsonNullValueFilter: {
-    DbNull: typeof DbNull,
-    JsonNull: typeof JsonNull,
-    AnyNull: typeof AnyNull
-  };
-
-  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-  export const NotebookScalarFieldEnum: {
-    id: 'id',
-    title: 'title',
-    description: 'description',
-    published: 'published',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    workspaceId: 'workspaceId'
-  };
-
-  export type NotebookScalarFieldEnum = (typeof NotebookScalarFieldEnum)[keyof typeof NotebookScalarFieldEnum]
-
-
-  export const NullableJsonNullValueInput: {
-    DbNull: typeof DbNull,
-    JsonNull: typeof JsonNull
-  };
-
-  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
-
-
-  export const PageScalarFieldEnum: {
-    id: 'id',
-    title: 'title',
-    content: 'content',
-    published: 'published',
-    createdAt: 'createdAt',
-    updatedBy: 'updatedBy',
-    updatedAt: 'updatedAt',
-    deletedBy: 'deletedBy',
-    deletedAt: 'deletedAt',
-    notebookId: 'notebookId'
-  };
-
-  export type PageScalarFieldEnum = (typeof PageScalarFieldEnum)[keyof typeof PageScalarFieldEnum]
 
 
   export const SessionScalarFieldEnum: {
@@ -9104,36 +14481,6 @@ export namespace Prisma {
   };
 
   export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
-
-
-  export const SortOrder: {
-    asc: 'asc',
-    desc: 'desc'
-  };
-
-  export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
-
-
-  export const TrackingUserAccessScalarFieldEnum: {
-    id: 'id',
-    userId: 'userId',
-    lastAccessWorkspaceId: 'lastAccessWorkspaceId',
-    lastAccessNotebookId: 'lastAccessNotebookId',
-    lastAccessPageId: 'lastAccessPageId',
-    createdAt: 'createdAt'
-  };
-
-  export type TrackingUserAccessScalarFieldEnum = (typeof TrackingUserAccessScalarFieldEnum)[keyof typeof TrackingUserAccessScalarFieldEnum]
-
-
-  export const TransactionIsolationLevel: {
-    ReadUncommitted: 'ReadUncommitted',
-    ReadCommitted: 'ReadCommitted',
-    RepeatableRead: 'RepeatableRead',
-    Serializable: 'Serializable'
-  };
-
-  export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
   export const UserScalarFieldEnum: {
@@ -9163,6 +14510,18 @@ export namespace Prisma {
   export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
 
 
+  export const TrackingUserAccessOnWorkspaceScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    lastAccessNotebookId: 'lastAccessNotebookId',
+    lastAccessPageId: 'lastAccessPageId',
+    userId: 'userId',
+    workspaceId: 'workspaceId'
+  };
+
+  export type TrackingUserAccessOnWorkspaceScalarFieldEnum = (typeof TrackingUserAccessOnWorkspaceScalarFieldEnum)[keyof typeof TrackingUserAccessOnWorkspaceScalarFieldEnum]
+
+
   export const WorkspaceScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -9172,14 +14531,175 @@ export namespace Prisma {
     stripeSubscriptionId: 'stripeSubscriptionId',
     stripePriceId: 'stripePriceId',
     stripeCurrentPeriodEnd: 'stripeCurrentPeriodEnd',
-    createdBy: 'createdBy',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    createdBy: 'createdBy'
   };
 
   export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
 
 
+  export const TeamspaceScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    isOrigin: 'isOrigin',
+    archivedAt: 'archivedAt',
+    workspaceId: 'workspaceId',
+    createdBy: 'createdBy'
+  };
+
+  export type TeamspaceScalarFieldEnum = (typeof TeamspaceScalarFieldEnum)[keyof typeof TeamspaceScalarFieldEnum]
+
+
+  export const NotebookScalarFieldEnum: {
+    id: 'id',
+    title: 'title',
+    description: 'description',
+    published: 'published',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    workspaceId: 'workspaceId',
+    teamspaceId: 'teamspaceId',
+    createdBy: 'createdBy'
+  };
+
+  export type NotebookScalarFieldEnum = (typeof NotebookScalarFieldEnum)[keyof typeof NotebookScalarFieldEnum]
+
+
+  export const PageScalarFieldEnum: {
+    id: 'id',
+    title: 'title',
+    content: 'content',
+    published: 'published',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    deletedAt: 'deletedAt',
+    notebookId: 'notebookId',
+    createdBy: 'createdBy',
+    deletedBy: 'deletedBy',
+    updatedBy: 'updatedBy'
+  };
+
+  export type PageScalarFieldEnum = (typeof PageScalarFieldEnum)[keyof typeof PageScalarFieldEnum]
+
+
+  export const FavoriteScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    userId: 'userId',
+    workspaceId: 'workspaceId',
+    pageId: 'pageId'
+  };
+
+  export type FavoriteScalarFieldEnum = (typeof FavoriteScalarFieldEnum)[keyof typeof FavoriteScalarFieldEnum]
+
+
+  export const UserOnWorkspaceScalarFieldEnum: {
+    id: 'id',
+    role: 'role',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    userId: 'userId',
+    workspaceId: 'workspaceId'
+  };
+
+  export type UserOnWorkspaceScalarFieldEnum = (typeof UserOnWorkspaceScalarFieldEnum)[keyof typeof UserOnWorkspaceScalarFieldEnum]
+
+
+  export const UserOnTeamspaceScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    operation: 'operation',
+    userId: 'userId',
+    teamspaceId: 'teamspaceId'
+  };
+
+  export type UserOnTeamspaceScalarFieldEnum = (typeof UserOnTeamspaceScalarFieldEnum)[keyof typeof UserOnTeamspaceScalarFieldEnum]
+
+
+  export const SortOrder: {
+    asc: 'asc',
+    desc: 'desc'
+  };
+
+  export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+  /**
+   * Field references 
+   */
+
+
+  /**
+   * Reference to a field of type 'String'
+   */
+  export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
   /**
    * Deep Input Types
    */
@@ -9189,61 +14709,78 @@ export namespace Prisma {
     AND?: Enumerable<AccountWhereInput>
     OR?: Enumerable<AccountWhereInput>
     NOT?: Enumerable<AccountWhereInput>
-    id?: StringFilter | string
-    userId?: StringFilter | string
-    type?: StringFilter | string
-    provider?: StringFilter | string
-    providerAccountId?: StringFilter | string
-    refresh_token?: StringNullableFilter | string | null
-    access_token?: StringNullableFilter | string | null
-    expires_at?: IntNullableFilter | number | null
-    token_type?: StringNullableFilter | string | null
-    scope?: StringNullableFilter | string | null
-    id_token?: StringNullableFilter | string | null
-    session_state?: StringNullableFilter | string | null
-    createdAt?: DateTimeFilter | Date | string
-    updatedAt?: DateTimeFilter | Date | string
+    id?: StringFilter<"Account"> | string
+    type?: StringFilter<"Account"> | string
+    provider?: StringFilter<"Account"> | string
+    providerAccountId?: StringFilter<"Account"> | string
+    refresh_token?: StringNullableFilter<"Account"> | string | null
+    access_token?: StringNullableFilter<"Account"> | string | null
+    expires_at?: IntNullableFilter<"Account"> | number | null
+    token_type?: StringNullableFilter<"Account"> | string | null
+    scope?: StringNullableFilter<"Account"> | string | null
+    id_token?: StringNullableFilter<"Account"> | string | null
+    session_state?: StringNullableFilter<"Account"> | string | null
+    createdAt?: DateTimeFilter<"Account"> | Date | string
+    updatedAt?: DateTimeFilter<"Account"> | Date | string
+    userId?: StringFilter<"Account"> | string
     user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type AccountOrderByWithRelationInput = {
     id?: SortOrder
-    userId?: SortOrder
     type?: SortOrder
     provider?: SortOrder
     providerAccountId?: SortOrder
-    refresh_token?: SortOrder
-    access_token?: SortOrder
-    expires_at?: SortOrder
-    token_type?: SortOrder
-    scope?: SortOrder
-    id_token?: SortOrder
-    session_state?: SortOrder
+    refresh_token?: SortOrderInput | SortOrder
+    access_token?: SortOrderInput | SortOrder
+    expires_at?: SortOrderInput | SortOrder
+    token_type?: SortOrderInput | SortOrder
+    scope?: SortOrderInput | SortOrder
+    id_token?: SortOrderInput | SortOrder
+    session_state?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    userId?: SortOrder
     user?: UserOrderByWithRelationInput
   }
 
-  export type AccountWhereUniqueInput = {
+  export type AccountWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     provider_providerAccountId?: AccountProviderProviderAccountIdCompoundUniqueInput
-  }
+    AND?: Enumerable<AccountWhereInput>
+    OR?: Enumerable<AccountWhereInput>
+    NOT?: Enumerable<AccountWhereInput>
+    type?: StringFilter<"Account"> | string
+    provider?: StringFilter<"Account"> | string
+    providerAccountId?: StringFilter<"Account"> | string
+    refresh_token?: StringNullableFilter<"Account"> | string | null
+    access_token?: StringNullableFilter<"Account"> | string | null
+    expires_at?: IntNullableFilter<"Account"> | number | null
+    token_type?: StringNullableFilter<"Account"> | string | null
+    scope?: StringNullableFilter<"Account"> | string | null
+    id_token?: StringNullableFilter<"Account"> | string | null
+    session_state?: StringNullableFilter<"Account"> | string | null
+    createdAt?: DateTimeFilter<"Account"> | Date | string
+    updatedAt?: DateTimeFilter<"Account"> | Date | string
+    userId?: StringFilter<"Account"> | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+  }, "id" | "provider_providerAccountId">
 
   export type AccountOrderByWithAggregationInput = {
     id?: SortOrder
-    userId?: SortOrder
     type?: SortOrder
     provider?: SortOrder
     providerAccountId?: SortOrder
-    refresh_token?: SortOrder
-    access_token?: SortOrder
-    expires_at?: SortOrder
-    token_type?: SortOrder
-    scope?: SortOrder
-    id_token?: SortOrder
-    session_state?: SortOrder
+    refresh_token?: SortOrderInput | SortOrder
+    access_token?: SortOrderInput | SortOrder
+    expires_at?: SortOrderInput | SortOrder
+    token_type?: SortOrderInput | SortOrder
+    scope?: SortOrderInput | SortOrder
+    id_token?: SortOrderInput | SortOrder
+    session_state?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    userId?: SortOrder
     _count?: AccountCountOrderByAggregateInput
     _avg?: AccountAvgOrderByAggregateInput
     _max?: AccountMaxOrderByAggregateInput
@@ -9255,54 +14792,61 @@ export namespace Prisma {
     AND?: Enumerable<AccountScalarWhereWithAggregatesInput>
     OR?: Enumerable<AccountScalarWhereWithAggregatesInput>
     NOT?: Enumerable<AccountScalarWhereWithAggregatesInput>
-    id?: StringWithAggregatesFilter | string
-    userId?: StringWithAggregatesFilter | string
-    type?: StringWithAggregatesFilter | string
-    provider?: StringWithAggregatesFilter | string
-    providerAccountId?: StringWithAggregatesFilter | string
-    refresh_token?: StringNullableWithAggregatesFilter | string | null
-    access_token?: StringNullableWithAggregatesFilter | string | null
-    expires_at?: IntNullableWithAggregatesFilter | number | null
-    token_type?: StringNullableWithAggregatesFilter | string | null
-    scope?: StringNullableWithAggregatesFilter | string | null
-    id_token?: StringNullableWithAggregatesFilter | string | null
-    session_state?: StringNullableWithAggregatesFilter | string | null
-    createdAt?: DateTimeWithAggregatesFilter | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter | Date | string
+    id?: StringWithAggregatesFilter<"Account"> | string
+    type?: StringWithAggregatesFilter<"Account"> | string
+    provider?: StringWithAggregatesFilter<"Account"> | string
+    providerAccountId?: StringWithAggregatesFilter<"Account"> | string
+    refresh_token?: StringNullableWithAggregatesFilter<"Account"> | string | null
+    access_token?: StringNullableWithAggregatesFilter<"Account"> | string | null
+    expires_at?: IntNullableWithAggregatesFilter<"Account"> | number | null
+    token_type?: StringNullableWithAggregatesFilter<"Account"> | string | null
+    scope?: StringNullableWithAggregatesFilter<"Account"> | string | null
+    id_token?: StringNullableWithAggregatesFilter<"Account"> | string | null
+    session_state?: StringNullableWithAggregatesFilter<"Account"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Account"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Account"> | Date | string
+    userId?: StringWithAggregatesFilter<"Account"> | string
   }
 
   export type SessionWhereInput = {
     AND?: Enumerable<SessionWhereInput>
     OR?: Enumerable<SessionWhereInput>
     NOT?: Enumerable<SessionWhereInput>
-    id?: StringFilter | string
-    sessionToken?: StringFilter | string
-    accessToken?: StringNullableFilter | string | null
-    expires?: DateTimeFilter | Date | string
-    userId?: StringNullableFilter | string | null
-    user?: XOR<UserRelationFilter, UserWhereInput> | null
+    id?: StringFilter<"Session"> | string
+    sessionToken?: StringFilter<"Session"> | string
+    accessToken?: StringNullableFilter<"Session"> | string | null
+    expires?: DateTimeFilter<"Session"> | Date | string
+    userId?: StringNullableFilter<"Session"> | string | null
+    user?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }
 
   export type SessionOrderByWithRelationInput = {
     id?: SortOrder
     sessionToken?: SortOrder
-    accessToken?: SortOrder
+    accessToken?: SortOrderInput | SortOrder
     expires?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
   }
 
-  export type SessionWhereUniqueInput = {
+  export type SessionWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     sessionToken?: string
-  }
+    AND?: Enumerable<SessionWhereInput>
+    OR?: Enumerable<SessionWhereInput>
+    NOT?: Enumerable<SessionWhereInput>
+    accessToken?: StringNullableFilter<"Session"> | string | null
+    expires?: DateTimeFilter<"Session"> | Date | string
+    userId?: StringNullableFilter<"Session"> | string | null
+    user?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+  }, "id" | "sessionToken">
 
   export type SessionOrderByWithAggregationInput = {
     id?: SortOrder
     sessionToken?: SortOrder
-    accessToken?: SortOrder
+    accessToken?: SortOrderInput | SortOrder
     expires?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
     _count?: SessionCountOrderByAggregateInput
     _max?: SessionMaxOrderByAggregateInput
     _min?: SessionMinOrderByAggregateInput
@@ -9312,71 +14856,95 @@ export namespace Prisma {
     AND?: Enumerable<SessionScalarWhereWithAggregatesInput>
     OR?: Enumerable<SessionScalarWhereWithAggregatesInput>
     NOT?: Enumerable<SessionScalarWhereWithAggregatesInput>
-    id?: StringWithAggregatesFilter | string
-    sessionToken?: StringWithAggregatesFilter | string
-    accessToken?: StringNullableWithAggregatesFilter | string | null
-    expires?: DateTimeWithAggregatesFilter | Date | string
-    userId?: StringNullableWithAggregatesFilter | string | null
+    id?: StringWithAggregatesFilter<"Session"> | string
+    sessionToken?: StringWithAggregatesFilter<"Session"> | string
+    accessToken?: StringNullableWithAggregatesFilter<"Session"> | string | null
+    expires?: DateTimeWithAggregatesFilter<"Session"> | Date | string
+    userId?: StringNullableWithAggregatesFilter<"Session"> | string | null
   }
 
   export type UserWhereInput = {
     AND?: Enumerable<UserWhereInput>
     OR?: Enumerable<UserWhereInput>
     NOT?: Enumerable<UserWhereInput>
-    id?: StringFilter | string
-    name?: StringNullableFilter | string | null
-    email?: StringNullableFilter | string | null
-    emailVerified?: DateTimeNullableFilter | Date | string | null
-    image?: StringNullableFilter | string | null
-    createdAt?: DateTimeFilter | Date | string
-    updatedAt?: DateTimeFilter | Date | string
-    stripeCustomerId?: StringNullableFilter | string | null
-    lastAccessWorkspaceId?: StringNullableFilter | string | null
+    id?: StringFilter<"User"> | string
+    name?: StringNullableFilter<"User"> | string | null
+    email?: StringNullableFilter<"User"> | string | null
+    emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
+    image?: StringNullableFilter<"User"> | string | null
+    createdAt?: DateTimeFilter<"User"> | Date | string
+    updatedAt?: DateTimeFilter<"User"> | Date | string
+    stripeCustomerId?: StringNullableFilter<"User"> | string | null
+    lastAccessWorkspaceId?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
-    workspaces?: WorkspaceListRelationFilter
-    trackingUserAccess?: TrackingUserAccessListRelationFilter
-    lastAccessWorkspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput> | null
-    pagesUserUpdated?: XOR<PageRelationFilter, PageWhereInput> | null
-    pagesUserDeleted?: XOR<PageRelationFilter, PageWhereInput> | null
+    userOnWorkspace?: UserOnWorkspaceListRelationFilter
+    userOnTeamspace?: UserOnTeamspaceListRelationFilter
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceListRelationFilter
+    favorites?: FavoriteListRelationFilter
+    notebooks?: NotebookListRelationFilter
+    PagesCreated?: PageListRelationFilter
+    PagesUpdated?: PageListRelationFilter
+    PagesDeleted?: PageListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
-    name?: SortOrder
-    email?: SortOrder
-    emailVerified?: SortOrder
-    image?: SortOrder
+    name?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    emailVerified?: SortOrderInput | SortOrder
+    image?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    stripeCustomerId?: SortOrder
-    lastAccessWorkspaceId?: SortOrder
+    stripeCustomerId?: SortOrderInput | SortOrder
+    lastAccessWorkspaceId?: SortOrderInput | SortOrder
     accounts?: AccountOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
-    workspaces?: WorkspaceOrderByRelationAggregateInput
-    trackingUserAccess?: TrackingUserAccessOrderByRelationAggregateInput
-    lastAccessWorkspace?: WorkspaceOrderByWithRelationInput
-    pagesUserUpdated?: PageOrderByWithRelationInput
-    pagesUserDeleted?: PageOrderByWithRelationInput
+    userOnWorkspace?: UserOnWorkspaceOrderByRelationAggregateInput
+    userOnTeamspace?: UserOnTeamspaceOrderByRelationAggregateInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceOrderByRelationAggregateInput
+    favorites?: FavoriteOrderByRelationAggregateInput
+    notebooks?: NotebookOrderByRelationAggregateInput
+    PagesCreated?: PageOrderByRelationAggregateInput
+    PagesUpdated?: PageOrderByRelationAggregateInput
+    PagesDeleted?: PageOrderByRelationAggregateInput
   }
 
-  export type UserWhereUniqueInput = {
+  export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     email?: string
     stripeCustomerId?: string
-    lastAccessWorkspaceId?: string
-  }
+    AND?: Enumerable<UserWhereInput>
+    OR?: Enumerable<UserWhereInput>
+    NOT?: Enumerable<UserWhereInput>
+    name?: StringNullableFilter<"User"> | string | null
+    emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
+    image?: StringNullableFilter<"User"> | string | null
+    createdAt?: DateTimeFilter<"User"> | Date | string
+    updatedAt?: DateTimeFilter<"User"> | Date | string
+    lastAccessWorkspaceId?: StringNullableFilter<"User"> | string | null
+    accounts?: AccountListRelationFilter
+    sessions?: SessionListRelationFilter
+    userOnWorkspace?: UserOnWorkspaceListRelationFilter
+    userOnTeamspace?: UserOnTeamspaceListRelationFilter
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceListRelationFilter
+    favorites?: FavoriteListRelationFilter
+    notebooks?: NotebookListRelationFilter
+    PagesCreated?: PageListRelationFilter
+    PagesUpdated?: PageListRelationFilter
+    PagesDeleted?: PageListRelationFilter
+  }, "id" | "email" | "stripeCustomerId">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
-    name?: SortOrder
-    email?: SortOrder
-    emailVerified?: SortOrder
-    image?: SortOrder
+    name?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    emailVerified?: SortOrderInput | SortOrder
+    image?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    stripeCustomerId?: SortOrder
-    lastAccessWorkspaceId?: SortOrder
+    stripeCustomerId?: SortOrderInput | SortOrder
+    lastAccessWorkspaceId?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -9386,27 +14954,27 @@ export namespace Prisma {
     AND?: Enumerable<UserScalarWhereWithAggregatesInput>
     OR?: Enumerable<UserScalarWhereWithAggregatesInput>
     NOT?: Enumerable<UserScalarWhereWithAggregatesInput>
-    id?: StringWithAggregatesFilter | string
-    name?: StringNullableWithAggregatesFilter | string | null
-    email?: StringNullableWithAggregatesFilter | string | null
-    emailVerified?: DateTimeNullableWithAggregatesFilter | Date | string | null
-    image?: StringNullableWithAggregatesFilter | string | null
-    createdAt?: DateTimeWithAggregatesFilter | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter | Date | string
-    stripeCustomerId?: StringNullableWithAggregatesFilter | string | null
-    lastAccessWorkspaceId?: StringNullableWithAggregatesFilter | string | null
+    id?: StringWithAggregatesFilter<"User"> | string
+    name?: StringNullableWithAggregatesFilter<"User"> | string | null
+    email?: StringNullableWithAggregatesFilter<"User"> | string | null
+    emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    image?: StringNullableWithAggregatesFilter<"User"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    stripeCustomerId?: StringNullableWithAggregatesFilter<"User"> | string | null
+    lastAccessWorkspaceId?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type VerificationTokenWhereInput = {
     AND?: Enumerable<VerificationTokenWhereInput>
     OR?: Enumerable<VerificationTokenWhereInput>
     NOT?: Enumerable<VerificationTokenWhereInput>
-    id?: StringFilter | string
-    identifier?: StringFilter | string
-    token?: StringFilter | string
-    expires?: DateTimeFilter | Date | string
-    createdAt?: DateTimeFilter | Date | string
-    updatedAt?: DateTimeFilter | Date | string
+    id?: StringFilter<"VerificationToken"> | string
+    identifier?: StringFilter<"VerificationToken"> | string
+    token?: StringFilter<"VerificationToken"> | string
+    expires?: DateTimeFilter<"VerificationToken"> | Date | string
+    createdAt?: DateTimeFilter<"VerificationToken"> | Date | string
+    updatedAt?: DateTimeFilter<"VerificationToken"> | Date | string
   }
 
   export type VerificationTokenOrderByWithRelationInput = {
@@ -9418,11 +14986,18 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type VerificationTokenWhereUniqueInput = {
+  export type VerificationTokenWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     token?: string
     identifier_token?: VerificationTokenIdentifierTokenCompoundUniqueInput
-  }
+    AND?: Enumerable<VerificationTokenWhereInput>
+    OR?: Enumerable<VerificationTokenWhereInput>
+    NOT?: Enumerable<VerificationTokenWhereInput>
+    identifier?: StringFilter<"VerificationToken"> | string
+    expires?: DateTimeFilter<"VerificationToken"> | Date | string
+    createdAt?: DateTimeFilter<"VerificationToken"> | Date | string
+    updatedAt?: DateTimeFilter<"VerificationToken"> | Date | string
+  }, "id" | "token" | "identifier_token">
 
   export type VerificationTokenOrderByWithAggregationInput = {
     id?: SortOrder
@@ -9440,126 +15015,152 @@ export namespace Prisma {
     AND?: Enumerable<VerificationTokenScalarWhereWithAggregatesInput>
     OR?: Enumerable<VerificationTokenScalarWhereWithAggregatesInput>
     NOT?: Enumerable<VerificationTokenScalarWhereWithAggregatesInput>
-    id?: StringWithAggregatesFilter | string
-    identifier?: StringWithAggregatesFilter | string
-    token?: StringWithAggregatesFilter | string
-    expires?: DateTimeWithAggregatesFilter | Date | string
-    createdAt?: DateTimeWithAggregatesFilter | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter | Date | string
+    id?: StringWithAggregatesFilter<"VerificationToken"> | string
+    identifier?: StringWithAggregatesFilter<"VerificationToken"> | string
+    token?: StringWithAggregatesFilter<"VerificationToken"> | string
+    expires?: DateTimeWithAggregatesFilter<"VerificationToken"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"VerificationToken"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"VerificationToken"> | Date | string
   }
 
-  export type TrackingUserAccessWhereInput = {
-    AND?: Enumerable<TrackingUserAccessWhereInput>
-    OR?: Enumerable<TrackingUserAccessWhereInput>
-    NOT?: Enumerable<TrackingUserAccessWhereInput>
-    id?: StringFilter | string
-    userId?: StringNullableFilter | string | null
-    lastAccessWorkspaceId?: StringNullableFilter | string | null
-    lastAccessNotebookId?: StringNullableFilter | string | null
-    lastAccessPageId?: StringNullableFilter | string | null
-    createdAt?: DateTimeFilter | Date | string
-    user?: XOR<UserRelationFilter, UserWhereInput> | null
-    workspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput> | null
+  export type TrackingUserAccessOnWorkspaceWhereInput = {
+    AND?: Enumerable<TrackingUserAccessOnWorkspaceWhereInput>
+    OR?: Enumerable<TrackingUserAccessOnWorkspaceWhereInput>
+    NOT?: Enumerable<TrackingUserAccessOnWorkspaceWhereInput>
+    id?: StringFilter<"TrackingUserAccessOnWorkspace"> | string
+    createdAt?: DateTimeFilter<"TrackingUserAccessOnWorkspace"> | Date | string
+    lastAccessNotebookId?: StringNullableFilter<"TrackingUserAccessOnWorkspace"> | string | null
+    lastAccessPageId?: StringNullableFilter<"TrackingUserAccessOnWorkspace"> | string | null
+    userId?: StringFilter<"TrackingUserAccessOnWorkspace"> | string
+    workspaceId?: StringFilter<"TrackingUserAccessOnWorkspace"> | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    workspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput>
   }
 
-  export type TrackingUserAccessOrderByWithRelationInput = {
+  export type TrackingUserAccessOnWorkspaceOrderByWithRelationInput = {
     id?: SortOrder
-    userId?: SortOrder
-    lastAccessWorkspaceId?: SortOrder
-    lastAccessNotebookId?: SortOrder
-    lastAccessPageId?: SortOrder
     createdAt?: SortOrder
+    lastAccessNotebookId?: SortOrderInput | SortOrder
+    lastAccessPageId?: SortOrderInput | SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
     user?: UserOrderByWithRelationInput
     workspace?: WorkspaceOrderByWithRelationInput
   }
 
-  export type TrackingUserAccessWhereUniqueInput = {
+  export type TrackingUserAccessOnWorkspaceWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-  }
+    workspaceId?: string
+    AND?: Enumerable<TrackingUserAccessOnWorkspaceWhereInput>
+    OR?: Enumerable<TrackingUserAccessOnWorkspaceWhereInput>
+    NOT?: Enumerable<TrackingUserAccessOnWorkspaceWhereInput>
+    createdAt?: DateTimeFilter<"TrackingUserAccessOnWorkspace"> | Date | string
+    lastAccessNotebookId?: StringNullableFilter<"TrackingUserAccessOnWorkspace"> | string | null
+    lastAccessPageId?: StringNullableFilter<"TrackingUserAccessOnWorkspace"> | string | null
+    userId?: StringFilter<"TrackingUserAccessOnWorkspace"> | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    workspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput>
+  }, "id" | "workspaceId">
 
-  export type TrackingUserAccessOrderByWithAggregationInput = {
+  export type TrackingUserAccessOnWorkspaceOrderByWithAggregationInput = {
     id?: SortOrder
-    userId?: SortOrder
-    lastAccessWorkspaceId?: SortOrder
-    lastAccessNotebookId?: SortOrder
-    lastAccessPageId?: SortOrder
     createdAt?: SortOrder
-    _count?: TrackingUserAccessCountOrderByAggregateInput
-    _max?: TrackingUserAccessMaxOrderByAggregateInput
-    _min?: TrackingUserAccessMinOrderByAggregateInput
+    lastAccessNotebookId?: SortOrderInput | SortOrder
+    lastAccessPageId?: SortOrderInput | SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+    _count?: TrackingUserAccessOnWorkspaceCountOrderByAggregateInput
+    _max?: TrackingUserAccessOnWorkspaceMaxOrderByAggregateInput
+    _min?: TrackingUserAccessOnWorkspaceMinOrderByAggregateInput
   }
 
-  export type TrackingUserAccessScalarWhereWithAggregatesInput = {
-    AND?: Enumerable<TrackingUserAccessScalarWhereWithAggregatesInput>
-    OR?: Enumerable<TrackingUserAccessScalarWhereWithAggregatesInput>
-    NOT?: Enumerable<TrackingUserAccessScalarWhereWithAggregatesInput>
-    id?: StringWithAggregatesFilter | string
-    userId?: StringNullableWithAggregatesFilter | string | null
-    lastAccessWorkspaceId?: StringNullableWithAggregatesFilter | string | null
-    lastAccessNotebookId?: StringNullableWithAggregatesFilter | string | null
-    lastAccessPageId?: StringNullableWithAggregatesFilter | string | null
-    createdAt?: DateTimeWithAggregatesFilter | Date | string
+  export type TrackingUserAccessOnWorkspaceScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<TrackingUserAccessOnWorkspaceScalarWhereWithAggregatesInput>
+    OR?: Enumerable<TrackingUserAccessOnWorkspaceScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<TrackingUserAccessOnWorkspaceScalarWhereWithAggregatesInput>
+    id?: StringWithAggregatesFilter<"TrackingUserAccessOnWorkspace"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"TrackingUserAccessOnWorkspace"> | Date | string
+    lastAccessNotebookId?: StringNullableWithAggregatesFilter<"TrackingUserAccessOnWorkspace"> | string | null
+    lastAccessPageId?: StringNullableWithAggregatesFilter<"TrackingUserAccessOnWorkspace"> | string | null
+    userId?: StringWithAggregatesFilter<"TrackingUserAccessOnWorkspace"> | string
+    workspaceId?: StringWithAggregatesFilter<"TrackingUserAccessOnWorkspace"> | string
   }
 
   export type WorkspaceWhereInput = {
     AND?: Enumerable<WorkspaceWhereInput>
     OR?: Enumerable<WorkspaceWhereInput>
     NOT?: Enumerable<WorkspaceWhereInput>
-    id?: StringFilter | string
-    name?: StringFilter | string
-    domain?: StringFilter | string
-    stripeCustomerId?: StringNullableFilter | string | null
-    stripeWorkspaceId?: StringNullableFilter | string | null
-    stripeSubscriptionId?: StringNullableFilter | string | null
-    stripePriceId?: StringNullableFilter | string | null
-    stripeCurrentPeriodEnd?: DateTimeNullableFilter | Date | string | null
-    createdBy?: StringFilter | string
-    createdAt?: DateTimeFilter | Date | string
-    updatedAt?: DateTimeFilter | Date | string
-    trackUserAccessWorkspace?: XOR<UserRelationFilter, UserWhereInput> | null
-    users?: UserListRelationFilter
+    id?: StringFilter<"Workspace"> | string
+    name?: StringFilter<"Workspace"> | string
+    domain?: StringFilter<"Workspace"> | string
+    stripeCustomerId?: StringNullableFilter<"Workspace"> | string | null
+    stripeWorkspaceId?: StringNullableFilter<"Workspace"> | string | null
+    stripeSubscriptionId?: StringNullableFilter<"Workspace"> | string | null
+    stripePriceId?: StringNullableFilter<"Workspace"> | string | null
+    stripeCurrentPeriodEnd?: DateTimeNullableFilter<"Workspace"> | Date | string | null
+    createdAt?: DateTimeFilter<"Workspace"> | Date | string
+    updatedAt?: DateTimeFilter<"Workspace"> | Date | string
+    createdBy?: StringFilter<"Workspace"> | string
+    trackingUserAccessOnWorkspace?: XOR<TrackingUserAccessOnWorkspaceNullableRelationFilter, TrackingUserAccessOnWorkspaceWhereInput> | null
+    userOnWorkspace?: UserOnWorkspaceListRelationFilter
+    teamspaces?: TeamspaceListRelationFilter
     notebooks?: NotebookListRelationFilter
-    trackingUserAccess?: TrackingUserAccessListRelationFilter
+    favorites?: FavoriteListRelationFilter
   }
 
   export type WorkspaceOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
     domain?: SortOrder
-    stripeCustomerId?: SortOrder
-    stripeWorkspaceId?: SortOrder
-    stripeSubscriptionId?: SortOrder
-    stripePriceId?: SortOrder
-    stripeCurrentPeriodEnd?: SortOrder
-    createdBy?: SortOrder
+    stripeCustomerId?: SortOrderInput | SortOrder
+    stripeWorkspaceId?: SortOrderInput | SortOrder
+    stripeSubscriptionId?: SortOrderInput | SortOrder
+    stripePriceId?: SortOrderInput | SortOrder
+    stripeCurrentPeriodEnd?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    trackUserAccessWorkspace?: UserOrderByWithRelationInput
-    users?: UserOrderByRelationAggregateInput
+    createdBy?: SortOrder
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceOrderByWithRelationInput
+    userOnWorkspace?: UserOnWorkspaceOrderByRelationAggregateInput
+    teamspaces?: TeamspaceOrderByRelationAggregateInput
     notebooks?: NotebookOrderByRelationAggregateInput
-    trackingUserAccess?: TrackingUserAccessOrderByRelationAggregateInput
+    favorites?: FavoriteOrderByRelationAggregateInput
   }
 
-  export type WorkspaceWhereUniqueInput = {
+  export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     domain?: string
     stripeCustomerId?: string
     stripeWorkspaceId?: string
     stripeSubscriptionId?: string
-  }
+    AND?: Enumerable<WorkspaceWhereInput>
+    OR?: Enumerable<WorkspaceWhereInput>
+    NOT?: Enumerable<WorkspaceWhereInput>
+    name?: StringFilter<"Workspace"> | string
+    stripePriceId?: StringNullableFilter<"Workspace"> | string | null
+    stripeCurrentPeriodEnd?: DateTimeNullableFilter<"Workspace"> | Date | string | null
+    createdAt?: DateTimeFilter<"Workspace"> | Date | string
+    updatedAt?: DateTimeFilter<"Workspace"> | Date | string
+    createdBy?: StringFilter<"Workspace"> | string
+    trackingUserAccessOnWorkspace?: XOR<TrackingUserAccessOnWorkspaceNullableRelationFilter, TrackingUserAccessOnWorkspaceWhereInput> | null
+    userOnWorkspace?: UserOnWorkspaceListRelationFilter
+    teamspaces?: TeamspaceListRelationFilter
+    notebooks?: NotebookListRelationFilter
+    favorites?: FavoriteListRelationFilter
+  }, "id" | "domain" | "stripeCustomerId" | "stripeWorkspaceId" | "stripeSubscriptionId">
 
   export type WorkspaceOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
     domain?: SortOrder
-    stripeCustomerId?: SortOrder
-    stripeWorkspaceId?: SortOrder
-    stripeSubscriptionId?: SortOrder
-    stripePriceId?: SortOrder
-    stripeCurrentPeriodEnd?: SortOrder
-    createdBy?: SortOrder
+    stripeCustomerId?: SortOrderInput | SortOrder
+    stripeWorkspaceId?: SortOrderInput | SortOrder
+    stripeSubscriptionId?: SortOrderInput | SortOrder
+    stripePriceId?: SortOrderInput | SortOrder
+    stripeCurrentPeriodEnd?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    createdBy?: SortOrder
     _count?: WorkspaceCountOrderByAggregateInput
     _max?: WorkspaceMaxOrderByAggregateInput
     _min?: WorkspaceMinOrderByAggregateInput
@@ -9569,58 +15170,164 @@ export namespace Prisma {
     AND?: Enumerable<WorkspaceScalarWhereWithAggregatesInput>
     OR?: Enumerable<WorkspaceScalarWhereWithAggregatesInput>
     NOT?: Enumerable<WorkspaceScalarWhereWithAggregatesInput>
-    id?: StringWithAggregatesFilter | string
-    name?: StringWithAggregatesFilter | string
-    domain?: StringWithAggregatesFilter | string
-    stripeCustomerId?: StringNullableWithAggregatesFilter | string | null
-    stripeWorkspaceId?: StringNullableWithAggregatesFilter | string | null
-    stripeSubscriptionId?: StringNullableWithAggregatesFilter | string | null
-    stripePriceId?: StringNullableWithAggregatesFilter | string | null
-    stripeCurrentPeriodEnd?: DateTimeNullableWithAggregatesFilter | Date | string | null
-    createdBy?: StringWithAggregatesFilter | string
-    createdAt?: DateTimeWithAggregatesFilter | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter | Date | string
+    id?: StringWithAggregatesFilter<"Workspace"> | string
+    name?: StringWithAggregatesFilter<"Workspace"> | string
+    domain?: StringWithAggregatesFilter<"Workspace"> | string
+    stripeCustomerId?: StringNullableWithAggregatesFilter<"Workspace"> | string | null
+    stripeWorkspaceId?: StringNullableWithAggregatesFilter<"Workspace"> | string | null
+    stripeSubscriptionId?: StringNullableWithAggregatesFilter<"Workspace"> | string | null
+    stripePriceId?: StringNullableWithAggregatesFilter<"Workspace"> | string | null
+    stripeCurrentPeriodEnd?: DateTimeNullableWithAggregatesFilter<"Workspace"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Workspace"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Workspace"> | Date | string
+    createdBy?: StringWithAggregatesFilter<"Workspace"> | string
+  }
+
+  export type TeamspaceWhereInput = {
+    AND?: Enumerable<TeamspaceWhereInput>
+    OR?: Enumerable<TeamspaceWhereInput>
+    NOT?: Enumerable<TeamspaceWhereInput>
+    id?: StringFilter<"Teamspace"> | string
+    name?: StringFilter<"Teamspace"> | string
+    description?: StringNullableFilter<"Teamspace"> | string | null
+    createdAt?: DateTimeFilter<"Teamspace"> | Date | string
+    updatedAt?: DateTimeFilter<"Teamspace"> | Date | string
+    isOrigin?: BoolNullableFilter<"Teamspace"> | boolean | null
+    archivedAt?: DateTimeNullableFilter<"Teamspace"> | Date | string | null
+    workspaceId?: StringNullableFilter<"Teamspace"> | string | null
+    createdBy?: StringFilter<"Teamspace"> | string
+    workspace?: XOR<WorkspaceNullableRelationFilter, WorkspaceWhereInput> | null
+    userOnTeamspace?: UserOnTeamspaceListRelationFilter
+    notebooks?: NotebookListRelationFilter
+  }
+
+  export type TeamspaceOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    isOrigin?: SortOrderInput | SortOrder
+    archivedAt?: SortOrderInput | SortOrder
+    workspaceId?: SortOrderInput | SortOrder
+    createdBy?: SortOrder
+    workspace?: WorkspaceOrderByWithRelationInput
+    userOnTeamspace?: UserOnTeamspaceOrderByRelationAggregateInput
+    notebooks?: NotebookOrderByRelationAggregateInput
+  }
+
+  export type TeamspaceWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: Enumerable<TeamspaceWhereInput>
+    OR?: Enumerable<TeamspaceWhereInput>
+    NOT?: Enumerable<TeamspaceWhereInput>
+    name?: StringFilter<"Teamspace"> | string
+    description?: StringNullableFilter<"Teamspace"> | string | null
+    createdAt?: DateTimeFilter<"Teamspace"> | Date | string
+    updatedAt?: DateTimeFilter<"Teamspace"> | Date | string
+    isOrigin?: BoolNullableFilter<"Teamspace"> | boolean | null
+    archivedAt?: DateTimeNullableFilter<"Teamspace"> | Date | string | null
+    workspaceId?: StringNullableFilter<"Teamspace"> | string | null
+    createdBy?: StringFilter<"Teamspace"> | string
+    workspace?: XOR<WorkspaceNullableRelationFilter, WorkspaceWhereInput> | null
+    userOnTeamspace?: UserOnTeamspaceListRelationFilter
+    notebooks?: NotebookListRelationFilter
+  }, "id">
+
+  export type TeamspaceOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    isOrigin?: SortOrderInput | SortOrder
+    archivedAt?: SortOrderInput | SortOrder
+    workspaceId?: SortOrderInput | SortOrder
+    createdBy?: SortOrder
+    _count?: TeamspaceCountOrderByAggregateInput
+    _max?: TeamspaceMaxOrderByAggregateInput
+    _min?: TeamspaceMinOrderByAggregateInput
+  }
+
+  export type TeamspaceScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<TeamspaceScalarWhereWithAggregatesInput>
+    OR?: Enumerable<TeamspaceScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<TeamspaceScalarWhereWithAggregatesInput>
+    id?: StringWithAggregatesFilter<"Teamspace"> | string
+    name?: StringWithAggregatesFilter<"Teamspace"> | string
+    description?: StringNullableWithAggregatesFilter<"Teamspace"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Teamspace"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Teamspace"> | Date | string
+    isOrigin?: BoolNullableWithAggregatesFilter<"Teamspace"> | boolean | null
+    archivedAt?: DateTimeNullableWithAggregatesFilter<"Teamspace"> | Date | string | null
+    workspaceId?: StringNullableWithAggregatesFilter<"Teamspace"> | string | null
+    createdBy?: StringWithAggregatesFilter<"Teamspace"> | string
   }
 
   export type NotebookWhereInput = {
     AND?: Enumerable<NotebookWhereInput>
     OR?: Enumerable<NotebookWhereInput>
     NOT?: Enumerable<NotebookWhereInput>
-    id?: StringFilter | string
-    title?: StringFilter | string
-    description?: StringFilter | string
-    published?: BoolFilter | boolean
-    createdAt?: DateTimeFilter | Date | string
-    updatedAt?: DateTimeFilter | Date | string
-    workspaceId?: StringFilter | string
+    id?: StringFilter<"Notebook"> | string
+    title?: StringFilter<"Notebook"> | string
+    description?: StringNullableFilter<"Notebook"> | string | null
+    published?: BoolFilter<"Notebook"> | boolean
+    createdAt?: DateTimeFilter<"Notebook"> | Date | string
+    updatedAt?: DateTimeFilter<"Notebook"> | Date | string
+    workspaceId?: StringFilter<"Notebook"> | string
+    teamspaceId?: StringNullableFilter<"Notebook"> | string | null
+    createdBy?: StringFilter<"Notebook"> | string
     pages?: PageListRelationFilter
     workspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput>
+    teamspace?: XOR<TeamspaceNullableRelationFilter, TeamspaceWhereInput> | null
+    user?: XOR<UserRelationFilter, UserWhereInput>
   }
 
   export type NotebookOrderByWithRelationInput = {
     id?: SortOrder
     title?: SortOrder
-    description?: SortOrder
+    description?: SortOrderInput | SortOrder
     published?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     workspaceId?: SortOrder
+    teamspaceId?: SortOrderInput | SortOrder
+    createdBy?: SortOrder
     pages?: PageOrderByRelationAggregateInput
     workspace?: WorkspaceOrderByWithRelationInput
+    teamspace?: TeamspaceOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
   }
 
-  export type NotebookWhereUniqueInput = {
+  export type NotebookWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-  }
+    AND?: Enumerable<NotebookWhereInput>
+    OR?: Enumerable<NotebookWhereInput>
+    NOT?: Enumerable<NotebookWhereInput>
+    title?: StringFilter<"Notebook"> | string
+    description?: StringNullableFilter<"Notebook"> | string | null
+    published?: BoolFilter<"Notebook"> | boolean
+    createdAt?: DateTimeFilter<"Notebook"> | Date | string
+    updatedAt?: DateTimeFilter<"Notebook"> | Date | string
+    workspaceId?: StringFilter<"Notebook"> | string
+    teamspaceId?: StringNullableFilter<"Notebook"> | string | null
+    createdBy?: StringFilter<"Notebook"> | string
+    pages?: PageListRelationFilter
+    workspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput>
+    teamspace?: XOR<TeamspaceNullableRelationFilter, TeamspaceWhereInput> | null
+    user?: XOR<UserRelationFilter, UserWhereInput>
+  }, "id">
 
   export type NotebookOrderByWithAggregationInput = {
     id?: SortOrder
     title?: SortOrder
-    description?: SortOrder
+    description?: SortOrderInput | SortOrder
     published?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     workspaceId?: SortOrder
+    teamspaceId?: SortOrderInput | SortOrder
+    createdBy?: SortOrder
     _count?: NotebookCountOrderByAggregateInput
     _max?: NotebookMaxOrderByAggregateInput
     _min?: NotebookMinOrderByAggregateInput
@@ -9630,67 +15337,92 @@ export namespace Prisma {
     AND?: Enumerable<NotebookScalarWhereWithAggregatesInput>
     OR?: Enumerable<NotebookScalarWhereWithAggregatesInput>
     NOT?: Enumerable<NotebookScalarWhereWithAggregatesInput>
-    id?: StringWithAggregatesFilter | string
-    title?: StringWithAggregatesFilter | string
-    description?: StringWithAggregatesFilter | string
-    published?: BoolWithAggregatesFilter | boolean
-    createdAt?: DateTimeWithAggregatesFilter | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter | Date | string
-    workspaceId?: StringWithAggregatesFilter | string
+    id?: StringWithAggregatesFilter<"Notebook"> | string
+    title?: StringWithAggregatesFilter<"Notebook"> | string
+    description?: StringNullableWithAggregatesFilter<"Notebook"> | string | null
+    published?: BoolWithAggregatesFilter<"Notebook"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Notebook"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Notebook"> | Date | string
+    workspaceId?: StringWithAggregatesFilter<"Notebook"> | string
+    teamspaceId?: StringNullableWithAggregatesFilter<"Notebook"> | string | null
+    createdBy?: StringWithAggregatesFilter<"Notebook"> | string
   }
 
   export type PageWhereInput = {
     AND?: Enumerable<PageWhereInput>
     OR?: Enumerable<PageWhereInput>
     NOT?: Enumerable<PageWhereInput>
-    id?: StringFilter | string
-    title?: StringFilter | string
-    content?: JsonNullableFilter
-    published?: BoolFilter | boolean
-    createdAt?: DateTimeFilter | Date | string
-    updatedBy?: StringNullableFilter | string | null
-    updatedAt?: DateTimeFilter | Date | string
-    deletedBy?: StringNullableFilter | string | null
-    deletedAt?: DateTimeNullableFilter | Date | string | null
-    notebookId?: StringFilter | string
-    updatedByUser?: XOR<UserRelationFilter, UserWhereInput> | null
-    deletedByUser?: XOR<UserRelationFilter, UserWhereInput> | null
+    id?: StringFilter<"Page"> | string
+    title?: StringFilter<"Page"> | string
+    content?: JsonNullableFilter<"Page">
+    published?: BoolFilter<"Page"> | boolean
+    createdAt?: DateTimeFilter<"Page"> | Date | string
+    updatedAt?: DateTimeFilter<"Page"> | Date | string
+    deletedAt?: DateTimeNullableFilter<"Page"> | Date | string | null
+    notebookId?: StringFilter<"Page"> | string
+    createdBy?: StringFilter<"Page"> | string
+    deletedBy?: StringNullableFilter<"Page"> | string | null
+    updatedBy?: StringFilter<"Page"> | string
     notebook?: XOR<NotebookRelationFilter, NotebookWhereInput>
+    createdByUser?: XOR<UserRelationFilter, UserWhereInput>
+    deletedByUser?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+    updatedByUser?: XOR<UserRelationFilter, UserWhereInput>
+    favorites?: FavoriteListRelationFilter
   }
 
   export type PageOrderByWithRelationInput = {
     id?: SortOrder
     title?: SortOrder
-    content?: SortOrder
+    content?: SortOrderInput | SortOrder
     published?: SortOrder
     createdAt?: SortOrder
-    updatedBy?: SortOrder
     updatedAt?: SortOrder
-    deletedBy?: SortOrder
-    deletedAt?: SortOrder
+    deletedAt?: SortOrderInput | SortOrder
     notebookId?: SortOrder
-    updatedByUser?: UserOrderByWithRelationInput
-    deletedByUser?: UserOrderByWithRelationInput
+    createdBy?: SortOrder
+    deletedBy?: SortOrderInput | SortOrder
+    updatedBy?: SortOrder
     notebook?: NotebookOrderByWithRelationInput
+    createdByUser?: UserOrderByWithRelationInput
+    deletedByUser?: UserOrderByWithRelationInput
+    updatedByUser?: UserOrderByWithRelationInput
+    favorites?: FavoriteOrderByRelationAggregateInput
   }
 
-  export type PageWhereUniqueInput = {
+  export type PageWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    updatedBy?: string
-    deletedBy?: string
-  }
+    AND?: Enumerable<PageWhereInput>
+    OR?: Enumerable<PageWhereInput>
+    NOT?: Enumerable<PageWhereInput>
+    title?: StringFilter<"Page"> | string
+    content?: JsonNullableFilter<"Page">
+    published?: BoolFilter<"Page"> | boolean
+    createdAt?: DateTimeFilter<"Page"> | Date | string
+    updatedAt?: DateTimeFilter<"Page"> | Date | string
+    deletedAt?: DateTimeNullableFilter<"Page"> | Date | string | null
+    notebookId?: StringFilter<"Page"> | string
+    createdBy?: StringFilter<"Page"> | string
+    deletedBy?: StringNullableFilter<"Page"> | string | null
+    updatedBy?: StringFilter<"Page"> | string
+    notebook?: XOR<NotebookRelationFilter, NotebookWhereInput>
+    createdByUser?: XOR<UserRelationFilter, UserWhereInput>
+    deletedByUser?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+    updatedByUser?: XOR<UserRelationFilter, UserWhereInput>
+    favorites?: FavoriteListRelationFilter
+  }, "id">
 
   export type PageOrderByWithAggregationInput = {
     id?: SortOrder
     title?: SortOrder
-    content?: SortOrder
+    content?: SortOrderInput | SortOrder
     published?: SortOrder
     createdAt?: SortOrder
-    updatedBy?: SortOrder
     updatedAt?: SortOrder
-    deletedBy?: SortOrder
-    deletedAt?: SortOrder
+    deletedAt?: SortOrderInput | SortOrder
     notebookId?: SortOrder
+    createdBy?: SortOrder
+    deletedBy?: SortOrderInput | SortOrder
+    updatedBy?: SortOrder
     _count?: PageCountOrderByAggregateInput
     _max?: PageMaxOrderByAggregateInput
     _min?: PageMinOrderByAggregateInput
@@ -9700,16 +15432,213 @@ export namespace Prisma {
     AND?: Enumerable<PageScalarWhereWithAggregatesInput>
     OR?: Enumerable<PageScalarWhereWithAggregatesInput>
     NOT?: Enumerable<PageScalarWhereWithAggregatesInput>
-    id?: StringWithAggregatesFilter | string
-    title?: StringWithAggregatesFilter | string
-    content?: JsonNullableWithAggregatesFilter
-    published?: BoolWithAggregatesFilter | boolean
-    createdAt?: DateTimeWithAggregatesFilter | Date | string
-    updatedBy?: StringNullableWithAggregatesFilter | string | null
-    updatedAt?: DateTimeWithAggregatesFilter | Date | string
-    deletedBy?: StringNullableWithAggregatesFilter | string | null
-    deletedAt?: DateTimeNullableWithAggregatesFilter | Date | string | null
-    notebookId?: StringWithAggregatesFilter | string
+    id?: StringWithAggregatesFilter<"Page"> | string
+    title?: StringWithAggregatesFilter<"Page"> | string
+    content?: JsonNullableWithAggregatesFilter<"Page">
+    published?: BoolWithAggregatesFilter<"Page"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Page"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Page"> | Date | string
+    deletedAt?: DateTimeNullableWithAggregatesFilter<"Page"> | Date | string | null
+    notebookId?: StringWithAggregatesFilter<"Page"> | string
+    createdBy?: StringWithAggregatesFilter<"Page"> | string
+    deletedBy?: StringNullableWithAggregatesFilter<"Page"> | string | null
+    updatedBy?: StringWithAggregatesFilter<"Page"> | string
+  }
+
+  export type FavoriteWhereInput = {
+    AND?: Enumerable<FavoriteWhereInput>
+    OR?: Enumerable<FavoriteWhereInput>
+    NOT?: Enumerable<FavoriteWhereInput>
+    id?: StringFilter<"Favorite"> | string
+    createdAt?: DateTimeFilter<"Favorite"> | Date | string
+    updatedAt?: DateTimeFilter<"Favorite"> | Date | string
+    userId?: StringFilter<"Favorite"> | string
+    workspaceId?: StringFilter<"Favorite"> | string
+    pageId?: StringFilter<"Favorite"> | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    workspace?: XOR<WorkspaceNullableRelationFilter, WorkspaceWhereInput> | null
+    page?: XOR<PageNullableRelationFilter, PageWhereInput> | null
+  }
+
+  export type FavoriteOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+    pageId?: SortOrder
+    user?: UserOrderByWithRelationInput
+    workspace?: WorkspaceOrderByWithRelationInput
+    page?: PageOrderByWithRelationInput
+  }
+
+  export type FavoriteWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: Enumerable<FavoriteWhereInput>
+    OR?: Enumerable<FavoriteWhereInput>
+    NOT?: Enumerable<FavoriteWhereInput>
+    createdAt?: DateTimeFilter<"Favorite"> | Date | string
+    updatedAt?: DateTimeFilter<"Favorite"> | Date | string
+    userId?: StringFilter<"Favorite"> | string
+    workspaceId?: StringFilter<"Favorite"> | string
+    pageId?: StringFilter<"Favorite"> | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    workspace?: XOR<WorkspaceNullableRelationFilter, WorkspaceWhereInput> | null
+    page?: XOR<PageNullableRelationFilter, PageWhereInput> | null
+  }, "id">
+
+  export type FavoriteOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+    pageId?: SortOrder
+    _count?: FavoriteCountOrderByAggregateInput
+    _max?: FavoriteMaxOrderByAggregateInput
+    _min?: FavoriteMinOrderByAggregateInput
+  }
+
+  export type FavoriteScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<FavoriteScalarWhereWithAggregatesInput>
+    OR?: Enumerable<FavoriteScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<FavoriteScalarWhereWithAggregatesInput>
+    id?: StringWithAggregatesFilter<"Favorite"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Favorite"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Favorite"> | Date | string
+    userId?: StringWithAggregatesFilter<"Favorite"> | string
+    workspaceId?: StringWithAggregatesFilter<"Favorite"> | string
+    pageId?: StringWithAggregatesFilter<"Favorite"> | string
+  }
+
+  export type UserOnWorkspaceWhereInput = {
+    AND?: Enumerable<UserOnWorkspaceWhereInput>
+    OR?: Enumerable<UserOnWorkspaceWhereInput>
+    NOT?: Enumerable<UserOnWorkspaceWhereInput>
+    id?: StringFilter<"UserOnWorkspace"> | string
+    role?: IntFilter<"UserOnWorkspace"> | number
+    createdAt?: DateTimeFilter<"UserOnWorkspace"> | Date | string
+    updatedAt?: DateTimeFilter<"UserOnWorkspace"> | Date | string
+    userId?: StringFilter<"UserOnWorkspace"> | string
+    workspaceId?: StringFilter<"UserOnWorkspace"> | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    workspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput>
+  }
+
+  export type UserOnWorkspaceOrderByWithRelationInput = {
+    id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+    user?: UserOrderByWithRelationInput
+    workspace?: WorkspaceOrderByWithRelationInput
+  }
+
+  export type UserOnWorkspaceWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: Enumerable<UserOnWorkspaceWhereInput>
+    OR?: Enumerable<UserOnWorkspaceWhereInput>
+    NOT?: Enumerable<UserOnWorkspaceWhereInput>
+    role?: IntFilter<"UserOnWorkspace"> | number
+    createdAt?: DateTimeFilter<"UserOnWorkspace"> | Date | string
+    updatedAt?: DateTimeFilter<"UserOnWorkspace"> | Date | string
+    userId?: StringFilter<"UserOnWorkspace"> | string
+    workspaceId?: StringFilter<"UserOnWorkspace"> | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    workspace?: XOR<WorkspaceRelationFilter, WorkspaceWhereInput>
+  }, "id">
+
+  export type UserOnWorkspaceOrderByWithAggregationInput = {
+    id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+    _count?: UserOnWorkspaceCountOrderByAggregateInput
+    _avg?: UserOnWorkspaceAvgOrderByAggregateInput
+    _max?: UserOnWorkspaceMaxOrderByAggregateInput
+    _min?: UserOnWorkspaceMinOrderByAggregateInput
+    _sum?: UserOnWorkspaceSumOrderByAggregateInput
+  }
+
+  export type UserOnWorkspaceScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<UserOnWorkspaceScalarWhereWithAggregatesInput>
+    OR?: Enumerable<UserOnWorkspaceScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<UserOnWorkspaceScalarWhereWithAggregatesInput>
+    id?: StringWithAggregatesFilter<"UserOnWorkspace"> | string
+    role?: IntWithAggregatesFilter<"UserOnWorkspace"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"UserOnWorkspace"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"UserOnWorkspace"> | Date | string
+    userId?: StringWithAggregatesFilter<"UserOnWorkspace"> | string
+    workspaceId?: StringWithAggregatesFilter<"UserOnWorkspace"> | string
+  }
+
+  export type UserOnTeamspaceWhereInput = {
+    AND?: Enumerable<UserOnTeamspaceWhereInput>
+    OR?: Enumerable<UserOnTeamspaceWhereInput>
+    NOT?: Enumerable<UserOnTeamspaceWhereInput>
+    id?: StringFilter<"UserOnTeamspace"> | string
+    createdAt?: DateTimeFilter<"UserOnTeamspace"> | Date | string
+    updatedAt?: DateTimeFilter<"UserOnTeamspace"> | Date | string
+    operation?: IntFilter<"UserOnTeamspace"> | number
+    userId?: StringFilter<"UserOnTeamspace"> | string
+    teamspaceId?: StringFilter<"UserOnTeamspace"> | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    teamspace?: XOR<TeamspaceRelationFilter, TeamspaceWhereInput>
+  }
+
+  export type UserOnTeamspaceOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    operation?: SortOrder
+    userId?: SortOrder
+    teamspaceId?: SortOrder
+    user?: UserOrderByWithRelationInput
+    teamspace?: TeamspaceOrderByWithRelationInput
+  }
+
+  export type UserOnTeamspaceWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: Enumerable<UserOnTeamspaceWhereInput>
+    OR?: Enumerable<UserOnTeamspaceWhereInput>
+    NOT?: Enumerable<UserOnTeamspaceWhereInput>
+    createdAt?: DateTimeFilter<"UserOnTeamspace"> | Date | string
+    updatedAt?: DateTimeFilter<"UserOnTeamspace"> | Date | string
+    operation?: IntFilter<"UserOnTeamspace"> | number
+    userId?: StringFilter<"UserOnTeamspace"> | string
+    teamspaceId?: StringFilter<"UserOnTeamspace"> | string
+    user?: XOR<UserRelationFilter, UserWhereInput>
+    teamspace?: XOR<TeamspaceRelationFilter, TeamspaceWhereInput>
+  }, "id">
+
+  export type UserOnTeamspaceOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    operation?: SortOrder
+    userId?: SortOrder
+    teamspaceId?: SortOrder
+    _count?: UserOnTeamspaceCountOrderByAggregateInput
+    _avg?: UserOnTeamspaceAvgOrderByAggregateInput
+    _max?: UserOnTeamspaceMaxOrderByAggregateInput
+    _min?: UserOnTeamspaceMinOrderByAggregateInput
+    _sum?: UserOnTeamspaceSumOrderByAggregateInput
+  }
+
+  export type UserOnTeamspaceScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<UserOnTeamspaceScalarWhereWithAggregatesInput>
+    OR?: Enumerable<UserOnTeamspaceScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<UserOnTeamspaceScalarWhereWithAggregatesInput>
+    id?: StringWithAggregatesFilter<"UserOnTeamspace"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"UserOnTeamspace"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"UserOnTeamspace"> | Date | string
+    operation?: IntWithAggregatesFilter<"UserOnTeamspace"> | number
+    userId?: StringWithAggregatesFilter<"UserOnTeamspace"> | string
+    teamspaceId?: StringWithAggregatesFilter<"UserOnTeamspace"> | string
   }
 
   export type AccountCreateInput = {
@@ -9731,7 +15660,6 @@ export namespace Prisma {
 
   export type AccountUncheckedCreateInput = {
     id?: string
-    userId: string
     type: string
     provider: string
     providerAccountId: string
@@ -9744,6 +15672,7 @@ export namespace Prisma {
     session_state?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    userId: string
   }
 
   export type AccountUpdateInput = {
@@ -9765,7 +15694,6 @@ export namespace Prisma {
 
   export type AccountUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
     provider?: StringFieldUpdateOperationsInput | string
     providerAccountId?: StringFieldUpdateOperationsInput | string
@@ -9778,11 +15706,11 @@ export namespace Prisma {
     session_state?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AccountCreateManyInput = {
     id?: string
-    userId: string
     type: string
     provider: string
     providerAccountId: string
@@ -9795,6 +15723,7 @@ export namespace Prisma {
     session_state?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    userId: string
   }
 
   export type AccountUpdateManyMutationInput = {
@@ -9815,7 +15744,6 @@ export namespace Prisma {
 
   export type AccountUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
     provider?: StringFieldUpdateOperationsInput | string
     providerAccountId?: StringFieldUpdateOperationsInput | string
@@ -9828,6 +15756,7 @@ export namespace Prisma {
     session_state?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
   }
 
   export type SessionCreateInput = {
@@ -9894,13 +15823,17 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
-    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
-    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput
+    favorites?: FavoriteCreateNestedManyWithoutUserInput
+    notebooks?: NotebookCreateNestedManyWithoutUserInput
+    PagesCreated?: PageCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageCreateNestedManyWithoutDeletedByUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -9915,10 +15848,14 @@ export namespace Prisma {
     lastAccessWorkspaceId?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
-    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutUserInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutUserInput
+    PagesCreated?: PageUncheckedCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageUncheckedCreateNestedManyWithoutDeletedByUserInput
   }
 
   export type UserUpdateInput = {
@@ -9930,13 +15867,17 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
-    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
-    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUpdateManyWithoutDeletedByUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -9951,10 +15892,14 @@ export namespace Prisma {
     lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
-    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUncheckedUpdateManyWithoutDeletedByUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -9978,6 +15923,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -10055,65 +16001,65 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type TrackingUserAccessCreateInput = {
+  export type TrackingUserAccessOnWorkspaceCreateInput = {
     id?: string
+    createdAt?: Date | string
     lastAccessNotebookId?: string | null
     lastAccessPageId?: string | null
-    createdAt?: Date | string
-    user?: UserCreateNestedOneWithoutTrackingUserAccessInput
-    workspace?: WorkspaceCreateNestedOneWithoutTrackingUserAccessInput
+    user: UserCreateNestedOneWithoutTrackingUserAccessInput
+    workspace: WorkspaceCreateNestedOneWithoutTrackingUserAccessOnWorkspaceInput
   }
 
-  export type TrackingUserAccessUncheckedCreateInput = {
+  export type TrackingUserAccessOnWorkspaceUncheckedCreateInput = {
     id?: string
-    userId?: string | null
-    lastAccessWorkspaceId?: string | null
+    createdAt?: Date | string
     lastAccessNotebookId?: string | null
     lastAccessPageId?: string | null
-    createdAt?: Date | string
+    userId: string
+    workspaceId: string
   }
 
-  export type TrackingUserAccessUpdateInput = {
+  export type TrackingUserAccessOnWorkspaceUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
     lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneWithoutTrackingUserAccessNestedInput
-    workspace?: WorkspaceUpdateOneWithoutTrackingUserAccessNestedInput
+    user?: UserUpdateOneRequiredWithoutTrackingUserAccessNestedInput
+    workspace?: WorkspaceUpdateOneRequiredWithoutTrackingUserAccessOnWorkspaceNestedInput
   }
 
-  export type TrackingUserAccessUncheckedUpdateInput = {
+  export type TrackingUserAccessOnWorkspaceUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
     lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type TrackingUserAccessCreateManyInput = {
+  export type TrackingUserAccessOnWorkspaceCreateManyInput = {
     id?: string
-    userId?: string | null
-    lastAccessWorkspaceId?: string | null
+    createdAt?: Date | string
     lastAccessNotebookId?: string | null
     lastAccessPageId?: string | null
-    createdAt?: Date | string
+    userId: string
+    workspaceId: string
   }
 
-  export type TrackingUserAccessUpdateManyMutationInput = {
+  export type TrackingUserAccessOnWorkspaceUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
     lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type TrackingUserAccessUncheckedUpdateManyInput = {
+  export type TrackingUserAccessOnWorkspaceUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
     lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
   }
 
   export type WorkspaceCreateInput = {
@@ -10125,13 +16071,14 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    trackUserAccessWorkspace?: UserCreateNestedOneWithoutLastAccessWorkspaceInput
-    users?: UserCreateNestedManyWithoutWorkspacesInput
+    createdBy: string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceCreateNestedOneWithoutWorkspaceInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutWorkspaceInput
+    teamspaces?: TeamspaceCreateNestedManyWithoutWorkspaceInput
     notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutWorkspaceInput
+    favorites?: FavoriteCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateInput = {
@@ -10143,13 +16090,14 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    trackUserAccessWorkspace?: UserUncheckedCreateNestedOneWithoutLastAccessWorkspaceInput
-    users?: UserUncheckedCreateNestedManyWithoutWorkspacesInput
+    createdBy: string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedOneWithoutWorkspaceInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput
+    teamspaces?: TeamspaceUncheckedCreateNestedManyWithoutWorkspaceInput
     notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutWorkspaceInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUpdateInput = {
@@ -10161,13 +16109,14 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    trackUserAccessWorkspace?: UserUpdateOneWithoutLastAccessWorkspaceNestedInput
-    users?: UserUpdateManyWithoutWorkspacesNestedInput
+    createdBy?: StringFieldUpdateOperationsInput | string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUpdateOneWithoutWorkspaceNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutWorkspaceNestedInput
+    teamspaces?: TeamspaceUpdateManyWithoutWorkspaceNestedInput
     notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutWorkspaceNestedInput
+    favorites?: FavoriteUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateInput = {
@@ -10179,13 +16128,14 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    trackUserAccessWorkspace?: UserUncheckedUpdateOneWithoutLastAccessWorkspaceNestedInput
-    users?: UserUncheckedUpdateManyWithoutWorkspacesNestedInput
+    createdBy?: StringFieldUpdateOperationsInput | string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUncheckedUpdateOneWithoutWorkspaceNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
+    teamspaces?: TeamspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
     notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutWorkspaceNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceCreateManyInput = {
@@ -10197,9 +16147,9 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    createdBy: string
   }
 
   export type WorkspaceUpdateManyMutationInput = {
@@ -10211,9 +16161,9 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: StringFieldUpdateOperationsInput | string
   }
 
   export type WorkspaceUncheckedUpdateManyInput = {
@@ -10225,69 +16175,170 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TeamspaceCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isOrigin?: boolean | null
+    archivedAt?: Date | string | null
+    createdBy: string
+    workspace?: WorkspaceCreateNestedOneWithoutTeamspacesInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutTeamspaceInput
+    notebooks?: NotebookCreateNestedManyWithoutTeamspaceInput
+  }
+
+  export type TeamspaceUncheckedCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isOrigin?: boolean | null
+    archivedAt?: Date | string | null
+    workspaceId?: string | null
+    createdBy: string
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutTeamspaceInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutTeamspaceInput
+  }
+
+  export type TeamspaceUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    workspace?: WorkspaceUpdateOneWithoutTeamspacesNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutTeamspaceNestedInput
+    notebooks?: NotebookUpdateManyWithoutTeamspaceNestedInput
+  }
+
+  export type TeamspaceUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutTeamspaceNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutTeamspaceNestedInput
+  }
+
+  export type TeamspaceCreateManyInput = {
+    id?: string
+    name: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isOrigin?: boolean | null
+    archivedAt?: Date | string | null
+    workspaceId?: string | null
+    createdBy: string
+  }
+
+  export type TeamspaceUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TeamspaceUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
   }
 
   export type NotebookCreateInput = {
     id?: string
     title: string
-    description: string
+    description?: string | null
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     pages?: PageCreateNestedManyWithoutNotebookInput
     workspace: WorkspaceCreateNestedOneWithoutNotebooksInput
+    teamspace?: TeamspaceCreateNestedOneWithoutNotebooksInput
+    user: UserCreateNestedOneWithoutNotebooksInput
   }
 
   export type NotebookUncheckedCreateInput = {
     id?: string
     title: string
-    description: string
+    description?: string | null
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     workspaceId: string
+    teamspaceId?: string | null
+    createdBy: string
     pages?: PageUncheckedCreateNestedManyWithoutNotebookInput
   }
 
   export type NotebookUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     pages?: PageUpdateManyWithoutNotebookNestedInput
     workspace?: WorkspaceUpdateOneRequiredWithoutNotebooksNestedInput
+    teamspace?: TeamspaceUpdateOneWithoutNotebooksNestedInput
+    user?: UserUpdateOneRequiredWithoutNotebooksNestedInput
   }
 
   export type NotebookUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workspaceId?: StringFieldUpdateOperationsInput | string
+    teamspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
     pages?: PageUncheckedUpdateManyWithoutNotebookNestedInput
   }
 
   export type NotebookCreateManyInput = {
     id?: string
     title: string
-    description: string
+    description?: string | null
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     workspaceId: string
+    teamspaceId?: string | null
+    createdBy: string
   }
 
   export type NotebookUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10296,11 +16347,13 @@ export namespace Prisma {
   export type NotebookUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workspaceId?: StringFieldUpdateOperationsInput | string
+    teamspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
   }
 
   export type PageCreateInput = {
@@ -10311,9 +16364,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    updatedByUser?: UserCreateNestedOneWithoutPagesUserUpdatedInput
-    deletedByUser?: UserCreateNestedOneWithoutPagesUserDeletedInput
     notebook: NotebookCreateNestedOneWithoutPagesInput
+    createdByUser: UserCreateNestedOneWithoutPagesCreatedInput
+    deletedByUser?: UserCreateNestedOneWithoutPagesDeletedInput
+    updatedByUser: UserCreateNestedOneWithoutPagesUpdatedInput
+    favorites?: FavoriteCreateNestedManyWithoutPageInput
   }
 
   export type PageUncheckedCreateInput = {
@@ -10322,11 +16377,13 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: boolean
     createdAt?: Date | string
-    updatedBy?: string | null
     updatedAt?: Date | string
-    deletedBy?: string | null
     deletedAt?: Date | string | null
     notebookId: string
+    createdBy: string
+    deletedBy?: string | null
+    updatedBy: string
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutPageInput
   }
 
   export type PageUpdateInput = {
@@ -10337,9 +16394,11 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    updatedByUser?: UserUpdateOneWithoutPagesUserUpdatedNestedInput
-    deletedByUser?: UserUpdateOneWithoutPagesUserDeletedNestedInput
     notebook?: NotebookUpdateOneRequiredWithoutPagesNestedInput
+    createdByUser?: UserUpdateOneRequiredWithoutPagesCreatedNestedInput
+    deletedByUser?: UserUpdateOneWithoutPagesDeletedNestedInput
+    updatedByUser?: UserUpdateOneRequiredWithoutPagesUpdatedNestedInput
+    favorites?: FavoriteUpdateManyWithoutPageNestedInput
   }
 
   export type PageUncheckedUpdateInput = {
@@ -10348,11 +16407,13 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notebookId?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    favorites?: FavoriteUncheckedUpdateManyWithoutPageNestedInput
   }
 
   export type PageCreateManyInput = {
@@ -10361,11 +16422,12 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: boolean
     createdAt?: Date | string
-    updatedBy?: string | null
     updatedAt?: Date | string
-    deletedBy?: string | null
     deletedAt?: Date | string | null
     notebookId: string
+    createdBy: string
+    deletedBy?: string | null
+    updatedBy: string
   }
 
   export type PageUpdateManyMutationInput = {
@@ -10384,66 +16446,254 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notebookId?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
   }
 
-  export type StringFilter = {
-    equals?: string
+  export type FavoriteCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutFavoritesInput
+    workspace?: WorkspaceCreateNestedOneWithoutFavoritesInput
+    page?: PageCreateNestedOneWithoutFavoritesInput
+  }
+
+  export type FavoriteUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    workspaceId: string
+    pageId: string
+  }
+
+  export type FavoriteUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutFavoritesNestedInput
+    workspace?: WorkspaceUpdateOneWithoutFavoritesNestedInput
+    page?: PageUpdateOneWithoutFavoritesNestedInput
+  }
+
+  export type FavoriteUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    pageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FavoriteCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    workspaceId: string
+    pageId: string
+  }
+
+  export type FavoriteUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FavoriteUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    pageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UserOnWorkspaceCreateInput = {
+    id?: string
+    role?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutUserOnWorkspaceInput
+    workspace: WorkspaceCreateNestedOneWithoutUserOnWorkspaceInput
+  }
+
+  export type UserOnWorkspaceUncheckedCreateInput = {
+    id?: string
+    role?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    workspaceId: string
+  }
+
+  export type UserOnWorkspaceUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutUserOnWorkspaceNestedInput
+    workspace?: WorkspaceUpdateOneRequiredWithoutUserOnWorkspaceNestedInput
+  }
+
+  export type UserOnWorkspaceUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UserOnWorkspaceCreateManyInput = {
+    id?: string
+    role?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    workspaceId: string
+  }
+
+  export type UserOnWorkspaceUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserOnWorkspaceUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UserOnTeamspaceCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    operation?: number
+    user: UserCreateNestedOneWithoutUserOnTeamspaceInput
+    teamspace: TeamspaceCreateNestedOneWithoutUserOnTeamspaceInput
+  }
+
+  export type UserOnTeamspaceUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    operation?: number
+    userId: string
+    teamspaceId: string
+  }
+
+  export type UserOnTeamspaceUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operation?: IntFieldUpdateOperationsInput | number
+    user?: UserUpdateOneRequiredWithoutUserOnTeamspaceNestedInput
+    teamspace?: TeamspaceUpdateOneRequiredWithoutUserOnTeamspaceNestedInput
+  }
+
+  export type UserOnTeamspaceUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operation?: IntFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
+    teamspaceId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UserOnTeamspaceCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    operation?: number
+    userId: string
+    teamspaceId: string
+  }
+
+  export type UserOnTeamspaceUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operation?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UserOnTeamspaceUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operation?: IntFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
+    teamspaceId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StringFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
     in?: Enumerable<string>
     notIn?: Enumerable<string>
-    lt?: string
-    lte?: string
-    gt?: string
-    gte?: string
-    contains?: string
-    startsWith?: string
-    endsWith?: string
-    not?: NestedStringFilter | string
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type StringNullableFilter = {
-    equals?: string | null
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: Enumerable<string> | null
     notIn?: Enumerable<string> | null
-    lt?: string
-    lte?: string
-    gt?: string
-    gte?: string
-    contains?: string
-    startsWith?: string
-    endsWith?: string
-    not?: NestedStringNullableFilter | string | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type IntNullableFilter = {
-    equals?: number | null
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: Enumerable<number> | null
     notIn?: Enumerable<number> | null
-    lt?: number
-    lte?: number
-    gt?: number
-    gte?: number
-    not?: NestedIntNullableFilter | number | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type DateTimeFilter = {
-    equals?: Date | string
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Enumerable<Date> | Enumerable<string>
     notIn?: Enumerable<Date> | Enumerable<string>
-    lt?: Date | string
-    lte?: Date | string
-    gt?: Date | string
-    gte?: Date | string
-    not?: NestedDateTimeFilter | Date | string
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type UserRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
   }
 
   export type AccountProviderProviderAccountIdCompoundUniqueInput = {
@@ -10453,7 +16703,6 @@ export namespace Prisma {
 
   export type AccountCountOrderByAggregateInput = {
     id?: SortOrder
-    userId?: SortOrder
     type?: SortOrder
     provider?: SortOrder
     providerAccountId?: SortOrder
@@ -10466,6 +16715,7 @@ export namespace Prisma {
     session_state?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    userId?: SortOrder
   }
 
   export type AccountAvgOrderByAggregateInput = {
@@ -10474,7 +16724,6 @@ export namespace Prisma {
 
   export type AccountMaxOrderByAggregateInput = {
     id?: SortOrder
-    userId?: SortOrder
     type?: SortOrder
     provider?: SortOrder
     providerAccountId?: SortOrder
@@ -10487,11 +16736,11 @@ export namespace Prisma {
     session_state?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    userId?: SortOrder
   }
 
   export type AccountMinOrderByAggregateInput = {
     id?: SortOrder
-    userId?: SortOrder
     type?: SortOrder
     provider?: SortOrder
     providerAccountId?: SortOrder
@@ -10504,74 +16753,80 @@ export namespace Prisma {
     session_state?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    userId?: SortOrder
   }
 
   export type AccountSumOrderByAggregateInput = {
     expires_at?: SortOrder
   }
 
-  export type StringWithAggregatesFilter = {
-    equals?: string
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
     in?: Enumerable<string>
     notIn?: Enumerable<string>
-    lt?: string
-    lte?: string
-    gt?: string
-    gte?: string
-    contains?: string
-    startsWith?: string
-    endsWith?: string
-    not?: NestedStringWithAggregatesFilter | string
-    _count?: NestedIntFilter
-    _min?: NestedStringFilter
-    _max?: NestedStringFilter
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type StringNullableWithAggregatesFilter = {
-    equals?: string | null
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: Enumerable<string> | null
     notIn?: Enumerable<string> | null
-    lt?: string
-    lte?: string
-    gt?: string
-    gte?: string
-    contains?: string
-    startsWith?: string
-    endsWith?: string
-    not?: NestedStringNullableWithAggregatesFilter | string | null
-    _count?: NestedIntNullableFilter
-    _min?: NestedStringNullableFilter
-    _max?: NestedStringNullableFilter
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type IntNullableWithAggregatesFilter = {
-    equals?: number | null
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: Enumerable<number> | null
     notIn?: Enumerable<number> | null
-    lt?: number
-    lte?: number
-    gt?: number
-    gte?: number
-    not?: NestedIntNullableWithAggregatesFilter | number | null
-    _count?: NestedIntNullableFilter
-    _avg?: NestedFloatNullableFilter
-    _sum?: NestedIntNullableFilter
-    _min?: NestedIntNullableFilter
-    _max?: NestedIntNullableFilter
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
-  export type DateTimeWithAggregatesFilter = {
-    equals?: Date | string
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Enumerable<Date> | Enumerable<string>
     notIn?: Enumerable<Date> | Enumerable<string>
-    lt?: Date | string
-    lte?: Date | string
-    gt?: Date | string
-    gte?: Date | string
-    not?: NestedDateTimeWithAggregatesFilter | Date | string
-    _count?: NestedIntFilter
-    _min?: NestedDateTimeFilter
-    _max?: NestedDateTimeFilter
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type UserNullableRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
   }
 
   export type SessionCountOrderByAggregateInput = {
@@ -10598,15 +16853,15 @@ export namespace Prisma {
     userId?: SortOrder
   }
 
-  export type DateTimeNullableFilter = {
-    equals?: Date | string | null
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Enumerable<Date> | Enumerable<string> | null
     notIn?: Enumerable<Date> | Enumerable<string> | null
-    lt?: Date | string
-    lte?: Date | string
-    gt?: Date | string
-    gte?: Date | string
-    not?: NestedDateTimeNullableFilter | Date | string | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type AccountListRelationFilter = {
@@ -10621,26 +16876,40 @@ export namespace Prisma {
     none?: SessionWhereInput
   }
 
-  export type WorkspaceListRelationFilter = {
-    every?: WorkspaceWhereInput
-    some?: WorkspaceWhereInput
-    none?: WorkspaceWhereInput
+  export type UserOnWorkspaceListRelationFilter = {
+    every?: UserOnWorkspaceWhereInput
+    some?: UserOnWorkspaceWhereInput
+    none?: UserOnWorkspaceWhereInput
   }
 
-  export type TrackingUserAccessListRelationFilter = {
-    every?: TrackingUserAccessWhereInput
-    some?: TrackingUserAccessWhereInput
-    none?: TrackingUserAccessWhereInput
+  export type UserOnTeamspaceListRelationFilter = {
+    every?: UserOnTeamspaceWhereInput
+    some?: UserOnTeamspaceWhereInput
+    none?: UserOnTeamspaceWhereInput
   }
 
-  export type WorkspaceRelationFilter = {
-    is?: WorkspaceWhereInput
-    isNot?: WorkspaceWhereInput
+  export type TrackingUserAccessOnWorkspaceListRelationFilter = {
+    every?: TrackingUserAccessOnWorkspaceWhereInput
+    some?: TrackingUserAccessOnWorkspaceWhereInput
+    none?: TrackingUserAccessOnWorkspaceWhereInput
   }
 
-  export type PageRelationFilter = {
-    is?: PageWhereInput | null
-    isNot?: PageWhereInput | null
+  export type FavoriteListRelationFilter = {
+    every?: FavoriteWhereInput
+    some?: FavoriteWhereInput
+    none?: FavoriteWhereInput
+  }
+
+  export type NotebookListRelationFilter = {
+    every?: NotebookWhereInput
+    some?: NotebookWhereInput
+    none?: NotebookWhereInput
+  }
+
+  export type PageListRelationFilter = {
+    every?: PageWhereInput
+    some?: PageWhereInput
+    none?: PageWhereInput
   }
 
   export type AccountOrderByRelationAggregateInput = {
@@ -10651,11 +16920,27 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type WorkspaceOrderByRelationAggregateInput = {
+  export type UserOnWorkspaceOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
-  export type TrackingUserAccessOrderByRelationAggregateInput = {
+  export type UserOnTeamspaceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TrackingUserAccessOnWorkspaceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FavoriteOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type NotebookOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PageOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -10695,18 +16980,18 @@ export namespace Prisma {
     lastAccessWorkspaceId?: SortOrder
   }
 
-  export type DateTimeNullableWithAggregatesFilter = {
-    equals?: Date | string | null
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Enumerable<Date> | Enumerable<string> | null
     notIn?: Enumerable<Date> | Enumerable<string> | null
-    lt?: Date | string
-    lte?: Date | string
-    gt?: Date | string
-    gte?: Date | string
-    not?: NestedDateTimeNullableWithAggregatesFilter | Date | string | null
-    _count?: NestedIntNullableFilter
-    _min?: NestedDateTimeNullableFilter
-    _max?: NestedDateTimeNullableFilter
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type VerificationTokenIdentifierTokenCompoundUniqueInput = {
@@ -10741,50 +17026,50 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type TrackingUserAccessCountOrderByAggregateInput = {
+  export type WorkspaceRelationFilter = {
+    is?: WorkspaceWhereInput
+    isNot?: WorkspaceWhereInput
+  }
+
+  export type TrackingUserAccessOnWorkspaceCountOrderByAggregateInput = {
     id?: SortOrder
-    userId?: SortOrder
-    lastAccessWorkspaceId?: SortOrder
+    createdAt?: SortOrder
     lastAccessNotebookId?: SortOrder
     lastAccessPageId?: SortOrder
-    createdAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
   }
 
-  export type TrackingUserAccessMaxOrderByAggregateInput = {
+  export type TrackingUserAccessOnWorkspaceMaxOrderByAggregateInput = {
     id?: SortOrder
-    userId?: SortOrder
-    lastAccessWorkspaceId?: SortOrder
+    createdAt?: SortOrder
     lastAccessNotebookId?: SortOrder
     lastAccessPageId?: SortOrder
-    createdAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
   }
 
-  export type TrackingUserAccessMinOrderByAggregateInput = {
+  export type TrackingUserAccessOnWorkspaceMinOrderByAggregateInput = {
     id?: SortOrder
-    userId?: SortOrder
-    lastAccessWorkspaceId?: SortOrder
+    createdAt?: SortOrder
     lastAccessNotebookId?: SortOrder
     lastAccessPageId?: SortOrder
-    createdAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
   }
 
-  export type UserListRelationFilter = {
-    every?: UserWhereInput
-    some?: UserWhereInput
-    none?: UserWhereInput
+  export type TrackingUserAccessOnWorkspaceNullableRelationFilter = {
+    is?: TrackingUserAccessOnWorkspaceWhereInput | null
+    isNot?: TrackingUserAccessOnWorkspaceWhereInput | null
   }
 
-  export type NotebookListRelationFilter = {
-    every?: NotebookWhereInput
-    some?: NotebookWhereInput
-    none?: NotebookWhereInput
+  export type TeamspaceListRelationFilter = {
+    every?: TeamspaceWhereInput
+    some?: TeamspaceWhereInput
+    none?: TeamspaceWhereInput
   }
 
-  export type UserOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type NotebookOrderByRelationAggregateInput = {
+  export type TeamspaceOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -10797,9 +17082,9 @@ export namespace Prisma {
     stripeSubscriptionId?: SortOrder
     stripePriceId?: SortOrder
     stripeCurrentPeriodEnd?: SortOrder
-    createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    createdBy?: SortOrder
   }
 
   export type WorkspaceMaxOrderByAggregateInput = {
@@ -10811,9 +17096,9 @@ export namespace Prisma {
     stripeSubscriptionId?: SortOrder
     stripePriceId?: SortOrder
     stripeCurrentPeriodEnd?: SortOrder
-    createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    createdBy?: SortOrder
   }
 
   export type WorkspaceMinOrderByAggregateInput = {
@@ -10825,24 +17110,73 @@ export namespace Prisma {
     stripeSubscriptionId?: SortOrder
     stripePriceId?: SortOrder
     stripeCurrentPeriodEnd?: SortOrder
-    createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    createdBy?: SortOrder
   }
 
-  export type BoolFilter = {
-    equals?: boolean
-    not?: NestedBoolFilter | boolean
+  export type BoolNullableFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
   }
 
-  export type PageListRelationFilter = {
-    every?: PageWhereInput
-    some?: PageWhereInput
-    none?: PageWhereInput
+  export type WorkspaceNullableRelationFilter = {
+    is?: WorkspaceWhereInput | null
+    isNot?: WorkspaceWhereInput | null
   }
 
-  export type PageOrderByRelationAggregateInput = {
-    _count?: SortOrder
+  export type TeamspaceCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    isOrigin?: SortOrder
+    archivedAt?: SortOrder
+    workspaceId?: SortOrder
+    createdBy?: SortOrder
+  }
+
+  export type TeamspaceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    isOrigin?: SortOrder
+    archivedAt?: SortOrder
+    workspaceId?: SortOrder
+    createdBy?: SortOrder
+  }
+
+  export type TeamspaceMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    isOrigin?: SortOrder
+    archivedAt?: SortOrder
+    workspaceId?: SortOrder
+    createdBy?: SortOrder
+  }
+
+  export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBoolNullableFilter<$PrismaModel>
+    _max?: NestedBoolNullableFilter<$PrismaModel>
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type TeamspaceNullableRelationFilter = {
+    is?: TeamspaceWhereInput | null
+    isNot?: TeamspaceWhereInput | null
   }
 
   export type NotebookCountOrderByAggregateInput = {
@@ -10853,6 +17187,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     workspaceId?: SortOrder
+    teamspaceId?: SortOrder
+    createdBy?: SortOrder
   }
 
   export type NotebookMaxOrderByAggregateInput = {
@@ -10863,6 +17199,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     workspaceId?: SortOrder
+    teamspaceId?: SortOrder
+    createdBy?: SortOrder
   }
 
   export type NotebookMinOrderByAggregateInput = {
@@ -10873,36 +17211,38 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     workspaceId?: SortOrder
+    teamspaceId?: SortOrder
+    createdBy?: SortOrder
   }
 
-  export type BoolWithAggregatesFilter = {
-    equals?: boolean
-    not?: NestedBoolWithAggregatesFilter | boolean
-    _count?: NestedIntFilter
-    _min?: NestedBoolFilter
-    _max?: NestedBoolFilter
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
-  export type JsonNullableFilter = 
+  export type JsonNullableFilter<$PrismaModel = never> = 
     | PatchUndefined<
-        Either<Required<JsonNullableFilterBase>, Exclude<keyof Required<JsonNullableFilterBase>, 'path'>>,
-        Required<JsonNullableFilterBase>
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
       >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase>, 'path'>>
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonNullableFilterBase = {
-    equals?: InputJsonValue | JsonNullValueFilter
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
     path?: string
-    string_contains?: string
-    string_starts_with?: string
-    string_ends_with?: string
-    array_contains?: InputJsonValue | null
-    array_starts_with?: InputJsonValue | null
-    array_ends_with?: InputJsonValue | null
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue
     lte?: InputJsonValue
     gt?: InputJsonValue
     gte?: InputJsonValue
-    not?: InputJsonValue | JsonNullValueFilter
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NotebookRelationFilter = {
@@ -10916,11 +17256,12 @@ export namespace Prisma {
     content?: SortOrder
     published?: SortOrder
     createdAt?: SortOrder
-    updatedBy?: SortOrder
     updatedAt?: SortOrder
-    deletedBy?: SortOrder
     deletedAt?: SortOrder
     notebookId?: SortOrder
+    createdBy?: SortOrder
+    deletedBy?: SortOrder
+    updatedBy?: SortOrder
   }
 
   export type PageMaxOrderByAggregateInput = {
@@ -10928,11 +17269,12 @@ export namespace Prisma {
     title?: SortOrder
     published?: SortOrder
     createdAt?: SortOrder
-    updatedBy?: SortOrder
     updatedAt?: SortOrder
-    deletedBy?: SortOrder
     deletedAt?: SortOrder
     notebookId?: SortOrder
+    createdBy?: SortOrder
+    deletedBy?: SortOrder
+    updatedBy?: SortOrder
   }
 
   export type PageMinOrderByAggregateInput = {
@@ -10940,36 +17282,171 @@ export namespace Prisma {
     title?: SortOrder
     published?: SortOrder
     createdAt?: SortOrder
-    updatedBy?: SortOrder
     updatedAt?: SortOrder
-    deletedBy?: SortOrder
     deletedAt?: SortOrder
     notebookId?: SortOrder
+    createdBy?: SortOrder
+    deletedBy?: SortOrder
+    updatedBy?: SortOrder
   }
-  export type JsonNullableWithAggregatesFilter = 
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> = 
     | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase>
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
       >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase>, 'path'>>
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonNullableWithAggregatesFilterBase = {
-    equals?: InputJsonValue | JsonNullValueFilter
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
     path?: string
-    string_contains?: string
-    string_starts_with?: string
-    string_ends_with?: string
-    array_contains?: InputJsonValue | null
-    array_starts_with?: InputJsonValue | null
-    array_ends_with?: InputJsonValue | null
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue
     lte?: InputJsonValue
     gt?: InputJsonValue
     gte?: InputJsonValue
-    not?: InputJsonValue | JsonNullValueFilter
-    _count?: NestedIntNullableFilter
-    _min?: NestedJsonNullableFilter
-    _max?: NestedJsonNullableFilter
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type PageNullableRelationFilter = {
+    is?: PageWhereInput | null
+    isNot?: PageWhereInput | null
+  }
+
+  export type FavoriteCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+    pageId?: SortOrder
+  }
+
+  export type FavoriteMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+    pageId?: SortOrder
+  }
+
+  export type FavoriteMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+    pageId?: SortOrder
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: Enumerable<number>
+    notIn?: Enumerable<number>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type UserOnWorkspaceCountOrderByAggregateInput = {
+    id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+  }
+
+  export type UserOnWorkspaceAvgOrderByAggregateInput = {
+    role?: SortOrder
+  }
+
+  export type UserOnWorkspaceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+  }
+
+  export type UserOnWorkspaceMinOrderByAggregateInput = {
+    id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    workspaceId?: SortOrder
+  }
+
+  export type UserOnWorkspaceSumOrderByAggregateInput = {
+    role?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: Enumerable<number>
+    notIn?: Enumerable<number>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type TeamspaceRelationFilter = {
+    is?: TeamspaceWhereInput
+    isNot?: TeamspaceWhereInput
+  }
+
+  export type UserOnTeamspaceCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    operation?: SortOrder
+    userId?: SortOrder
+    teamspaceId?: SortOrder
+  }
+
+  export type UserOnTeamspaceAvgOrderByAggregateInput = {
+    operation?: SortOrder
+  }
+
+  export type UserOnTeamspaceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    operation?: SortOrder
+    userId?: SortOrder
+    teamspaceId?: SortOrder
+  }
+
+  export type UserOnTeamspaceMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    operation?: SortOrder
+    userId?: SortOrder
+    teamspaceId?: SortOrder
+  }
+
+  export type UserOnTeamspaceSumOrderByAggregateInput = {
+    operation?: SortOrder
   }
 
   export type UserCreateNestedOneWithoutAccountsInput = {
@@ -11003,7 +17480,7 @@ export namespace Prisma {
     connectOrCreate?: UserCreateOrConnectWithoutAccountsInput
     upsert?: UserUpsertWithoutAccountsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUpdateWithoutAccountsInput, UserUncheckedUpdateWithoutAccountsInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAccountsInput, UserUpdateWithoutAccountsInput>, UserUncheckedUpdateWithoutAccountsInput>
   }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
@@ -11016,10 +17493,10 @@ export namespace Prisma {
     create?: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutSessionsInput
     upsert?: UserUpsertWithoutSessionsInput
-    disconnect?: boolean
-    delete?: boolean
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUpdateWithoutSessionsInput, UserUncheckedUpdateWithoutSessionsInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSessionsInput, UserUpdateWithoutSessionsInput>, UserUncheckedUpdateWithoutSessionsInput>
   }
 
   export type AccountCreateNestedManyWithoutUserInput = {
@@ -11036,35 +17513,60 @@ export namespace Prisma {
     connect?: Enumerable<SessionWhereUniqueInput>
   }
 
-  export type WorkspaceCreateNestedManyWithoutUsersInput = {
-    create?: XOR<Enumerable<WorkspaceCreateWithoutUsersInput>, Enumerable<WorkspaceUncheckedCreateWithoutUsersInput>>
-    connectOrCreate?: Enumerable<WorkspaceCreateOrConnectWithoutUsersInput>
-    connect?: Enumerable<WorkspaceWhereUniqueInput>
+  export type UserOnWorkspaceCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<UserOnWorkspaceCreateWithoutUserInput>, Enumerable<UserOnWorkspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<UserOnWorkspaceCreateOrConnectWithoutUserInput>
+    createMany?: UserOnWorkspaceCreateManyUserInputEnvelope
+    connect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
   }
 
-  export type TrackingUserAccessCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutUserInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutUserInput>
-    createMany?: TrackingUserAccessCreateManyUserInputEnvelope
-    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+  export type UserOnTeamspaceCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<UserOnTeamspaceCreateWithoutUserInput>, Enumerable<UserOnTeamspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<UserOnTeamspaceCreateOrConnectWithoutUserInput>
+    createMany?: UserOnTeamspaceCreateManyUserInputEnvelope
+    connect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
   }
 
-  export type WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput = {
-    create?: XOR<WorkspaceCreateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackUserAccessWorkspaceInput>
-    connectOrCreate?: WorkspaceCreateOrConnectWithoutTrackUserAccessWorkspaceInput
-    connect?: WorkspaceWhereUniqueInput
+  export type TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<TrackingUserAccessOnWorkspaceCreateWithoutUserInput>, Enumerable<TrackingUserAccessOnWorkspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessOnWorkspaceCreateOrConnectWithoutUserInput>
+    createMany?: TrackingUserAccessOnWorkspaceCreateManyUserInputEnvelope
+    connect?: Enumerable<TrackingUserAccessOnWorkspaceWhereUniqueInput>
   }
 
-  export type PageCreateNestedOneWithoutUpdatedByUserInput = {
-    create?: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
-    connectOrCreate?: PageCreateOrConnectWithoutUpdatedByUserInput
-    connect?: PageWhereUniqueInput
+  export type FavoriteCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutUserInput>, Enumerable<FavoriteUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutUserInput>
+    createMany?: FavoriteCreateManyUserInputEnvelope
+    connect?: Enumerable<FavoriteWhereUniqueInput>
   }
 
-  export type PageCreateNestedOneWithoutDeletedByUserInput = {
-    create?: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
-    connectOrCreate?: PageCreateOrConnectWithoutDeletedByUserInput
-    connect?: PageWhereUniqueInput
+  export type NotebookCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutUserInput>, Enumerable<NotebookUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutUserInput>
+    createMany?: NotebookCreateManyUserInputEnvelope
+    connect?: Enumerable<NotebookWhereUniqueInput>
+  }
+
+  export type PageCreateNestedManyWithoutCreatedByUserInput = {
+    create?: XOR<Enumerable<PageCreateWithoutCreatedByUserInput>, Enumerable<PageUncheckedCreateWithoutCreatedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutCreatedByUserInput>
+    createMany?: PageCreateManyCreatedByUserInputEnvelope
+    connect?: Enumerable<PageWhereUniqueInput>
+  }
+
+  export type PageCreateNestedManyWithoutUpdatedByUserInput = {
+    create?: XOR<Enumerable<PageCreateWithoutUpdatedByUserInput>, Enumerable<PageUncheckedCreateWithoutUpdatedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutUpdatedByUserInput>
+    createMany?: PageCreateManyUpdatedByUserInputEnvelope
+    connect?: Enumerable<PageWhereUniqueInput>
+  }
+
+  export type PageCreateNestedManyWithoutDeletedByUserInput = {
+    create?: XOR<Enumerable<PageCreateWithoutDeletedByUserInput>, Enumerable<PageUncheckedCreateWithoutDeletedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutDeletedByUserInput>
+    createMany?: PageCreateManyDeletedByUserInputEnvelope
+    connect?: Enumerable<PageWhereUniqueInput>
   }
 
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
@@ -11081,29 +17583,60 @@ export namespace Prisma {
     connect?: Enumerable<SessionWhereUniqueInput>
   }
 
-  export type WorkspaceUncheckedCreateNestedManyWithoutUsersInput = {
-    create?: XOR<Enumerable<WorkspaceCreateWithoutUsersInput>, Enumerable<WorkspaceUncheckedCreateWithoutUsersInput>>
-    connectOrCreate?: Enumerable<WorkspaceCreateOrConnectWithoutUsersInput>
-    connect?: Enumerable<WorkspaceWhereUniqueInput>
+  export type UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<UserOnWorkspaceCreateWithoutUserInput>, Enumerable<UserOnWorkspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<UserOnWorkspaceCreateOrConnectWithoutUserInput>
+    createMany?: UserOnWorkspaceCreateManyUserInputEnvelope
+    connect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
   }
 
-  export type TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutUserInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutUserInput>
-    createMany?: TrackingUserAccessCreateManyUserInputEnvelope
-    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+  export type UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<UserOnTeamspaceCreateWithoutUserInput>, Enumerable<UserOnTeamspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<UserOnTeamspaceCreateOrConnectWithoutUserInput>
+    createMany?: UserOnTeamspaceCreateManyUserInputEnvelope
+    connect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
   }
 
-  export type PageUncheckedCreateNestedOneWithoutUpdatedByUserInput = {
-    create?: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
-    connectOrCreate?: PageCreateOrConnectWithoutUpdatedByUserInput
-    connect?: PageWhereUniqueInput
+  export type TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<TrackingUserAccessOnWorkspaceCreateWithoutUserInput>, Enumerable<TrackingUserAccessOnWorkspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessOnWorkspaceCreateOrConnectWithoutUserInput>
+    createMany?: TrackingUserAccessOnWorkspaceCreateManyUserInputEnvelope
+    connect?: Enumerable<TrackingUserAccessOnWorkspaceWhereUniqueInput>
   }
 
-  export type PageUncheckedCreateNestedOneWithoutDeletedByUserInput = {
-    create?: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
-    connectOrCreate?: PageCreateOrConnectWithoutDeletedByUserInput
-    connect?: PageWhereUniqueInput
+  export type FavoriteUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutUserInput>, Enumerable<FavoriteUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutUserInput>
+    createMany?: FavoriteCreateManyUserInputEnvelope
+    connect?: Enumerable<FavoriteWhereUniqueInput>
+  }
+
+  export type NotebookUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutUserInput>, Enumerable<NotebookUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutUserInput>
+    createMany?: NotebookCreateManyUserInputEnvelope
+    connect?: Enumerable<NotebookWhereUniqueInput>
+  }
+
+  export type PageUncheckedCreateNestedManyWithoutCreatedByUserInput = {
+    create?: XOR<Enumerable<PageCreateWithoutCreatedByUserInput>, Enumerable<PageUncheckedCreateWithoutCreatedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutCreatedByUserInput>
+    createMany?: PageCreateManyCreatedByUserInputEnvelope
+    connect?: Enumerable<PageWhereUniqueInput>
+  }
+
+  export type PageUncheckedCreateNestedManyWithoutUpdatedByUserInput = {
+    create?: XOR<Enumerable<PageCreateWithoutUpdatedByUserInput>, Enumerable<PageUncheckedCreateWithoutUpdatedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutUpdatedByUserInput>
+    createMany?: PageCreateManyUpdatedByUserInputEnvelope
+    connect?: Enumerable<PageWhereUniqueInput>
+  }
+
+  export type PageUncheckedCreateNestedManyWithoutDeletedByUserInput = {
+    create?: XOR<Enumerable<PageCreateWithoutDeletedByUserInput>, Enumerable<PageUncheckedCreateWithoutDeletedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutDeletedByUserInput>
+    createMany?: PageCreateManyDeletedByUserInputEnvelope
+    connect?: Enumerable<PageWhereUniqueInput>
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -11138,61 +17671,116 @@ export namespace Prisma {
     deleteMany?: Enumerable<SessionScalarWhereInput>
   }
 
-  export type WorkspaceUpdateManyWithoutUsersNestedInput = {
-    create?: XOR<Enumerable<WorkspaceCreateWithoutUsersInput>, Enumerable<WorkspaceUncheckedCreateWithoutUsersInput>>
-    connectOrCreate?: Enumerable<WorkspaceCreateOrConnectWithoutUsersInput>
-    upsert?: Enumerable<WorkspaceUpsertWithWhereUniqueWithoutUsersInput>
-    set?: Enumerable<WorkspaceWhereUniqueInput>
-    disconnect?: Enumerable<WorkspaceWhereUniqueInput>
-    delete?: Enumerable<WorkspaceWhereUniqueInput>
-    connect?: Enumerable<WorkspaceWhereUniqueInput>
-    update?: Enumerable<WorkspaceUpdateWithWhereUniqueWithoutUsersInput>
-    updateMany?: Enumerable<WorkspaceUpdateManyWithWhereWithoutUsersInput>
-    deleteMany?: Enumerable<WorkspaceScalarWhereInput>
+  export type UserOnWorkspaceUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<UserOnWorkspaceCreateWithoutUserInput>, Enumerable<UserOnWorkspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<UserOnWorkspaceCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<UserOnWorkspaceUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: UserOnWorkspaceCreateManyUserInputEnvelope
+    set?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    disconnect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    delete?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    connect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    update?: Enumerable<UserOnWorkspaceUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<UserOnWorkspaceUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<UserOnWorkspaceScalarWhereInput>
   }
 
-  export type TrackingUserAccessUpdateManyWithoutUserNestedInput = {
-    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutUserInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutUserInput>
-    upsert?: Enumerable<TrackingUserAccessUpsertWithWhereUniqueWithoutUserInput>
-    createMany?: TrackingUserAccessCreateManyUserInputEnvelope
-    set?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    disconnect?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    delete?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    update?: Enumerable<TrackingUserAccessUpdateWithWhereUniqueWithoutUserInput>
-    updateMany?: Enumerable<TrackingUserAccessUpdateManyWithWhereWithoutUserInput>
-    deleteMany?: Enumerable<TrackingUserAccessScalarWhereInput>
+  export type UserOnTeamspaceUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<UserOnTeamspaceCreateWithoutUserInput>, Enumerable<UserOnTeamspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<UserOnTeamspaceCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<UserOnTeamspaceUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: UserOnTeamspaceCreateManyUserInputEnvelope
+    set?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    disconnect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    delete?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    connect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    update?: Enumerable<UserOnTeamspaceUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<UserOnTeamspaceUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<UserOnTeamspaceScalarWhereInput>
   }
 
-  export type WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput = {
-    create?: XOR<WorkspaceCreateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackUserAccessWorkspaceInput>
-    connectOrCreate?: WorkspaceCreateOrConnectWithoutTrackUserAccessWorkspaceInput
-    upsert?: WorkspaceUpsertWithoutTrackUserAccessWorkspaceInput
-    disconnect?: boolean
-    delete?: boolean
-    connect?: WorkspaceWhereUniqueInput
-    update?: XOR<WorkspaceUpdateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedUpdateWithoutTrackUserAccessWorkspaceInput>
+  export type TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<TrackingUserAccessOnWorkspaceCreateWithoutUserInput>, Enumerable<TrackingUserAccessOnWorkspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessOnWorkspaceCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<TrackingUserAccessOnWorkspaceUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: TrackingUserAccessOnWorkspaceCreateManyUserInputEnvelope
+    set?: Enumerable<TrackingUserAccessOnWorkspaceWhereUniqueInput>
+    disconnect?: Enumerable<TrackingUserAccessOnWorkspaceWhereUniqueInput>
+    delete?: Enumerable<TrackingUserAccessOnWorkspaceWhereUniqueInput>
+    connect?: Enumerable<TrackingUserAccessOnWorkspaceWhereUniqueInput>
+    update?: Enumerable<TrackingUserAccessOnWorkspaceUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<TrackingUserAccessOnWorkspaceUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<TrackingUserAccessOnWorkspaceScalarWhereInput>
   }
 
-  export type PageUpdateOneWithoutUpdatedByUserNestedInput = {
-    create?: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
-    connectOrCreate?: PageCreateOrConnectWithoutUpdatedByUserInput
-    upsert?: PageUpsertWithoutUpdatedByUserInput
-    disconnect?: boolean
-    delete?: boolean
-    connect?: PageWhereUniqueInput
-    update?: XOR<PageUpdateWithoutUpdatedByUserInput, PageUncheckedUpdateWithoutUpdatedByUserInput>
+  export type FavoriteUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutUserInput>, Enumerable<FavoriteUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<FavoriteUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: FavoriteCreateManyUserInputEnvelope
+    set?: Enumerable<FavoriteWhereUniqueInput>
+    disconnect?: Enumerable<FavoriteWhereUniqueInput>
+    delete?: Enumerable<FavoriteWhereUniqueInput>
+    connect?: Enumerable<FavoriteWhereUniqueInput>
+    update?: Enumerable<FavoriteUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<FavoriteUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<FavoriteScalarWhereInput>
   }
 
-  export type PageUpdateOneWithoutDeletedByUserNestedInput = {
-    create?: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
-    connectOrCreate?: PageCreateOrConnectWithoutDeletedByUserInput
-    upsert?: PageUpsertWithoutDeletedByUserInput
-    disconnect?: boolean
-    delete?: boolean
-    connect?: PageWhereUniqueInput
-    update?: XOR<PageUpdateWithoutDeletedByUserInput, PageUncheckedUpdateWithoutDeletedByUserInput>
+  export type NotebookUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutUserInput>, Enumerable<NotebookUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<NotebookUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: NotebookCreateManyUserInputEnvelope
+    set?: Enumerable<NotebookWhereUniqueInput>
+    disconnect?: Enumerable<NotebookWhereUniqueInput>
+    delete?: Enumerable<NotebookWhereUniqueInput>
+    connect?: Enumerable<NotebookWhereUniqueInput>
+    update?: Enumerable<NotebookUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<NotebookUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<NotebookScalarWhereInput>
+  }
+
+  export type PageUpdateManyWithoutCreatedByUserNestedInput = {
+    create?: XOR<Enumerable<PageCreateWithoutCreatedByUserInput>, Enumerable<PageUncheckedCreateWithoutCreatedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutCreatedByUserInput>
+    upsert?: Enumerable<PageUpsertWithWhereUniqueWithoutCreatedByUserInput>
+    createMany?: PageCreateManyCreatedByUserInputEnvelope
+    set?: Enumerable<PageWhereUniqueInput>
+    disconnect?: Enumerable<PageWhereUniqueInput>
+    delete?: Enumerable<PageWhereUniqueInput>
+    connect?: Enumerable<PageWhereUniqueInput>
+    update?: Enumerable<PageUpdateWithWhereUniqueWithoutCreatedByUserInput>
+    updateMany?: Enumerable<PageUpdateManyWithWhereWithoutCreatedByUserInput>
+    deleteMany?: Enumerable<PageScalarWhereInput>
+  }
+
+  export type PageUpdateManyWithoutUpdatedByUserNestedInput = {
+    create?: XOR<Enumerable<PageCreateWithoutUpdatedByUserInput>, Enumerable<PageUncheckedCreateWithoutUpdatedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutUpdatedByUserInput>
+    upsert?: Enumerable<PageUpsertWithWhereUniqueWithoutUpdatedByUserInput>
+    createMany?: PageCreateManyUpdatedByUserInputEnvelope
+    set?: Enumerable<PageWhereUniqueInput>
+    disconnect?: Enumerable<PageWhereUniqueInput>
+    delete?: Enumerable<PageWhereUniqueInput>
+    connect?: Enumerable<PageWhereUniqueInput>
+    update?: Enumerable<PageUpdateWithWhereUniqueWithoutUpdatedByUserInput>
+    updateMany?: Enumerable<PageUpdateManyWithWhereWithoutUpdatedByUserInput>
+    deleteMany?: Enumerable<PageScalarWhereInput>
+  }
+
+  export type PageUpdateManyWithoutDeletedByUserNestedInput = {
+    create?: XOR<Enumerable<PageCreateWithoutDeletedByUserInput>, Enumerable<PageUncheckedCreateWithoutDeletedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutDeletedByUserInput>
+    upsert?: Enumerable<PageUpsertWithWhereUniqueWithoutDeletedByUserInput>
+    createMany?: PageCreateManyDeletedByUserInputEnvelope
+    set?: Enumerable<PageWhereUniqueInput>
+    disconnect?: Enumerable<PageWhereUniqueInput>
+    delete?: Enumerable<PageWhereUniqueInput>
+    connect?: Enumerable<PageWhereUniqueInput>
+    update?: Enumerable<PageUpdateWithWhereUniqueWithoutDeletedByUserInput>
+    updateMany?: Enumerable<PageUpdateManyWithWhereWithoutDeletedByUserInput>
+    deleteMany?: Enumerable<PageScalarWhereInput>
   }
 
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
@@ -11223,51 +17811,116 @@ export namespace Prisma {
     deleteMany?: Enumerable<SessionScalarWhereInput>
   }
 
-  export type WorkspaceUncheckedUpdateManyWithoutUsersNestedInput = {
-    create?: XOR<Enumerable<WorkspaceCreateWithoutUsersInput>, Enumerable<WorkspaceUncheckedCreateWithoutUsersInput>>
-    connectOrCreate?: Enumerable<WorkspaceCreateOrConnectWithoutUsersInput>
-    upsert?: Enumerable<WorkspaceUpsertWithWhereUniqueWithoutUsersInput>
-    set?: Enumerable<WorkspaceWhereUniqueInput>
-    disconnect?: Enumerable<WorkspaceWhereUniqueInput>
-    delete?: Enumerable<WorkspaceWhereUniqueInput>
-    connect?: Enumerable<WorkspaceWhereUniqueInput>
-    update?: Enumerable<WorkspaceUpdateWithWhereUniqueWithoutUsersInput>
-    updateMany?: Enumerable<WorkspaceUpdateManyWithWhereWithoutUsersInput>
-    deleteMany?: Enumerable<WorkspaceScalarWhereInput>
+  export type UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<UserOnWorkspaceCreateWithoutUserInput>, Enumerable<UserOnWorkspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<UserOnWorkspaceCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<UserOnWorkspaceUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: UserOnWorkspaceCreateManyUserInputEnvelope
+    set?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    disconnect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    delete?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    connect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    update?: Enumerable<UserOnWorkspaceUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<UserOnWorkspaceUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<UserOnWorkspaceScalarWhereInput>
   }
 
-  export type TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutUserInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutUserInput>>
-    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutUserInput>
-    upsert?: Enumerable<TrackingUserAccessUpsertWithWhereUniqueWithoutUserInput>
-    createMany?: TrackingUserAccessCreateManyUserInputEnvelope
-    set?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    disconnect?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    delete?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    update?: Enumerable<TrackingUserAccessUpdateWithWhereUniqueWithoutUserInput>
-    updateMany?: Enumerable<TrackingUserAccessUpdateManyWithWhereWithoutUserInput>
-    deleteMany?: Enumerable<TrackingUserAccessScalarWhereInput>
+  export type UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<UserOnTeamspaceCreateWithoutUserInput>, Enumerable<UserOnTeamspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<UserOnTeamspaceCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<UserOnTeamspaceUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: UserOnTeamspaceCreateManyUserInputEnvelope
+    set?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    disconnect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    delete?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    connect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    update?: Enumerable<UserOnTeamspaceUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<UserOnTeamspaceUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<UserOnTeamspaceScalarWhereInput>
   }
 
-  export type PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput = {
-    create?: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
-    connectOrCreate?: PageCreateOrConnectWithoutUpdatedByUserInput
-    upsert?: PageUpsertWithoutUpdatedByUserInput
-    disconnect?: boolean
-    delete?: boolean
-    connect?: PageWhereUniqueInput
-    update?: XOR<PageUpdateWithoutUpdatedByUserInput, PageUncheckedUpdateWithoutUpdatedByUserInput>
+  export type TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<TrackingUserAccessOnWorkspaceCreateWithoutUserInput>, Enumerable<TrackingUserAccessOnWorkspaceUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<TrackingUserAccessOnWorkspaceCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<TrackingUserAccessOnWorkspaceUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: TrackingUserAccessOnWorkspaceCreateManyUserInputEnvelope
+    set?: Enumerable<TrackingUserAccessOnWorkspaceWhereUniqueInput>
+    disconnect?: Enumerable<TrackingUserAccessOnWorkspaceWhereUniqueInput>
+    delete?: Enumerable<TrackingUserAccessOnWorkspaceWhereUniqueInput>
+    connect?: Enumerable<TrackingUserAccessOnWorkspaceWhereUniqueInput>
+    update?: Enumerable<TrackingUserAccessOnWorkspaceUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<TrackingUserAccessOnWorkspaceUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<TrackingUserAccessOnWorkspaceScalarWhereInput>
   }
 
-  export type PageUncheckedUpdateOneWithoutDeletedByUserNestedInput = {
-    create?: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
-    connectOrCreate?: PageCreateOrConnectWithoutDeletedByUserInput
-    upsert?: PageUpsertWithoutDeletedByUserInput
-    disconnect?: boolean
-    delete?: boolean
-    connect?: PageWhereUniqueInput
-    update?: XOR<PageUpdateWithoutDeletedByUserInput, PageUncheckedUpdateWithoutDeletedByUserInput>
+  export type FavoriteUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutUserInput>, Enumerable<FavoriteUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<FavoriteUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: FavoriteCreateManyUserInputEnvelope
+    set?: Enumerable<FavoriteWhereUniqueInput>
+    disconnect?: Enumerable<FavoriteWhereUniqueInput>
+    delete?: Enumerable<FavoriteWhereUniqueInput>
+    connect?: Enumerable<FavoriteWhereUniqueInput>
+    update?: Enumerable<FavoriteUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<FavoriteUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<FavoriteScalarWhereInput>
+  }
+
+  export type NotebookUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutUserInput>, Enumerable<NotebookUncheckedCreateWithoutUserInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutUserInput>
+    upsert?: Enumerable<NotebookUpsertWithWhereUniqueWithoutUserInput>
+    createMany?: NotebookCreateManyUserInputEnvelope
+    set?: Enumerable<NotebookWhereUniqueInput>
+    disconnect?: Enumerable<NotebookWhereUniqueInput>
+    delete?: Enumerable<NotebookWhereUniqueInput>
+    connect?: Enumerable<NotebookWhereUniqueInput>
+    update?: Enumerable<NotebookUpdateWithWhereUniqueWithoutUserInput>
+    updateMany?: Enumerable<NotebookUpdateManyWithWhereWithoutUserInput>
+    deleteMany?: Enumerable<NotebookScalarWhereInput>
+  }
+
+  export type PageUncheckedUpdateManyWithoutCreatedByUserNestedInput = {
+    create?: XOR<Enumerable<PageCreateWithoutCreatedByUserInput>, Enumerable<PageUncheckedCreateWithoutCreatedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutCreatedByUserInput>
+    upsert?: Enumerable<PageUpsertWithWhereUniqueWithoutCreatedByUserInput>
+    createMany?: PageCreateManyCreatedByUserInputEnvelope
+    set?: Enumerable<PageWhereUniqueInput>
+    disconnect?: Enumerable<PageWhereUniqueInput>
+    delete?: Enumerable<PageWhereUniqueInput>
+    connect?: Enumerable<PageWhereUniqueInput>
+    update?: Enumerable<PageUpdateWithWhereUniqueWithoutCreatedByUserInput>
+    updateMany?: Enumerable<PageUpdateManyWithWhereWithoutCreatedByUserInput>
+    deleteMany?: Enumerable<PageScalarWhereInput>
+  }
+
+  export type PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput = {
+    create?: XOR<Enumerable<PageCreateWithoutUpdatedByUserInput>, Enumerable<PageUncheckedCreateWithoutUpdatedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutUpdatedByUserInput>
+    upsert?: Enumerable<PageUpsertWithWhereUniqueWithoutUpdatedByUserInput>
+    createMany?: PageCreateManyUpdatedByUserInputEnvelope
+    set?: Enumerable<PageWhereUniqueInput>
+    disconnect?: Enumerable<PageWhereUniqueInput>
+    delete?: Enumerable<PageWhereUniqueInput>
+    connect?: Enumerable<PageWhereUniqueInput>
+    update?: Enumerable<PageUpdateWithWhereUniqueWithoutUpdatedByUserInput>
+    updateMany?: Enumerable<PageUpdateManyWithWhereWithoutUpdatedByUserInput>
+    deleteMany?: Enumerable<PageScalarWhereInput>
+  }
+
+  export type PageUncheckedUpdateManyWithoutDeletedByUserNestedInput = {
+    create?: XOR<Enumerable<PageCreateWithoutDeletedByUserInput>, Enumerable<PageUncheckedCreateWithoutDeletedByUserInput>>
+    connectOrCreate?: Enumerable<PageCreateOrConnectWithoutDeletedByUserInput>
+    upsert?: Enumerable<PageUpsertWithWhereUniqueWithoutDeletedByUserInput>
+    createMany?: PageCreateManyDeletedByUserInputEnvelope
+    set?: Enumerable<PageWhereUniqueInput>
+    disconnect?: Enumerable<PageWhereUniqueInput>
+    delete?: Enumerable<PageWhereUniqueInput>
+    connect?: Enumerable<PageWhereUniqueInput>
+    update?: Enumerable<PageUpdateWithWhereUniqueWithoutDeletedByUserInput>
+    updateMany?: Enumerable<PageUpdateManyWithWhereWithoutDeletedByUserInput>
+    deleteMany?: Enumerable<PageScalarWhereInput>
   }
 
   export type UserCreateNestedOneWithoutTrackingUserAccessInput = {
@@ -11276,42 +17929,46 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type WorkspaceCreateNestedOneWithoutTrackingUserAccessInput = {
-    create?: XOR<WorkspaceCreateWithoutTrackingUserAccessInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessInput>
-    connectOrCreate?: WorkspaceCreateOrConnectWithoutTrackingUserAccessInput
+  export type WorkspaceCreateNestedOneWithoutTrackingUserAccessOnWorkspaceInput = {
+    create?: XOR<WorkspaceCreateWithoutTrackingUserAccessOnWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessOnWorkspaceInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutTrackingUserAccessOnWorkspaceInput
     connect?: WorkspaceWhereUniqueInput
   }
 
-  export type UserUpdateOneWithoutTrackingUserAccessNestedInput = {
+  export type UserUpdateOneRequiredWithoutTrackingUserAccessNestedInput = {
     create?: XOR<UserCreateWithoutTrackingUserAccessInput, UserUncheckedCreateWithoutTrackingUserAccessInput>
     connectOrCreate?: UserCreateOrConnectWithoutTrackingUserAccessInput
     upsert?: UserUpsertWithoutTrackingUserAccessInput
-    disconnect?: boolean
-    delete?: boolean
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUpdateWithoutTrackingUserAccessInput, UserUncheckedUpdateWithoutTrackingUserAccessInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTrackingUserAccessInput, UserUpdateWithoutTrackingUserAccessInput>, UserUncheckedUpdateWithoutTrackingUserAccessInput>
   }
 
-  export type WorkspaceUpdateOneWithoutTrackingUserAccessNestedInput = {
-    create?: XOR<WorkspaceCreateWithoutTrackingUserAccessInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessInput>
-    connectOrCreate?: WorkspaceCreateOrConnectWithoutTrackingUserAccessInput
-    upsert?: WorkspaceUpsertWithoutTrackingUserAccessInput
-    disconnect?: boolean
-    delete?: boolean
+  export type WorkspaceUpdateOneRequiredWithoutTrackingUserAccessOnWorkspaceNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutTrackingUserAccessOnWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessOnWorkspaceInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutTrackingUserAccessOnWorkspaceInput
+    upsert?: WorkspaceUpsertWithoutTrackingUserAccessOnWorkspaceInput
     connect?: WorkspaceWhereUniqueInput
-    update?: XOR<WorkspaceUpdateWithoutTrackingUserAccessInput, WorkspaceUncheckedUpdateWithoutTrackingUserAccessInput>
+    update?: XOR<XOR<WorkspaceUpdateToOneWithWhereWithoutTrackingUserAccessOnWorkspaceInput, WorkspaceUpdateWithoutTrackingUserAccessOnWorkspaceInput>, WorkspaceUncheckedUpdateWithoutTrackingUserAccessOnWorkspaceInput>
   }
 
-  export type UserCreateNestedOneWithoutLastAccessWorkspaceInput = {
-    create?: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
-    connectOrCreate?: UserCreateOrConnectWithoutLastAccessWorkspaceInput
-    connect?: UserWhereUniqueInput
+  export type TrackingUserAccessOnWorkspaceCreateNestedOneWithoutWorkspaceInput = {
+    create?: XOR<TrackingUserAccessOnWorkspaceCreateWithoutWorkspaceInput, TrackingUserAccessOnWorkspaceUncheckedCreateWithoutWorkspaceInput>
+    connectOrCreate?: TrackingUserAccessOnWorkspaceCreateOrConnectWithoutWorkspaceInput
+    connect?: TrackingUserAccessOnWorkspaceWhereUniqueInput
   }
 
-  export type UserCreateNestedManyWithoutWorkspacesInput = {
-    create?: XOR<Enumerable<UserCreateWithoutWorkspacesInput>, Enumerable<UserUncheckedCreateWithoutWorkspacesInput>>
-    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutWorkspacesInput>
-    connect?: Enumerable<UserWhereUniqueInput>
+  export type UserOnWorkspaceCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<Enumerable<UserOnWorkspaceCreateWithoutWorkspaceInput>, Enumerable<UserOnWorkspaceUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<UserOnWorkspaceCreateOrConnectWithoutWorkspaceInput>
+    createMany?: UserOnWorkspaceCreateManyWorkspaceInputEnvelope
+    connect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+  }
+
+  export type TeamspaceCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<Enumerable<TeamspaceCreateWithoutWorkspaceInput>, Enumerable<TeamspaceUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<TeamspaceCreateOrConnectWithoutWorkspaceInput>
+    createMany?: TeamspaceCreateManyWorkspaceInputEnvelope
+    connect?: Enumerable<TeamspaceWhereUniqueInput>
   }
 
   export type NotebookCreateNestedManyWithoutWorkspaceInput = {
@@ -11321,23 +17978,31 @@ export namespace Prisma {
     connect?: Enumerable<NotebookWhereUniqueInput>
   }
 
-  export type TrackingUserAccessCreateNestedManyWithoutWorkspaceInput = {
-    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutWorkspaceInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>>
-    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutWorkspaceInput>
-    createMany?: TrackingUserAccessCreateManyWorkspaceInputEnvelope
-    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+  export type FavoriteCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutWorkspaceInput>, Enumerable<FavoriteUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutWorkspaceInput>
+    createMany?: FavoriteCreateManyWorkspaceInputEnvelope
+    connect?: Enumerable<FavoriteWhereUniqueInput>
   }
 
-  export type UserUncheckedCreateNestedOneWithoutLastAccessWorkspaceInput = {
-    create?: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
-    connectOrCreate?: UserCreateOrConnectWithoutLastAccessWorkspaceInput
-    connect?: UserWhereUniqueInput
+  export type TrackingUserAccessOnWorkspaceUncheckedCreateNestedOneWithoutWorkspaceInput = {
+    create?: XOR<TrackingUserAccessOnWorkspaceCreateWithoutWorkspaceInput, TrackingUserAccessOnWorkspaceUncheckedCreateWithoutWorkspaceInput>
+    connectOrCreate?: TrackingUserAccessOnWorkspaceCreateOrConnectWithoutWorkspaceInput
+    connect?: TrackingUserAccessOnWorkspaceWhereUniqueInput
   }
 
-  export type UserUncheckedCreateNestedManyWithoutWorkspacesInput = {
-    create?: XOR<Enumerable<UserCreateWithoutWorkspacesInput>, Enumerable<UserUncheckedCreateWithoutWorkspacesInput>>
-    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutWorkspacesInput>
-    connect?: Enumerable<UserWhereUniqueInput>
+  export type UserOnWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<Enumerable<UserOnWorkspaceCreateWithoutWorkspaceInput>, Enumerable<UserOnWorkspaceUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<UserOnWorkspaceCreateOrConnectWithoutWorkspaceInput>
+    createMany?: UserOnWorkspaceCreateManyWorkspaceInputEnvelope
+    connect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+  }
+
+  export type TeamspaceUncheckedCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<Enumerable<TeamspaceCreateWithoutWorkspaceInput>, Enumerable<TeamspaceUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<TeamspaceCreateOrConnectWithoutWorkspaceInput>
+    createMany?: TeamspaceCreateManyWorkspaceInputEnvelope
+    connect?: Enumerable<TeamspaceWhereUniqueInput>
   }
 
   export type NotebookUncheckedCreateNestedManyWithoutWorkspaceInput = {
@@ -11347,34 +18012,49 @@ export namespace Prisma {
     connect?: Enumerable<NotebookWhereUniqueInput>
   }
 
-  export type TrackingUserAccessUncheckedCreateNestedManyWithoutWorkspaceInput = {
-    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutWorkspaceInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>>
-    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutWorkspaceInput>
-    createMany?: TrackingUserAccessCreateManyWorkspaceInputEnvelope
-    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
+  export type FavoriteUncheckedCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutWorkspaceInput>, Enumerable<FavoriteUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutWorkspaceInput>
+    createMany?: FavoriteCreateManyWorkspaceInputEnvelope
+    connect?: Enumerable<FavoriteWhereUniqueInput>
   }
 
-  export type UserUpdateOneWithoutLastAccessWorkspaceNestedInput = {
-    create?: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
-    connectOrCreate?: UserCreateOrConnectWithoutLastAccessWorkspaceInput
-    upsert?: UserUpsertWithoutLastAccessWorkspaceInput
-    disconnect?: boolean
-    delete?: boolean
-    connect?: UserWhereUniqueInput
-    update?: XOR<UserUpdateWithoutLastAccessWorkspaceInput, UserUncheckedUpdateWithoutLastAccessWorkspaceInput>
+  export type TrackingUserAccessOnWorkspaceUpdateOneWithoutWorkspaceNestedInput = {
+    create?: XOR<TrackingUserAccessOnWorkspaceCreateWithoutWorkspaceInput, TrackingUserAccessOnWorkspaceUncheckedCreateWithoutWorkspaceInput>
+    connectOrCreate?: TrackingUserAccessOnWorkspaceCreateOrConnectWithoutWorkspaceInput
+    upsert?: TrackingUserAccessOnWorkspaceUpsertWithoutWorkspaceInput
+    disconnect?: TrackingUserAccessOnWorkspaceWhereInput | boolean
+    delete?: TrackingUserAccessOnWorkspaceWhereInput | boolean
+    connect?: TrackingUserAccessOnWorkspaceWhereUniqueInput
+    update?: XOR<XOR<TrackingUserAccessOnWorkspaceUpdateToOneWithWhereWithoutWorkspaceInput, TrackingUserAccessOnWorkspaceUpdateWithoutWorkspaceInput>, TrackingUserAccessOnWorkspaceUncheckedUpdateWithoutWorkspaceInput>
   }
 
-  export type UserUpdateManyWithoutWorkspacesNestedInput = {
-    create?: XOR<Enumerable<UserCreateWithoutWorkspacesInput>, Enumerable<UserUncheckedCreateWithoutWorkspacesInput>>
-    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutWorkspacesInput>
-    upsert?: Enumerable<UserUpsertWithWhereUniqueWithoutWorkspacesInput>
-    set?: Enumerable<UserWhereUniqueInput>
-    disconnect?: Enumerable<UserWhereUniqueInput>
-    delete?: Enumerable<UserWhereUniqueInput>
-    connect?: Enumerable<UserWhereUniqueInput>
-    update?: Enumerable<UserUpdateWithWhereUniqueWithoutWorkspacesInput>
-    updateMany?: Enumerable<UserUpdateManyWithWhereWithoutWorkspacesInput>
-    deleteMany?: Enumerable<UserScalarWhereInput>
+  export type UserOnWorkspaceUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<Enumerable<UserOnWorkspaceCreateWithoutWorkspaceInput>, Enumerable<UserOnWorkspaceUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<UserOnWorkspaceCreateOrConnectWithoutWorkspaceInput>
+    upsert?: Enumerable<UserOnWorkspaceUpsertWithWhereUniqueWithoutWorkspaceInput>
+    createMany?: UserOnWorkspaceCreateManyWorkspaceInputEnvelope
+    set?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    disconnect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    delete?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    connect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    update?: Enumerable<UserOnWorkspaceUpdateWithWhereUniqueWithoutWorkspaceInput>
+    updateMany?: Enumerable<UserOnWorkspaceUpdateManyWithWhereWithoutWorkspaceInput>
+    deleteMany?: Enumerable<UserOnWorkspaceScalarWhereInput>
+  }
+
+  export type TeamspaceUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<Enumerable<TeamspaceCreateWithoutWorkspaceInput>, Enumerable<TeamspaceUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<TeamspaceCreateOrConnectWithoutWorkspaceInput>
+    upsert?: Enumerable<TeamspaceUpsertWithWhereUniqueWithoutWorkspaceInput>
+    createMany?: TeamspaceCreateManyWorkspaceInputEnvelope
+    set?: Enumerable<TeamspaceWhereUniqueInput>
+    disconnect?: Enumerable<TeamspaceWhereUniqueInput>
+    delete?: Enumerable<TeamspaceWhereUniqueInput>
+    connect?: Enumerable<TeamspaceWhereUniqueInput>
+    update?: Enumerable<TeamspaceUpdateWithWhereUniqueWithoutWorkspaceInput>
+    updateMany?: Enumerable<TeamspaceUpdateManyWithWhereWithoutWorkspaceInput>
+    deleteMany?: Enumerable<TeamspaceScalarWhereInput>
   }
 
   export type NotebookUpdateManyWithoutWorkspaceNestedInput = {
@@ -11391,41 +18071,56 @@ export namespace Prisma {
     deleteMany?: Enumerable<NotebookScalarWhereInput>
   }
 
-  export type TrackingUserAccessUpdateManyWithoutWorkspaceNestedInput = {
-    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutWorkspaceInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>>
-    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutWorkspaceInput>
-    upsert?: Enumerable<TrackingUserAccessUpsertWithWhereUniqueWithoutWorkspaceInput>
-    createMany?: TrackingUserAccessCreateManyWorkspaceInputEnvelope
-    set?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    disconnect?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    delete?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    update?: Enumerable<TrackingUserAccessUpdateWithWhereUniqueWithoutWorkspaceInput>
-    updateMany?: Enumerable<TrackingUserAccessUpdateManyWithWhereWithoutWorkspaceInput>
-    deleteMany?: Enumerable<TrackingUserAccessScalarWhereInput>
+  export type FavoriteUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutWorkspaceInput>, Enumerable<FavoriteUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutWorkspaceInput>
+    upsert?: Enumerable<FavoriteUpsertWithWhereUniqueWithoutWorkspaceInput>
+    createMany?: FavoriteCreateManyWorkspaceInputEnvelope
+    set?: Enumerable<FavoriteWhereUniqueInput>
+    disconnect?: Enumerable<FavoriteWhereUniqueInput>
+    delete?: Enumerable<FavoriteWhereUniqueInput>
+    connect?: Enumerable<FavoriteWhereUniqueInput>
+    update?: Enumerable<FavoriteUpdateWithWhereUniqueWithoutWorkspaceInput>
+    updateMany?: Enumerable<FavoriteUpdateManyWithWhereWithoutWorkspaceInput>
+    deleteMany?: Enumerable<FavoriteScalarWhereInput>
   }
 
-  export type UserUncheckedUpdateOneWithoutLastAccessWorkspaceNestedInput = {
-    create?: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
-    connectOrCreate?: UserCreateOrConnectWithoutLastAccessWorkspaceInput
-    upsert?: UserUpsertWithoutLastAccessWorkspaceInput
-    disconnect?: boolean
-    delete?: boolean
-    connect?: UserWhereUniqueInput
-    update?: XOR<UserUpdateWithoutLastAccessWorkspaceInput, UserUncheckedUpdateWithoutLastAccessWorkspaceInput>
+  export type TrackingUserAccessOnWorkspaceUncheckedUpdateOneWithoutWorkspaceNestedInput = {
+    create?: XOR<TrackingUserAccessOnWorkspaceCreateWithoutWorkspaceInput, TrackingUserAccessOnWorkspaceUncheckedCreateWithoutWorkspaceInput>
+    connectOrCreate?: TrackingUserAccessOnWorkspaceCreateOrConnectWithoutWorkspaceInput
+    upsert?: TrackingUserAccessOnWorkspaceUpsertWithoutWorkspaceInput
+    disconnect?: TrackingUserAccessOnWorkspaceWhereInput | boolean
+    delete?: TrackingUserAccessOnWorkspaceWhereInput | boolean
+    connect?: TrackingUserAccessOnWorkspaceWhereUniqueInput
+    update?: XOR<XOR<TrackingUserAccessOnWorkspaceUpdateToOneWithWhereWithoutWorkspaceInput, TrackingUserAccessOnWorkspaceUpdateWithoutWorkspaceInput>, TrackingUserAccessOnWorkspaceUncheckedUpdateWithoutWorkspaceInput>
   }
 
-  export type UserUncheckedUpdateManyWithoutWorkspacesNestedInput = {
-    create?: XOR<Enumerable<UserCreateWithoutWorkspacesInput>, Enumerable<UserUncheckedCreateWithoutWorkspacesInput>>
-    connectOrCreate?: Enumerable<UserCreateOrConnectWithoutWorkspacesInput>
-    upsert?: Enumerable<UserUpsertWithWhereUniqueWithoutWorkspacesInput>
-    set?: Enumerable<UserWhereUniqueInput>
-    disconnect?: Enumerable<UserWhereUniqueInput>
-    delete?: Enumerable<UserWhereUniqueInput>
-    connect?: Enumerable<UserWhereUniqueInput>
-    update?: Enumerable<UserUpdateWithWhereUniqueWithoutWorkspacesInput>
-    updateMany?: Enumerable<UserUpdateManyWithWhereWithoutWorkspacesInput>
-    deleteMany?: Enumerable<UserScalarWhereInput>
+  export type UserOnWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<Enumerable<UserOnWorkspaceCreateWithoutWorkspaceInput>, Enumerable<UserOnWorkspaceUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<UserOnWorkspaceCreateOrConnectWithoutWorkspaceInput>
+    upsert?: Enumerable<UserOnWorkspaceUpsertWithWhereUniqueWithoutWorkspaceInput>
+    createMany?: UserOnWorkspaceCreateManyWorkspaceInputEnvelope
+    set?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    disconnect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    delete?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    connect?: Enumerable<UserOnWorkspaceWhereUniqueInput>
+    update?: Enumerable<UserOnWorkspaceUpdateWithWhereUniqueWithoutWorkspaceInput>
+    updateMany?: Enumerable<UserOnWorkspaceUpdateManyWithWhereWithoutWorkspaceInput>
+    deleteMany?: Enumerable<UserOnWorkspaceScalarWhereInput>
+  }
+
+  export type TeamspaceUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<Enumerable<TeamspaceCreateWithoutWorkspaceInput>, Enumerable<TeamspaceUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<TeamspaceCreateOrConnectWithoutWorkspaceInput>
+    upsert?: Enumerable<TeamspaceUpsertWithWhereUniqueWithoutWorkspaceInput>
+    createMany?: TeamspaceCreateManyWorkspaceInputEnvelope
+    set?: Enumerable<TeamspaceWhereUniqueInput>
+    disconnect?: Enumerable<TeamspaceWhereUniqueInput>
+    delete?: Enumerable<TeamspaceWhereUniqueInput>
+    connect?: Enumerable<TeamspaceWhereUniqueInput>
+    update?: Enumerable<TeamspaceUpdateWithWhereUniqueWithoutWorkspaceInput>
+    updateMany?: Enumerable<TeamspaceUpdateManyWithWhereWithoutWorkspaceInput>
+    deleteMany?: Enumerable<TeamspaceScalarWhereInput>
   }
 
   export type NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput = {
@@ -11442,18 +18137,122 @@ export namespace Prisma {
     deleteMany?: Enumerable<NotebookScalarWhereInput>
   }
 
-  export type TrackingUserAccessUncheckedUpdateManyWithoutWorkspaceNestedInput = {
-    create?: XOR<Enumerable<TrackingUserAccessCreateWithoutWorkspaceInput>, Enumerable<TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>>
-    connectOrCreate?: Enumerable<TrackingUserAccessCreateOrConnectWithoutWorkspaceInput>
-    upsert?: Enumerable<TrackingUserAccessUpsertWithWhereUniqueWithoutWorkspaceInput>
-    createMany?: TrackingUserAccessCreateManyWorkspaceInputEnvelope
-    set?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    disconnect?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    delete?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    connect?: Enumerable<TrackingUserAccessWhereUniqueInput>
-    update?: Enumerable<TrackingUserAccessUpdateWithWhereUniqueWithoutWorkspaceInput>
-    updateMany?: Enumerable<TrackingUserAccessUpdateManyWithWhereWithoutWorkspaceInput>
-    deleteMany?: Enumerable<TrackingUserAccessScalarWhereInput>
+  export type FavoriteUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutWorkspaceInput>, Enumerable<FavoriteUncheckedCreateWithoutWorkspaceInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutWorkspaceInput>
+    upsert?: Enumerable<FavoriteUpsertWithWhereUniqueWithoutWorkspaceInput>
+    createMany?: FavoriteCreateManyWorkspaceInputEnvelope
+    set?: Enumerable<FavoriteWhereUniqueInput>
+    disconnect?: Enumerable<FavoriteWhereUniqueInput>
+    delete?: Enumerable<FavoriteWhereUniqueInput>
+    connect?: Enumerable<FavoriteWhereUniqueInput>
+    update?: Enumerable<FavoriteUpdateWithWhereUniqueWithoutWorkspaceInput>
+    updateMany?: Enumerable<FavoriteUpdateManyWithWhereWithoutWorkspaceInput>
+    deleteMany?: Enumerable<FavoriteScalarWhereInput>
+  }
+
+  export type WorkspaceCreateNestedOneWithoutTeamspacesInput = {
+    create?: XOR<WorkspaceCreateWithoutTeamspacesInput, WorkspaceUncheckedCreateWithoutTeamspacesInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutTeamspacesInput
+    connect?: WorkspaceWhereUniqueInput
+  }
+
+  export type UserOnTeamspaceCreateNestedManyWithoutTeamspaceInput = {
+    create?: XOR<Enumerable<UserOnTeamspaceCreateWithoutTeamspaceInput>, Enumerable<UserOnTeamspaceUncheckedCreateWithoutTeamspaceInput>>
+    connectOrCreate?: Enumerable<UserOnTeamspaceCreateOrConnectWithoutTeamspaceInput>
+    createMany?: UserOnTeamspaceCreateManyTeamspaceInputEnvelope
+    connect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+  }
+
+  export type NotebookCreateNestedManyWithoutTeamspaceInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutTeamspaceInput>, Enumerable<NotebookUncheckedCreateWithoutTeamspaceInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutTeamspaceInput>
+    createMany?: NotebookCreateManyTeamspaceInputEnvelope
+    connect?: Enumerable<NotebookWhereUniqueInput>
+  }
+
+  export type UserOnTeamspaceUncheckedCreateNestedManyWithoutTeamspaceInput = {
+    create?: XOR<Enumerable<UserOnTeamspaceCreateWithoutTeamspaceInput>, Enumerable<UserOnTeamspaceUncheckedCreateWithoutTeamspaceInput>>
+    connectOrCreate?: Enumerable<UserOnTeamspaceCreateOrConnectWithoutTeamspaceInput>
+    createMany?: UserOnTeamspaceCreateManyTeamspaceInputEnvelope
+    connect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+  }
+
+  export type NotebookUncheckedCreateNestedManyWithoutTeamspaceInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutTeamspaceInput>, Enumerable<NotebookUncheckedCreateWithoutTeamspaceInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutTeamspaceInput>
+    createMany?: NotebookCreateManyTeamspaceInputEnvelope
+    connect?: Enumerable<NotebookWhereUniqueInput>
+  }
+
+  export type NullableBoolFieldUpdateOperationsInput = {
+    set?: boolean | null
+  }
+
+  export type WorkspaceUpdateOneWithoutTeamspacesNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutTeamspacesInput, WorkspaceUncheckedCreateWithoutTeamspacesInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutTeamspacesInput
+    upsert?: WorkspaceUpsertWithoutTeamspacesInput
+    disconnect?: WorkspaceWhereInput | boolean
+    delete?: WorkspaceWhereInput | boolean
+    connect?: WorkspaceWhereUniqueInput
+    update?: XOR<XOR<WorkspaceUpdateToOneWithWhereWithoutTeamspacesInput, WorkspaceUpdateWithoutTeamspacesInput>, WorkspaceUncheckedUpdateWithoutTeamspacesInput>
+  }
+
+  export type UserOnTeamspaceUpdateManyWithoutTeamspaceNestedInput = {
+    create?: XOR<Enumerable<UserOnTeamspaceCreateWithoutTeamspaceInput>, Enumerable<UserOnTeamspaceUncheckedCreateWithoutTeamspaceInput>>
+    connectOrCreate?: Enumerable<UserOnTeamspaceCreateOrConnectWithoutTeamspaceInput>
+    upsert?: Enumerable<UserOnTeamspaceUpsertWithWhereUniqueWithoutTeamspaceInput>
+    createMany?: UserOnTeamspaceCreateManyTeamspaceInputEnvelope
+    set?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    disconnect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    delete?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    connect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    update?: Enumerable<UserOnTeamspaceUpdateWithWhereUniqueWithoutTeamspaceInput>
+    updateMany?: Enumerable<UserOnTeamspaceUpdateManyWithWhereWithoutTeamspaceInput>
+    deleteMany?: Enumerable<UserOnTeamspaceScalarWhereInput>
+  }
+
+  export type NotebookUpdateManyWithoutTeamspaceNestedInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutTeamspaceInput>, Enumerable<NotebookUncheckedCreateWithoutTeamspaceInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutTeamspaceInput>
+    upsert?: Enumerable<NotebookUpsertWithWhereUniqueWithoutTeamspaceInput>
+    createMany?: NotebookCreateManyTeamspaceInputEnvelope
+    set?: Enumerable<NotebookWhereUniqueInput>
+    disconnect?: Enumerable<NotebookWhereUniqueInput>
+    delete?: Enumerable<NotebookWhereUniqueInput>
+    connect?: Enumerable<NotebookWhereUniqueInput>
+    update?: Enumerable<NotebookUpdateWithWhereUniqueWithoutTeamspaceInput>
+    updateMany?: Enumerable<NotebookUpdateManyWithWhereWithoutTeamspaceInput>
+    deleteMany?: Enumerable<NotebookScalarWhereInput>
+  }
+
+  export type UserOnTeamspaceUncheckedUpdateManyWithoutTeamspaceNestedInput = {
+    create?: XOR<Enumerable<UserOnTeamspaceCreateWithoutTeamspaceInput>, Enumerable<UserOnTeamspaceUncheckedCreateWithoutTeamspaceInput>>
+    connectOrCreate?: Enumerable<UserOnTeamspaceCreateOrConnectWithoutTeamspaceInput>
+    upsert?: Enumerable<UserOnTeamspaceUpsertWithWhereUniqueWithoutTeamspaceInput>
+    createMany?: UserOnTeamspaceCreateManyTeamspaceInputEnvelope
+    set?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    disconnect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    delete?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    connect?: Enumerable<UserOnTeamspaceWhereUniqueInput>
+    update?: Enumerable<UserOnTeamspaceUpdateWithWhereUniqueWithoutTeamspaceInput>
+    updateMany?: Enumerable<UserOnTeamspaceUpdateManyWithWhereWithoutTeamspaceInput>
+    deleteMany?: Enumerable<UserOnTeamspaceScalarWhereInput>
+  }
+
+  export type NotebookUncheckedUpdateManyWithoutTeamspaceNestedInput = {
+    create?: XOR<Enumerable<NotebookCreateWithoutTeamspaceInput>, Enumerable<NotebookUncheckedCreateWithoutTeamspaceInput>>
+    connectOrCreate?: Enumerable<NotebookCreateOrConnectWithoutTeamspaceInput>
+    upsert?: Enumerable<NotebookUpsertWithWhereUniqueWithoutTeamspaceInput>
+    createMany?: NotebookCreateManyTeamspaceInputEnvelope
+    set?: Enumerable<NotebookWhereUniqueInput>
+    disconnect?: Enumerable<NotebookWhereUniqueInput>
+    delete?: Enumerable<NotebookWhereUniqueInput>
+    connect?: Enumerable<NotebookWhereUniqueInput>
+    update?: Enumerable<NotebookUpdateWithWhereUniqueWithoutTeamspaceInput>
+    updateMany?: Enumerable<NotebookUpdateManyWithWhereWithoutTeamspaceInput>
+    deleteMany?: Enumerable<NotebookScalarWhereInput>
   }
 
   export type PageCreateNestedManyWithoutNotebookInput = {
@@ -11467,6 +18266,18 @@ export namespace Prisma {
     create?: XOR<WorkspaceCreateWithoutNotebooksInput, WorkspaceUncheckedCreateWithoutNotebooksInput>
     connectOrCreate?: WorkspaceCreateOrConnectWithoutNotebooksInput
     connect?: WorkspaceWhereUniqueInput
+  }
+
+  export type TeamspaceCreateNestedOneWithoutNotebooksInput = {
+    create?: XOR<TeamspaceCreateWithoutNotebooksInput, TeamspaceUncheckedCreateWithoutNotebooksInput>
+    connectOrCreate?: TeamspaceCreateOrConnectWithoutNotebooksInput
+    connect?: TeamspaceWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutNotebooksInput = {
+    create?: XOR<UserCreateWithoutNotebooksInput, UserUncheckedCreateWithoutNotebooksInput>
+    connectOrCreate?: UserCreateOrConnectWithoutNotebooksInput
+    connect?: UserWhereUniqueInput
   }
 
   export type PageUncheckedCreateNestedManyWithoutNotebookInput = {
@@ -11499,7 +18310,25 @@ export namespace Prisma {
     connectOrCreate?: WorkspaceCreateOrConnectWithoutNotebooksInput
     upsert?: WorkspaceUpsertWithoutNotebooksInput
     connect?: WorkspaceWhereUniqueInput
-    update?: XOR<WorkspaceUpdateWithoutNotebooksInput, WorkspaceUncheckedUpdateWithoutNotebooksInput>
+    update?: XOR<XOR<WorkspaceUpdateToOneWithWhereWithoutNotebooksInput, WorkspaceUpdateWithoutNotebooksInput>, WorkspaceUncheckedUpdateWithoutNotebooksInput>
+  }
+
+  export type TeamspaceUpdateOneWithoutNotebooksNestedInput = {
+    create?: XOR<TeamspaceCreateWithoutNotebooksInput, TeamspaceUncheckedCreateWithoutNotebooksInput>
+    connectOrCreate?: TeamspaceCreateOrConnectWithoutNotebooksInput
+    upsert?: TeamspaceUpsertWithoutNotebooksInput
+    disconnect?: TeamspaceWhereInput | boolean
+    delete?: TeamspaceWhereInput | boolean
+    connect?: TeamspaceWhereUniqueInput
+    update?: XOR<XOR<TeamspaceUpdateToOneWithWhereWithoutNotebooksInput, TeamspaceUpdateWithoutNotebooksInput>, TeamspaceUncheckedUpdateWithoutNotebooksInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutNotebooksNestedInput = {
+    create?: XOR<UserCreateWithoutNotebooksInput, UserUncheckedCreateWithoutNotebooksInput>
+    connectOrCreate?: UserCreateOrConnectWithoutNotebooksInput
+    upsert?: UserUpsertWithoutNotebooksInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutNotebooksInput, UserUpdateWithoutNotebooksInput>, UserUncheckedUpdateWithoutNotebooksInput>
   }
 
   export type PageUncheckedUpdateManyWithoutNotebookNestedInput = {
@@ -11516,42 +18345,42 @@ export namespace Prisma {
     deleteMany?: Enumerable<PageScalarWhereInput>
   }
 
-  export type UserCreateNestedOneWithoutPagesUserUpdatedInput = {
-    create?: XOR<UserCreateWithoutPagesUserUpdatedInput, UserUncheckedCreateWithoutPagesUserUpdatedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutPagesUserUpdatedInput
-    connect?: UserWhereUniqueInput
-  }
-
-  export type UserCreateNestedOneWithoutPagesUserDeletedInput = {
-    create?: XOR<UserCreateWithoutPagesUserDeletedInput, UserUncheckedCreateWithoutPagesUserDeletedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutPagesUserDeletedInput
-    connect?: UserWhereUniqueInput
-  }
-
   export type NotebookCreateNestedOneWithoutPagesInput = {
     create?: XOR<NotebookCreateWithoutPagesInput, NotebookUncheckedCreateWithoutPagesInput>
     connectOrCreate?: NotebookCreateOrConnectWithoutPagesInput
     connect?: NotebookWhereUniqueInput
   }
 
-  export type UserUpdateOneWithoutPagesUserUpdatedNestedInput = {
-    create?: XOR<UserCreateWithoutPagesUserUpdatedInput, UserUncheckedCreateWithoutPagesUserUpdatedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutPagesUserUpdatedInput
-    upsert?: UserUpsertWithoutPagesUserUpdatedInput
-    disconnect?: boolean
-    delete?: boolean
+  export type UserCreateNestedOneWithoutPagesCreatedInput = {
+    create?: XOR<UserCreateWithoutPagesCreatedInput, UserUncheckedCreateWithoutPagesCreatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPagesCreatedInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUpdateWithoutPagesUserUpdatedInput, UserUncheckedUpdateWithoutPagesUserUpdatedInput>
   }
 
-  export type UserUpdateOneWithoutPagesUserDeletedNestedInput = {
-    create?: XOR<UserCreateWithoutPagesUserDeletedInput, UserUncheckedCreateWithoutPagesUserDeletedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutPagesUserDeletedInput
-    upsert?: UserUpsertWithoutPagesUserDeletedInput
-    disconnect?: boolean
-    delete?: boolean
+  export type UserCreateNestedOneWithoutPagesDeletedInput = {
+    create?: XOR<UserCreateWithoutPagesDeletedInput, UserUncheckedCreateWithoutPagesDeletedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPagesDeletedInput
     connect?: UserWhereUniqueInput
-    update?: XOR<UserUpdateWithoutPagesUserDeletedInput, UserUncheckedUpdateWithoutPagesUserDeletedInput>
+  }
+
+  export type UserCreateNestedOneWithoutPagesUpdatedInput = {
+    create?: XOR<UserCreateWithoutPagesUpdatedInput, UserUncheckedCreateWithoutPagesUpdatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPagesUpdatedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type FavoriteCreateNestedManyWithoutPageInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutPageInput>, Enumerable<FavoriteUncheckedCreateWithoutPageInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutPageInput>
+    createMany?: FavoriteCreateManyPageInputEnvelope
+    connect?: Enumerable<FavoriteWhereUniqueInput>
+  }
+
+  export type FavoriteUncheckedCreateNestedManyWithoutPageInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutPageInput>, Enumerable<FavoriteUncheckedCreateWithoutPageInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutPageInput>
+    createMany?: FavoriteCreateManyPageInputEnvelope
+    connect?: Enumerable<FavoriteWhereUniqueInput>
   }
 
   export type NotebookUpdateOneRequiredWithoutPagesNestedInput = {
@@ -11559,203 +18388,407 @@ export namespace Prisma {
     connectOrCreate?: NotebookCreateOrConnectWithoutPagesInput
     upsert?: NotebookUpsertWithoutPagesInput
     connect?: NotebookWhereUniqueInput
-    update?: XOR<NotebookUpdateWithoutPagesInput, NotebookUncheckedUpdateWithoutPagesInput>
+    update?: XOR<XOR<NotebookUpdateToOneWithWhereWithoutPagesInput, NotebookUpdateWithoutPagesInput>, NotebookUncheckedUpdateWithoutPagesInput>
   }
 
-  export type NestedStringFilter = {
-    equals?: string
+  export type UserUpdateOneRequiredWithoutPagesCreatedNestedInput = {
+    create?: XOR<UserCreateWithoutPagesCreatedInput, UserUncheckedCreateWithoutPagesCreatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPagesCreatedInput
+    upsert?: UserUpsertWithoutPagesCreatedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPagesCreatedInput, UserUpdateWithoutPagesCreatedInput>, UserUncheckedUpdateWithoutPagesCreatedInput>
+  }
+
+  export type UserUpdateOneWithoutPagesDeletedNestedInput = {
+    create?: XOR<UserCreateWithoutPagesDeletedInput, UserUncheckedCreateWithoutPagesDeletedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPagesDeletedInput
+    upsert?: UserUpsertWithoutPagesDeletedInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPagesDeletedInput, UserUpdateWithoutPagesDeletedInput>, UserUncheckedUpdateWithoutPagesDeletedInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutPagesUpdatedNestedInput = {
+    create?: XOR<UserCreateWithoutPagesUpdatedInput, UserUncheckedCreateWithoutPagesUpdatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPagesUpdatedInput
+    upsert?: UserUpsertWithoutPagesUpdatedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPagesUpdatedInput, UserUpdateWithoutPagesUpdatedInput>, UserUncheckedUpdateWithoutPagesUpdatedInput>
+  }
+
+  export type FavoriteUpdateManyWithoutPageNestedInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutPageInput>, Enumerable<FavoriteUncheckedCreateWithoutPageInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutPageInput>
+    upsert?: Enumerable<FavoriteUpsertWithWhereUniqueWithoutPageInput>
+    createMany?: FavoriteCreateManyPageInputEnvelope
+    set?: Enumerable<FavoriteWhereUniqueInput>
+    disconnect?: Enumerable<FavoriteWhereUniqueInput>
+    delete?: Enumerable<FavoriteWhereUniqueInput>
+    connect?: Enumerable<FavoriteWhereUniqueInput>
+    update?: Enumerable<FavoriteUpdateWithWhereUniqueWithoutPageInput>
+    updateMany?: Enumerable<FavoriteUpdateManyWithWhereWithoutPageInput>
+    deleteMany?: Enumerable<FavoriteScalarWhereInput>
+  }
+
+  export type FavoriteUncheckedUpdateManyWithoutPageNestedInput = {
+    create?: XOR<Enumerable<FavoriteCreateWithoutPageInput>, Enumerable<FavoriteUncheckedCreateWithoutPageInput>>
+    connectOrCreate?: Enumerable<FavoriteCreateOrConnectWithoutPageInput>
+    upsert?: Enumerable<FavoriteUpsertWithWhereUniqueWithoutPageInput>
+    createMany?: FavoriteCreateManyPageInputEnvelope
+    set?: Enumerable<FavoriteWhereUniqueInput>
+    disconnect?: Enumerable<FavoriteWhereUniqueInput>
+    delete?: Enumerable<FavoriteWhereUniqueInput>
+    connect?: Enumerable<FavoriteWhereUniqueInput>
+    update?: Enumerable<FavoriteUpdateWithWhereUniqueWithoutPageInput>
+    updateMany?: Enumerable<FavoriteUpdateManyWithWhereWithoutPageInput>
+    deleteMany?: Enumerable<FavoriteScalarWhereInput>
+  }
+
+  export type UserCreateNestedOneWithoutFavoritesInput = {
+    create?: XOR<UserCreateWithoutFavoritesInput, UserUncheckedCreateWithoutFavoritesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFavoritesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type WorkspaceCreateNestedOneWithoutFavoritesInput = {
+    create?: XOR<WorkspaceCreateWithoutFavoritesInput, WorkspaceUncheckedCreateWithoutFavoritesInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutFavoritesInput
+    connect?: WorkspaceWhereUniqueInput
+  }
+
+  export type PageCreateNestedOneWithoutFavoritesInput = {
+    create?: XOR<PageCreateWithoutFavoritesInput, PageUncheckedCreateWithoutFavoritesInput>
+    connectOrCreate?: PageCreateOrConnectWithoutFavoritesInput
+    connect?: PageWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutFavoritesNestedInput = {
+    create?: XOR<UserCreateWithoutFavoritesInput, UserUncheckedCreateWithoutFavoritesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFavoritesInput
+    upsert?: UserUpsertWithoutFavoritesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFavoritesInput, UserUpdateWithoutFavoritesInput>, UserUncheckedUpdateWithoutFavoritesInput>
+  }
+
+  export type WorkspaceUpdateOneWithoutFavoritesNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutFavoritesInput, WorkspaceUncheckedCreateWithoutFavoritesInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutFavoritesInput
+    upsert?: WorkspaceUpsertWithoutFavoritesInput
+    disconnect?: WorkspaceWhereInput | boolean
+    delete?: WorkspaceWhereInput | boolean
+    connect?: WorkspaceWhereUniqueInput
+    update?: XOR<XOR<WorkspaceUpdateToOneWithWhereWithoutFavoritesInput, WorkspaceUpdateWithoutFavoritesInput>, WorkspaceUncheckedUpdateWithoutFavoritesInput>
+  }
+
+  export type PageUpdateOneWithoutFavoritesNestedInput = {
+    create?: XOR<PageCreateWithoutFavoritesInput, PageUncheckedCreateWithoutFavoritesInput>
+    connectOrCreate?: PageCreateOrConnectWithoutFavoritesInput
+    upsert?: PageUpsertWithoutFavoritesInput
+    disconnect?: PageWhereInput | boolean
+    delete?: PageWhereInput | boolean
+    connect?: PageWhereUniqueInput
+    update?: XOR<XOR<PageUpdateToOneWithWhereWithoutFavoritesInput, PageUpdateWithoutFavoritesInput>, PageUncheckedUpdateWithoutFavoritesInput>
+  }
+
+  export type UserCreateNestedOneWithoutUserOnWorkspaceInput = {
+    create?: XOR<UserCreateWithoutUserOnWorkspaceInput, UserUncheckedCreateWithoutUserOnWorkspaceInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUserOnWorkspaceInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type WorkspaceCreateNestedOneWithoutUserOnWorkspaceInput = {
+    create?: XOR<WorkspaceCreateWithoutUserOnWorkspaceInput, WorkspaceUncheckedCreateWithoutUserOnWorkspaceInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutUserOnWorkspaceInput
+    connect?: WorkspaceWhereUniqueInput
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type UserUpdateOneRequiredWithoutUserOnWorkspaceNestedInput = {
+    create?: XOR<UserCreateWithoutUserOnWorkspaceInput, UserUncheckedCreateWithoutUserOnWorkspaceInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUserOnWorkspaceInput
+    upsert?: UserUpsertWithoutUserOnWorkspaceInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUserOnWorkspaceInput, UserUpdateWithoutUserOnWorkspaceInput>, UserUncheckedUpdateWithoutUserOnWorkspaceInput>
+  }
+
+  export type WorkspaceUpdateOneRequiredWithoutUserOnWorkspaceNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutUserOnWorkspaceInput, WorkspaceUncheckedCreateWithoutUserOnWorkspaceInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutUserOnWorkspaceInput
+    upsert?: WorkspaceUpsertWithoutUserOnWorkspaceInput
+    connect?: WorkspaceWhereUniqueInput
+    update?: XOR<XOR<WorkspaceUpdateToOneWithWhereWithoutUserOnWorkspaceInput, WorkspaceUpdateWithoutUserOnWorkspaceInput>, WorkspaceUncheckedUpdateWithoutUserOnWorkspaceInput>
+  }
+
+  export type UserCreateNestedOneWithoutUserOnTeamspaceInput = {
+    create?: XOR<UserCreateWithoutUserOnTeamspaceInput, UserUncheckedCreateWithoutUserOnTeamspaceInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUserOnTeamspaceInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type TeamspaceCreateNestedOneWithoutUserOnTeamspaceInput = {
+    create?: XOR<TeamspaceCreateWithoutUserOnTeamspaceInput, TeamspaceUncheckedCreateWithoutUserOnTeamspaceInput>
+    connectOrCreate?: TeamspaceCreateOrConnectWithoutUserOnTeamspaceInput
+    connect?: TeamspaceWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutUserOnTeamspaceNestedInput = {
+    create?: XOR<UserCreateWithoutUserOnTeamspaceInput, UserUncheckedCreateWithoutUserOnTeamspaceInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUserOnTeamspaceInput
+    upsert?: UserUpsertWithoutUserOnTeamspaceInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUserOnTeamspaceInput, UserUpdateWithoutUserOnTeamspaceInput>, UserUncheckedUpdateWithoutUserOnTeamspaceInput>
+  }
+
+  export type TeamspaceUpdateOneRequiredWithoutUserOnTeamspaceNestedInput = {
+    create?: XOR<TeamspaceCreateWithoutUserOnTeamspaceInput, TeamspaceUncheckedCreateWithoutUserOnTeamspaceInput>
+    connectOrCreate?: TeamspaceCreateOrConnectWithoutUserOnTeamspaceInput
+    upsert?: TeamspaceUpsertWithoutUserOnTeamspaceInput
+    connect?: TeamspaceWhereUniqueInput
+    update?: XOR<XOR<TeamspaceUpdateToOneWithWhereWithoutUserOnTeamspaceInput, TeamspaceUpdateWithoutUserOnTeamspaceInput>, TeamspaceUncheckedUpdateWithoutUserOnTeamspaceInput>
+  }
+
+  export type NestedStringFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
     in?: Enumerable<string>
     notIn?: Enumerable<string>
-    lt?: string
-    lte?: string
-    gt?: string
-    gte?: string
-    contains?: string
-    startsWith?: string
-    endsWith?: string
-    not?: NestedStringFilter | string
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedStringNullableFilter = {
-    equals?: string | null
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: Enumerable<string> | null
     notIn?: Enumerable<string> | null
-    lt?: string
-    lte?: string
-    gt?: string
-    gte?: string
-    contains?: string
-    startsWith?: string
-    endsWith?: string
-    not?: NestedStringNullableFilter | string | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type NestedIntNullableFilter = {
-    equals?: number | null
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: Enumerable<number> | null
     notIn?: Enumerable<number> | null
-    lt?: number
-    lte?: number
-    gt?: number
-    gte?: number
-    not?: NestedIntNullableFilter | number | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedDateTimeFilter = {
-    equals?: Date | string
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Enumerable<Date> | Enumerable<string>
     notIn?: Enumerable<Date> | Enumerable<string>
-    lt?: Date | string
-    lte?: Date | string
-    gt?: Date | string
-    gte?: Date | string
-    not?: NestedDateTimeFilter | Date | string
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type NestedStringWithAggregatesFilter = {
-    equals?: string
+  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
     in?: Enumerable<string>
     notIn?: Enumerable<string>
-    lt?: string
-    lte?: string
-    gt?: string
-    gte?: string
-    contains?: string
-    startsWith?: string
-    endsWith?: string
-    not?: NestedStringWithAggregatesFilter | string
-    _count?: NestedIntFilter
-    _min?: NestedStringFilter
-    _max?: NestedStringFilter
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type NestedIntFilter = {
-    equals?: number
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
     in?: Enumerable<number>
     notIn?: Enumerable<number>
-    lt?: number
-    lte?: number
-    gt?: number
-    gte?: number
-    not?: NestedIntFilter | number
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
 
-  export type NestedStringNullableWithAggregatesFilter = {
-    equals?: string | null
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: Enumerable<string> | null
     notIn?: Enumerable<string> | null
-    lt?: string
-    lte?: string
-    gt?: string
-    gte?: string
-    contains?: string
-    startsWith?: string
-    endsWith?: string
-    not?: NestedStringNullableWithAggregatesFilter | string | null
-    _count?: NestedIntNullableFilter
-    _min?: NestedStringNullableFilter
-    _max?: NestedStringNullableFilter
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableWithAggregatesFilter = {
-    equals?: number | null
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: Enumerable<number> | null
     notIn?: Enumerable<number> | null
-    lt?: number
-    lte?: number
-    gt?: number
-    gte?: number
-    not?: NestedIntNullableWithAggregatesFilter | number | null
-    _count?: NestedIntNullableFilter
-    _avg?: NestedFloatNullableFilter
-    _sum?: NestedIntNullableFilter
-    _min?: NestedIntNullableFilter
-    _max?: NestedIntNullableFilter
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
-  export type NestedFloatNullableFilter = {
-    equals?: number | null
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: Enumerable<number> | null
     notIn?: Enumerable<number> | null
-    lt?: number
-    lte?: number
-    gt?: number
-    gte?: number
-    not?: NestedFloatNullableFilter | number | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedDateTimeWithAggregatesFilter = {
-    equals?: Date | string
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Enumerable<Date> | Enumerable<string>
     notIn?: Enumerable<Date> | Enumerable<string>
-    lt?: Date | string
-    lte?: Date | string
-    gt?: Date | string
-    gte?: Date | string
-    not?: NestedDateTimeWithAggregatesFilter | Date | string
-    _count?: NestedIntFilter
-    _min?: NestedDateTimeFilter
-    _max?: NestedDateTimeFilter
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type NestedDateTimeNullableFilter = {
-    equals?: Date | string | null
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Enumerable<Date> | Enumerable<string> | null
     notIn?: Enumerable<Date> | Enumerable<string> | null
-    lt?: Date | string
-    lte?: Date | string
-    gt?: Date | string
-    gte?: Date | string
-    not?: NestedDateTimeNullableFilter | Date | string | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
-  export type NestedDateTimeNullableWithAggregatesFilter = {
-    equals?: Date | string | null
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Enumerable<Date> | Enumerable<string> | null
     notIn?: Enumerable<Date> | Enumerable<string> | null
-    lt?: Date | string
-    lte?: Date | string
-    gt?: Date | string
-    gte?: Date | string
-    not?: NestedDateTimeNullableWithAggregatesFilter | Date | string | null
-    _count?: NestedIntNullableFilter
-    _min?: NestedDateTimeNullableFilter
-    _max?: NestedDateTimeNullableFilter
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type NestedBoolFilter = {
-    equals?: boolean
-    not?: NestedBoolFilter | boolean
+  export type NestedBoolNullableFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
   }
 
-  export type NestedBoolWithAggregatesFilter = {
-    equals?: boolean
-    not?: NestedBoolWithAggregatesFilter | boolean
-    _count?: NestedIntFilter
-    _min?: NestedBoolFilter
-    _max?: NestedBoolFilter
+  export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBoolNullableFilter<$PrismaModel>
+    _max?: NestedBoolNullableFilter<$PrismaModel>
   }
-  export type NestedJsonNullableFilter = 
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> = 
     | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase>, Exclude<keyof Required<NestedJsonNullableFilterBase>, 'path'>>,
-        Required<NestedJsonNullableFilterBase>
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
       >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase>, 'path'>>
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
 
-  export type NestedJsonNullableFilterBase = {
-    equals?: InputJsonValue | JsonNullValueFilter
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
     path?: string
-    string_contains?: string
-    string_starts_with?: string
-    string_ends_with?: string
-    array_contains?: InputJsonValue | null
-    array_starts_with?: InputJsonValue | null
-    array_ends_with?: InputJsonValue | null
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
     lt?: InputJsonValue
     lte?: InputJsonValue
     gt?: InputJsonValue
     gte?: InputJsonValue
-    not?: InputJsonValue | JsonNullValueFilter
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: Enumerable<number>
+    notIn?: Enumerable<number>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: Enumerable<number>
+    notIn?: Enumerable<number>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -11767,12 +18800,16 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
-    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
-    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput
+    favorites?: FavoriteCreateNestedManyWithoutUserInput
+    notebooks?: NotebookCreateNestedManyWithoutUserInput
+    PagesCreated?: PageCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageCreateNestedManyWithoutDeletedByUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -11786,10 +18823,14 @@ export namespace Prisma {
     stripeCustomerId?: string | null
     lastAccessWorkspaceId?: string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
-    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutUserInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutUserInput
+    PagesCreated?: PageUncheckedCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageUncheckedCreateNestedManyWithoutDeletedByUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -11800,6 +18841,12 @@ export namespace Prisma {
   export type UserUpsertWithoutAccountsInput = {
     update: XOR<UserUpdateWithoutAccountsInput, UserUncheckedUpdateWithoutAccountsInput>
     create: XOR<UserCreateWithoutAccountsInput, UserUncheckedCreateWithoutAccountsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutAccountsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutAccountsInput, UserUncheckedUpdateWithoutAccountsInput>
   }
 
   export type UserUpdateWithoutAccountsInput = {
@@ -11811,12 +18858,16 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
-    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
-    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUpdateManyWithoutDeletedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -11830,10 +18881,14 @@ export namespace Prisma {
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
-    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUncheckedUpdateManyWithoutDeletedByUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -11845,12 +18900,16 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
-    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
-    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput
+    favorites?: FavoriteCreateNestedManyWithoutUserInput
+    notebooks?: NotebookCreateNestedManyWithoutUserInput
+    PagesCreated?: PageCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageCreateNestedManyWithoutDeletedByUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -11864,10 +18923,14 @@ export namespace Prisma {
     stripeCustomerId?: string | null
     lastAccessWorkspaceId?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
-    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutUserInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutUserInput
+    PagesCreated?: PageUncheckedCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageUncheckedCreateNestedManyWithoutDeletedByUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -11878,6 +18941,12 @@ export namespace Prisma {
   export type UserUpsertWithoutSessionsInput = {
     update: XOR<UserUpdateWithoutSessionsInput, UserUncheckedUpdateWithoutSessionsInput>
     create: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSessionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSessionsInput, UserUncheckedUpdateWithoutSessionsInput>
   }
 
   export type UserUpdateWithoutSessionsInput = {
@@ -11889,12 +18958,16 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
-    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
-    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUpdateManyWithoutDeletedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -11908,10 +18981,14 @@ export namespace Prisma {
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
     lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
-    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUncheckedUpdateManyWithoutDeletedByUserNestedInput
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -11980,108 +19057,180 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type WorkspaceCreateWithoutUsersInput = {
+  export type UserOnWorkspaceCreateWithoutUserInput = {
     id?: string
-    name: string
-    domain: string
-    stripeCustomerId?: string | null
-    stripeWorkspaceId?: string | null
-    stripeSubscriptionId?: string | null
-    stripePriceId?: string | null
-    stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
+    role?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    trackUserAccessWorkspace?: UserCreateNestedOneWithoutLastAccessWorkspaceInput
-    notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutWorkspaceInput
+    workspace: WorkspaceCreateNestedOneWithoutUserOnWorkspaceInput
   }
 
-  export type WorkspaceUncheckedCreateWithoutUsersInput = {
+  export type UserOnWorkspaceUncheckedCreateWithoutUserInput = {
     id?: string
-    name: string
-    domain: string
-    stripeCustomerId?: string | null
-    stripeWorkspaceId?: string | null
-    stripeSubscriptionId?: string | null
-    stripePriceId?: string | null
-    stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
+    role?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    trackUserAccessWorkspace?: UserUncheckedCreateNestedOneWithoutLastAccessWorkspaceInput
-    notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutWorkspaceInput
+    workspaceId: string
   }
 
-  export type WorkspaceCreateOrConnectWithoutUsersInput = {
-    where: WorkspaceWhereUniqueInput
-    create: XOR<WorkspaceCreateWithoutUsersInput, WorkspaceUncheckedCreateWithoutUsersInput>
+  export type UserOnWorkspaceCreateOrConnectWithoutUserInput = {
+    where: UserOnWorkspaceWhereUniqueInput
+    create: XOR<UserOnWorkspaceCreateWithoutUserInput, UserOnWorkspaceUncheckedCreateWithoutUserInput>
   }
 
-  export type TrackingUserAccessCreateWithoutUserInput = {
-    id?: string
-    lastAccessNotebookId?: string | null
-    lastAccessPageId?: string | null
-    createdAt?: Date | string
-    workspace?: WorkspaceCreateNestedOneWithoutTrackingUserAccessInput
-  }
-
-  export type TrackingUserAccessUncheckedCreateWithoutUserInput = {
-    id?: string
-    lastAccessWorkspaceId?: string | null
-    lastAccessNotebookId?: string | null
-    lastAccessPageId?: string | null
-    createdAt?: Date | string
-  }
-
-  export type TrackingUserAccessCreateOrConnectWithoutUserInput = {
-    where: TrackingUserAccessWhereUniqueInput
-    create: XOR<TrackingUserAccessCreateWithoutUserInput, TrackingUserAccessUncheckedCreateWithoutUserInput>
-  }
-
-  export type TrackingUserAccessCreateManyUserInputEnvelope = {
-    data: Enumerable<TrackingUserAccessCreateManyUserInput>
+  export type UserOnWorkspaceCreateManyUserInputEnvelope = {
+    data: Enumerable<UserOnWorkspaceCreateManyUserInput>
     skipDuplicates?: boolean
   }
 
-  export type WorkspaceCreateWithoutTrackUserAccessWorkspaceInput = {
+  export type UserOnTeamspaceCreateWithoutUserInput = {
     id?: string
-    name: string
-    domain: string
-    stripeCustomerId?: string | null
-    stripeWorkspaceId?: string | null
-    stripeSubscriptionId?: string | null
-    stripePriceId?: string | null
-    stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    users?: UserCreateNestedManyWithoutWorkspacesInput
-    notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutWorkspaceInput
+    operation?: number
+    teamspace: TeamspaceCreateNestedOneWithoutUserOnTeamspaceInput
   }
 
-  export type WorkspaceUncheckedCreateWithoutTrackUserAccessWorkspaceInput = {
+  export type UserOnTeamspaceUncheckedCreateWithoutUserInput = {
     id?: string
-    name: string
-    domain: string
-    stripeCustomerId?: string | null
-    stripeWorkspaceId?: string | null
-    stripeSubscriptionId?: string | null
-    stripePriceId?: string | null
-    stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    users?: UserUncheckedCreateNestedManyWithoutWorkspacesInput
-    notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutWorkspaceInput
+    operation?: number
+    teamspaceId: string
   }
 
-  export type WorkspaceCreateOrConnectWithoutTrackUserAccessWorkspaceInput = {
-    where: WorkspaceWhereUniqueInput
-    create: XOR<WorkspaceCreateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackUserAccessWorkspaceInput>
+  export type UserOnTeamspaceCreateOrConnectWithoutUserInput = {
+    where: UserOnTeamspaceWhereUniqueInput
+    create: XOR<UserOnTeamspaceCreateWithoutUserInput, UserOnTeamspaceUncheckedCreateWithoutUserInput>
+  }
+
+  export type UserOnTeamspaceCreateManyUserInputEnvelope = {
+    data: Enumerable<UserOnTeamspaceCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
+  export type TrackingUserAccessOnWorkspaceCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    workspace: WorkspaceCreateNestedOneWithoutTrackingUserAccessOnWorkspaceInput
+  }
+
+  export type TrackingUserAccessOnWorkspaceUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    workspaceId: string
+  }
+
+  export type TrackingUserAccessOnWorkspaceCreateOrConnectWithoutUserInput = {
+    where: TrackingUserAccessOnWorkspaceWhereUniqueInput
+    create: XOR<TrackingUserAccessOnWorkspaceCreateWithoutUserInput, TrackingUserAccessOnWorkspaceUncheckedCreateWithoutUserInput>
+  }
+
+  export type TrackingUserAccessOnWorkspaceCreateManyUserInputEnvelope = {
+    data: Enumerable<TrackingUserAccessOnWorkspaceCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
+  export type FavoriteCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace?: WorkspaceCreateNestedOneWithoutFavoritesInput
+    page?: PageCreateNestedOneWithoutFavoritesInput
+  }
+
+  export type FavoriteUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspaceId: string
+    pageId: string
+  }
+
+  export type FavoriteCreateOrConnectWithoutUserInput = {
+    where: FavoriteWhereUniqueInput
+    create: XOR<FavoriteCreateWithoutUserInput, FavoriteUncheckedCreateWithoutUserInput>
+  }
+
+  export type FavoriteCreateManyUserInputEnvelope = {
+    data: Enumerable<FavoriteCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
+  export type NotebookCreateWithoutUserInput = {
+    id?: string
+    title: string
+    description?: string | null
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    pages?: PageCreateNestedManyWithoutNotebookInput
+    workspace: WorkspaceCreateNestedOneWithoutNotebooksInput
+    teamspace?: TeamspaceCreateNestedOneWithoutNotebooksInput
+  }
+
+  export type NotebookUncheckedCreateWithoutUserInput = {
+    id?: string
+    title: string
+    description?: string | null
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspaceId: string
+    teamspaceId?: string | null
+    pages?: PageUncheckedCreateNestedManyWithoutNotebookInput
+  }
+
+  export type NotebookCreateOrConnectWithoutUserInput = {
+    where: NotebookWhereUniqueInput
+    create: XOR<NotebookCreateWithoutUserInput, NotebookUncheckedCreateWithoutUserInput>
+  }
+
+  export type NotebookCreateManyUserInputEnvelope = {
+    data: Enumerable<NotebookCreateManyUserInput>
+    skipDuplicates?: boolean
+  }
+
+  export type PageCreateWithoutCreatedByUserInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    notebook: NotebookCreateNestedOneWithoutPagesInput
+    deletedByUser?: UserCreateNestedOneWithoutPagesDeletedInput
+    updatedByUser: UserCreateNestedOneWithoutPagesUpdatedInput
+    favorites?: FavoriteCreateNestedManyWithoutPageInput
+  }
+
+  export type PageUncheckedCreateWithoutCreatedByUserInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    notebookId: string
+    deletedBy?: string | null
+    updatedBy: string
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutPageInput
+  }
+
+  export type PageCreateOrConnectWithoutCreatedByUserInput = {
+    where: PageWhereUniqueInput
+    create: XOR<PageCreateWithoutCreatedByUserInput, PageUncheckedCreateWithoutCreatedByUserInput>
+  }
+
+  export type PageCreateManyCreatedByUserInputEnvelope = {
+    data: Enumerable<PageCreateManyCreatedByUserInput>
+    skipDuplicates?: boolean
   }
 
   export type PageCreateWithoutUpdatedByUserInput = {
@@ -12092,8 +19241,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    deletedByUser?: UserCreateNestedOneWithoutPagesUserDeletedInput
     notebook: NotebookCreateNestedOneWithoutPagesInput
+    createdByUser: UserCreateNestedOneWithoutPagesCreatedInput
+    deletedByUser?: UserCreateNestedOneWithoutPagesDeletedInput
+    favorites?: FavoriteCreateNestedManyWithoutPageInput
   }
 
   export type PageUncheckedCreateWithoutUpdatedByUserInput = {
@@ -12103,14 +19254,21 @@ export namespace Prisma {
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    deletedBy?: string | null
     deletedAt?: Date | string | null
     notebookId: string
+    createdBy: string
+    deletedBy?: string | null
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutPageInput
   }
 
   export type PageCreateOrConnectWithoutUpdatedByUserInput = {
     where: PageWhereUniqueInput
     create: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
+  }
+
+  export type PageCreateManyUpdatedByUserInputEnvelope = {
+    data: Enumerable<PageCreateManyUpdatedByUserInput>
+    skipDuplicates?: boolean
   }
 
   export type PageCreateWithoutDeletedByUserInput = {
@@ -12121,8 +19279,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    updatedByUser?: UserCreateNestedOneWithoutPagesUserUpdatedInput
     notebook: NotebookCreateNestedOneWithoutPagesInput
+    createdByUser: UserCreateNestedOneWithoutPagesCreatedInput
+    updatedByUser: UserCreateNestedOneWithoutPagesUpdatedInput
+    favorites?: FavoriteCreateNestedManyWithoutPageInput
   }
 
   export type PageUncheckedCreateWithoutDeletedByUserInput = {
@@ -12131,15 +19291,22 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: boolean
     createdAt?: Date | string
-    updatedBy?: string | null
     updatedAt?: Date | string
     deletedAt?: Date | string | null
     notebookId: string
+    createdBy: string
+    updatedBy: string
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutPageInput
   }
 
   export type PageCreateOrConnectWithoutDeletedByUserInput = {
     where: PageWhereUniqueInput
     create: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
+  }
+
+  export type PageCreateManyDeletedByUserInputEnvelope = {
+    data: Enumerable<PageCreateManyDeletedByUserInput>
+    skipDuplicates?: boolean
   }
 
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
@@ -12155,27 +19322,27 @@ export namespace Prisma {
 
   export type AccountUpdateManyWithWhereWithoutUserInput = {
     where: AccountScalarWhereInput
-    data: XOR<AccountUpdateManyMutationInput, AccountUncheckedUpdateManyWithoutAccountsInput>
+    data: XOR<AccountUpdateManyMutationInput, AccountUncheckedUpdateManyWithoutUserInput>
   }
 
   export type AccountScalarWhereInput = {
     AND?: Enumerable<AccountScalarWhereInput>
     OR?: Enumerable<AccountScalarWhereInput>
     NOT?: Enumerable<AccountScalarWhereInput>
-    id?: StringFilter | string
-    userId?: StringFilter | string
-    type?: StringFilter | string
-    provider?: StringFilter | string
-    providerAccountId?: StringFilter | string
-    refresh_token?: StringNullableFilter | string | null
-    access_token?: StringNullableFilter | string | null
-    expires_at?: IntNullableFilter | number | null
-    token_type?: StringNullableFilter | string | null
-    scope?: StringNullableFilter | string | null
-    id_token?: StringNullableFilter | string | null
-    session_state?: StringNullableFilter | string | null
-    createdAt?: DateTimeFilter | Date | string
-    updatedAt?: DateTimeFilter | Date | string
+    id?: StringFilter<"Account"> | string
+    type?: StringFilter<"Account"> | string
+    provider?: StringFilter<"Account"> | string
+    providerAccountId?: StringFilter<"Account"> | string
+    refresh_token?: StringNullableFilter<"Account"> | string | null
+    access_token?: StringNullableFilter<"Account"> | string | null
+    expires_at?: IntNullableFilter<"Account"> | number | null
+    token_type?: StringNullableFilter<"Account"> | string | null
+    scope?: StringNullableFilter<"Account"> | string | null
+    id_token?: StringNullableFilter<"Account"> | string | null
+    session_state?: StringNullableFilter<"Account"> | string | null
+    createdAt?: DateTimeFilter<"Account"> | Date | string
+    updatedAt?: DateTimeFilter<"Account"> | Date | string
+    userId?: StringFilter<"Account"> | string
   }
 
   export type SessionUpsertWithWhereUniqueWithoutUserInput = {
@@ -12191,176 +19358,226 @@ export namespace Prisma {
 
   export type SessionUpdateManyWithWhereWithoutUserInput = {
     where: SessionScalarWhereInput
-    data: XOR<SessionUpdateManyMutationInput, SessionUncheckedUpdateManyWithoutSessionsInput>
+    data: XOR<SessionUpdateManyMutationInput, SessionUncheckedUpdateManyWithoutUserInput>
   }
 
   export type SessionScalarWhereInput = {
     AND?: Enumerable<SessionScalarWhereInput>
     OR?: Enumerable<SessionScalarWhereInput>
     NOT?: Enumerable<SessionScalarWhereInput>
-    id?: StringFilter | string
-    sessionToken?: StringFilter | string
-    accessToken?: StringNullableFilter | string | null
-    expires?: DateTimeFilter | Date | string
-    userId?: StringNullableFilter | string | null
+    id?: StringFilter<"Session"> | string
+    sessionToken?: StringFilter<"Session"> | string
+    accessToken?: StringNullableFilter<"Session"> | string | null
+    expires?: DateTimeFilter<"Session"> | Date | string
+    userId?: StringNullableFilter<"Session"> | string | null
   }
 
-  export type WorkspaceUpsertWithWhereUniqueWithoutUsersInput = {
-    where: WorkspaceWhereUniqueInput
-    update: XOR<WorkspaceUpdateWithoutUsersInput, WorkspaceUncheckedUpdateWithoutUsersInput>
-    create: XOR<WorkspaceCreateWithoutUsersInput, WorkspaceUncheckedCreateWithoutUsersInput>
+  export type UserOnWorkspaceUpsertWithWhereUniqueWithoutUserInput = {
+    where: UserOnWorkspaceWhereUniqueInput
+    update: XOR<UserOnWorkspaceUpdateWithoutUserInput, UserOnWorkspaceUncheckedUpdateWithoutUserInput>
+    create: XOR<UserOnWorkspaceCreateWithoutUserInput, UserOnWorkspaceUncheckedCreateWithoutUserInput>
   }
 
-  export type WorkspaceUpdateWithWhereUniqueWithoutUsersInput = {
-    where: WorkspaceWhereUniqueInput
-    data: XOR<WorkspaceUpdateWithoutUsersInput, WorkspaceUncheckedUpdateWithoutUsersInput>
+  export type UserOnWorkspaceUpdateWithWhereUniqueWithoutUserInput = {
+    where: UserOnWorkspaceWhereUniqueInput
+    data: XOR<UserOnWorkspaceUpdateWithoutUserInput, UserOnWorkspaceUncheckedUpdateWithoutUserInput>
   }
 
-  export type WorkspaceUpdateManyWithWhereWithoutUsersInput = {
-    where: WorkspaceScalarWhereInput
-    data: XOR<WorkspaceUpdateManyMutationInput, WorkspaceUncheckedUpdateManyWithoutWorkspacesInput>
+  export type UserOnWorkspaceUpdateManyWithWhereWithoutUserInput = {
+    where: UserOnWorkspaceScalarWhereInput
+    data: XOR<UserOnWorkspaceUpdateManyMutationInput, UserOnWorkspaceUncheckedUpdateManyWithoutUserInput>
   }
 
-  export type WorkspaceScalarWhereInput = {
-    AND?: Enumerable<WorkspaceScalarWhereInput>
-    OR?: Enumerable<WorkspaceScalarWhereInput>
-    NOT?: Enumerable<WorkspaceScalarWhereInput>
-    id?: StringFilter | string
-    name?: StringFilter | string
-    domain?: StringFilter | string
-    stripeCustomerId?: StringNullableFilter | string | null
-    stripeWorkspaceId?: StringNullableFilter | string | null
-    stripeSubscriptionId?: StringNullableFilter | string | null
-    stripePriceId?: StringNullableFilter | string | null
-    stripeCurrentPeriodEnd?: DateTimeNullableFilter | Date | string | null
-    createdBy?: StringFilter | string
-    createdAt?: DateTimeFilter | Date | string
-    updatedAt?: DateTimeFilter | Date | string
+  export type UserOnWorkspaceScalarWhereInput = {
+    AND?: Enumerable<UserOnWorkspaceScalarWhereInput>
+    OR?: Enumerable<UserOnWorkspaceScalarWhereInput>
+    NOT?: Enumerable<UserOnWorkspaceScalarWhereInput>
+    id?: StringFilter<"UserOnWorkspace"> | string
+    role?: IntFilter<"UserOnWorkspace"> | number
+    createdAt?: DateTimeFilter<"UserOnWorkspace"> | Date | string
+    updatedAt?: DateTimeFilter<"UserOnWorkspace"> | Date | string
+    userId?: StringFilter<"UserOnWorkspace"> | string
+    workspaceId?: StringFilter<"UserOnWorkspace"> | string
   }
 
-  export type TrackingUserAccessUpsertWithWhereUniqueWithoutUserInput = {
-    where: TrackingUserAccessWhereUniqueInput
-    update: XOR<TrackingUserAccessUpdateWithoutUserInput, TrackingUserAccessUncheckedUpdateWithoutUserInput>
-    create: XOR<TrackingUserAccessCreateWithoutUserInput, TrackingUserAccessUncheckedCreateWithoutUserInput>
+  export type UserOnTeamspaceUpsertWithWhereUniqueWithoutUserInput = {
+    where: UserOnTeamspaceWhereUniqueInput
+    update: XOR<UserOnTeamspaceUpdateWithoutUserInput, UserOnTeamspaceUncheckedUpdateWithoutUserInput>
+    create: XOR<UserOnTeamspaceCreateWithoutUserInput, UserOnTeamspaceUncheckedCreateWithoutUserInput>
   }
 
-  export type TrackingUserAccessUpdateWithWhereUniqueWithoutUserInput = {
-    where: TrackingUserAccessWhereUniqueInput
-    data: XOR<TrackingUserAccessUpdateWithoutUserInput, TrackingUserAccessUncheckedUpdateWithoutUserInput>
+  export type UserOnTeamspaceUpdateWithWhereUniqueWithoutUserInput = {
+    where: UserOnTeamspaceWhereUniqueInput
+    data: XOR<UserOnTeamspaceUpdateWithoutUserInput, UserOnTeamspaceUncheckedUpdateWithoutUserInput>
   }
 
-  export type TrackingUserAccessUpdateManyWithWhereWithoutUserInput = {
-    where: TrackingUserAccessScalarWhereInput
-    data: XOR<TrackingUserAccessUpdateManyMutationInput, TrackingUserAccessUncheckedUpdateManyWithoutTrackingUserAccessInput>
+  export type UserOnTeamspaceUpdateManyWithWhereWithoutUserInput = {
+    where: UserOnTeamspaceScalarWhereInput
+    data: XOR<UserOnTeamspaceUpdateManyMutationInput, UserOnTeamspaceUncheckedUpdateManyWithoutUserInput>
   }
 
-  export type TrackingUserAccessScalarWhereInput = {
-    AND?: Enumerable<TrackingUserAccessScalarWhereInput>
-    OR?: Enumerable<TrackingUserAccessScalarWhereInput>
-    NOT?: Enumerable<TrackingUserAccessScalarWhereInput>
-    id?: StringFilter | string
-    userId?: StringNullableFilter | string | null
-    lastAccessWorkspaceId?: StringNullableFilter | string | null
-    lastAccessNotebookId?: StringNullableFilter | string | null
-    lastAccessPageId?: StringNullableFilter | string | null
-    createdAt?: DateTimeFilter | Date | string
+  export type UserOnTeamspaceScalarWhereInput = {
+    AND?: Enumerable<UserOnTeamspaceScalarWhereInput>
+    OR?: Enumerable<UserOnTeamspaceScalarWhereInput>
+    NOT?: Enumerable<UserOnTeamspaceScalarWhereInput>
+    id?: StringFilter<"UserOnTeamspace"> | string
+    createdAt?: DateTimeFilter<"UserOnTeamspace"> | Date | string
+    updatedAt?: DateTimeFilter<"UserOnTeamspace"> | Date | string
+    operation?: IntFilter<"UserOnTeamspace"> | number
+    userId?: StringFilter<"UserOnTeamspace"> | string
+    teamspaceId?: StringFilter<"UserOnTeamspace"> | string
   }
 
-  export type WorkspaceUpsertWithoutTrackUserAccessWorkspaceInput = {
-    update: XOR<WorkspaceUpdateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedUpdateWithoutTrackUserAccessWorkspaceInput>
-    create: XOR<WorkspaceCreateWithoutTrackUserAccessWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackUserAccessWorkspaceInput>
+  export type TrackingUserAccessOnWorkspaceUpsertWithWhereUniqueWithoutUserInput = {
+    where: TrackingUserAccessOnWorkspaceWhereUniqueInput
+    update: XOR<TrackingUserAccessOnWorkspaceUpdateWithoutUserInput, TrackingUserAccessOnWorkspaceUncheckedUpdateWithoutUserInput>
+    create: XOR<TrackingUserAccessOnWorkspaceCreateWithoutUserInput, TrackingUserAccessOnWorkspaceUncheckedCreateWithoutUserInput>
   }
 
-  export type WorkspaceUpdateWithoutTrackUserAccessWorkspaceInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    domain?: StringFieldUpdateOperationsInput | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    users?: UserUpdateManyWithoutWorkspacesNestedInput
-    notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutWorkspaceNestedInput
+  export type TrackingUserAccessOnWorkspaceUpdateWithWhereUniqueWithoutUserInput = {
+    where: TrackingUserAccessOnWorkspaceWhereUniqueInput
+    data: XOR<TrackingUserAccessOnWorkspaceUpdateWithoutUserInput, TrackingUserAccessOnWorkspaceUncheckedUpdateWithoutUserInput>
   }
 
-  export type WorkspaceUncheckedUpdateWithoutTrackUserAccessWorkspaceInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    domain?: StringFieldUpdateOperationsInput | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    users?: UserUncheckedUpdateManyWithoutWorkspacesNestedInput
-    notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutWorkspaceNestedInput
+  export type TrackingUserAccessOnWorkspaceUpdateManyWithWhereWithoutUserInput = {
+    where: TrackingUserAccessOnWorkspaceScalarWhereInput
+    data: XOR<TrackingUserAccessOnWorkspaceUpdateManyMutationInput, TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserInput>
   }
 
-  export type PageUpsertWithoutUpdatedByUserInput = {
+  export type TrackingUserAccessOnWorkspaceScalarWhereInput = {
+    AND?: Enumerable<TrackingUserAccessOnWorkspaceScalarWhereInput>
+    OR?: Enumerable<TrackingUserAccessOnWorkspaceScalarWhereInput>
+    NOT?: Enumerable<TrackingUserAccessOnWorkspaceScalarWhereInput>
+    id?: StringFilter<"TrackingUserAccessOnWorkspace"> | string
+    createdAt?: DateTimeFilter<"TrackingUserAccessOnWorkspace"> | Date | string
+    lastAccessNotebookId?: StringNullableFilter<"TrackingUserAccessOnWorkspace"> | string | null
+    lastAccessPageId?: StringNullableFilter<"TrackingUserAccessOnWorkspace"> | string | null
+    userId?: StringFilter<"TrackingUserAccessOnWorkspace"> | string
+    workspaceId?: StringFilter<"TrackingUserAccessOnWorkspace"> | string
+  }
+
+  export type FavoriteUpsertWithWhereUniqueWithoutUserInput = {
+    where: FavoriteWhereUniqueInput
+    update: XOR<FavoriteUpdateWithoutUserInput, FavoriteUncheckedUpdateWithoutUserInput>
+    create: XOR<FavoriteCreateWithoutUserInput, FavoriteUncheckedCreateWithoutUserInput>
+  }
+
+  export type FavoriteUpdateWithWhereUniqueWithoutUserInput = {
+    where: FavoriteWhereUniqueInput
+    data: XOR<FavoriteUpdateWithoutUserInput, FavoriteUncheckedUpdateWithoutUserInput>
+  }
+
+  export type FavoriteUpdateManyWithWhereWithoutUserInput = {
+    where: FavoriteScalarWhereInput
+    data: XOR<FavoriteUpdateManyMutationInput, FavoriteUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type FavoriteScalarWhereInput = {
+    AND?: Enumerable<FavoriteScalarWhereInput>
+    OR?: Enumerable<FavoriteScalarWhereInput>
+    NOT?: Enumerable<FavoriteScalarWhereInput>
+    id?: StringFilter<"Favorite"> | string
+    createdAt?: DateTimeFilter<"Favorite"> | Date | string
+    updatedAt?: DateTimeFilter<"Favorite"> | Date | string
+    userId?: StringFilter<"Favorite"> | string
+    workspaceId?: StringFilter<"Favorite"> | string
+    pageId?: StringFilter<"Favorite"> | string
+  }
+
+  export type NotebookUpsertWithWhereUniqueWithoutUserInput = {
+    where: NotebookWhereUniqueInput
+    update: XOR<NotebookUpdateWithoutUserInput, NotebookUncheckedUpdateWithoutUserInput>
+    create: XOR<NotebookCreateWithoutUserInput, NotebookUncheckedCreateWithoutUserInput>
+  }
+
+  export type NotebookUpdateWithWhereUniqueWithoutUserInput = {
+    where: NotebookWhereUniqueInput
+    data: XOR<NotebookUpdateWithoutUserInput, NotebookUncheckedUpdateWithoutUserInput>
+  }
+
+  export type NotebookUpdateManyWithWhereWithoutUserInput = {
+    where: NotebookScalarWhereInput
+    data: XOR<NotebookUpdateManyMutationInput, NotebookUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type NotebookScalarWhereInput = {
+    AND?: Enumerable<NotebookScalarWhereInput>
+    OR?: Enumerable<NotebookScalarWhereInput>
+    NOT?: Enumerable<NotebookScalarWhereInput>
+    id?: StringFilter<"Notebook"> | string
+    title?: StringFilter<"Notebook"> | string
+    description?: StringNullableFilter<"Notebook"> | string | null
+    published?: BoolFilter<"Notebook"> | boolean
+    createdAt?: DateTimeFilter<"Notebook"> | Date | string
+    updatedAt?: DateTimeFilter<"Notebook"> | Date | string
+    workspaceId?: StringFilter<"Notebook"> | string
+    teamspaceId?: StringNullableFilter<"Notebook"> | string | null
+    createdBy?: StringFilter<"Notebook"> | string
+  }
+
+  export type PageUpsertWithWhereUniqueWithoutCreatedByUserInput = {
+    where: PageWhereUniqueInput
+    update: XOR<PageUpdateWithoutCreatedByUserInput, PageUncheckedUpdateWithoutCreatedByUserInput>
+    create: XOR<PageCreateWithoutCreatedByUserInput, PageUncheckedCreateWithoutCreatedByUserInput>
+  }
+
+  export type PageUpdateWithWhereUniqueWithoutCreatedByUserInput = {
+    where: PageWhereUniqueInput
+    data: XOR<PageUpdateWithoutCreatedByUserInput, PageUncheckedUpdateWithoutCreatedByUserInput>
+  }
+
+  export type PageUpdateManyWithWhereWithoutCreatedByUserInput = {
+    where: PageScalarWhereInput
+    data: XOR<PageUpdateManyMutationInput, PageUncheckedUpdateManyWithoutCreatedByUserInput>
+  }
+
+  export type PageScalarWhereInput = {
+    AND?: Enumerable<PageScalarWhereInput>
+    OR?: Enumerable<PageScalarWhereInput>
+    NOT?: Enumerable<PageScalarWhereInput>
+    id?: StringFilter<"Page"> | string
+    title?: StringFilter<"Page"> | string
+    content?: JsonNullableFilter<"Page">
+    published?: BoolFilter<"Page"> | boolean
+    createdAt?: DateTimeFilter<"Page"> | Date | string
+    updatedAt?: DateTimeFilter<"Page"> | Date | string
+    deletedAt?: DateTimeNullableFilter<"Page"> | Date | string | null
+    notebookId?: StringFilter<"Page"> | string
+    createdBy?: StringFilter<"Page"> | string
+    deletedBy?: StringNullableFilter<"Page"> | string | null
+    updatedBy?: StringFilter<"Page"> | string
+  }
+
+  export type PageUpsertWithWhereUniqueWithoutUpdatedByUserInput = {
+    where: PageWhereUniqueInput
     update: XOR<PageUpdateWithoutUpdatedByUserInput, PageUncheckedUpdateWithoutUpdatedByUserInput>
     create: XOR<PageCreateWithoutUpdatedByUserInput, PageUncheckedCreateWithoutUpdatedByUserInput>
   }
 
-  export type PageUpdateWithoutUpdatedByUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    content?: NullableJsonNullValueInput | InputJsonValue
-    published?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    deletedByUser?: UserUpdateOneWithoutPagesUserDeletedNestedInput
-    notebook?: NotebookUpdateOneRequiredWithoutPagesNestedInput
+  export type PageUpdateWithWhereUniqueWithoutUpdatedByUserInput = {
+    where: PageWhereUniqueInput
+    data: XOR<PageUpdateWithoutUpdatedByUserInput, PageUncheckedUpdateWithoutUpdatedByUserInput>
   }
 
-  export type PageUncheckedUpdateWithoutUpdatedByUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    content?: NullableJsonNullValueInput | InputJsonValue
-    published?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    notebookId?: StringFieldUpdateOperationsInput | string
+  export type PageUpdateManyWithWhereWithoutUpdatedByUserInput = {
+    where: PageScalarWhereInput
+    data: XOR<PageUpdateManyMutationInput, PageUncheckedUpdateManyWithoutUpdatedByUserInput>
   }
 
-  export type PageUpsertWithoutDeletedByUserInput = {
+  export type PageUpsertWithWhereUniqueWithoutDeletedByUserInput = {
+    where: PageWhereUniqueInput
     update: XOR<PageUpdateWithoutDeletedByUserInput, PageUncheckedUpdateWithoutDeletedByUserInput>
     create: XOR<PageCreateWithoutDeletedByUserInput, PageUncheckedCreateWithoutDeletedByUserInput>
   }
 
-  export type PageUpdateWithoutDeletedByUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    content?: NullableJsonNullValueInput | InputJsonValue
-    published?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    updatedByUser?: UserUpdateOneWithoutPagesUserUpdatedNestedInput
-    notebook?: NotebookUpdateOneRequiredWithoutPagesNestedInput
+  export type PageUpdateWithWhereUniqueWithoutDeletedByUserInput = {
+    where: PageWhereUniqueInput
+    data: XOR<PageUpdateWithoutDeletedByUserInput, PageUncheckedUpdateWithoutDeletedByUserInput>
   }
 
-  export type PageUncheckedUpdateWithoutDeletedByUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    content?: NullableJsonNullValueInput | InputJsonValue
-    published?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    notebookId?: StringFieldUpdateOperationsInput | string
+  export type PageUpdateManyWithWhereWithoutDeletedByUserInput = {
+    where: PageScalarWhereInput
+    data: XOR<PageUpdateManyMutationInput, PageUncheckedUpdateManyWithoutDeletedByUserInput>
   }
 
   export type UserCreateWithoutTrackingUserAccessInput = {
@@ -12372,12 +19589,16 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
-    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
-    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutUserInput
+    favorites?: FavoriteCreateNestedManyWithoutUserInput
+    notebooks?: NotebookCreateNestedManyWithoutUserInput
+    PagesCreated?: PageCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageCreateNestedManyWithoutDeletedByUserInput
   }
 
   export type UserUncheckedCreateWithoutTrackingUserAccessInput = {
@@ -12392,9 +19613,13 @@ export namespace Prisma {
     lastAccessWorkspaceId?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
-    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutUserInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutUserInput
+    PagesCreated?: PageUncheckedCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageUncheckedCreateNestedManyWithoutDeletedByUserInput
   }
 
   export type UserCreateOrConnectWithoutTrackingUserAccessInput = {
@@ -12402,7 +19627,7 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutTrackingUserAccessInput, UserUncheckedCreateWithoutTrackingUserAccessInput>
   }
 
-  export type WorkspaceCreateWithoutTrackingUserAccessInput = {
+  export type WorkspaceCreateWithoutTrackingUserAccessOnWorkspaceInput = {
     id?: string
     name: string
     domain: string
@@ -12411,15 +19636,16 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    trackUserAccessWorkspace?: UserCreateNestedOneWithoutLastAccessWorkspaceInput
-    users?: UserCreateNestedManyWithoutWorkspacesInput
+    createdBy: string
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutWorkspaceInput
+    teamspaces?: TeamspaceCreateNestedManyWithoutWorkspaceInput
     notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
+    favorites?: FavoriteCreateNestedManyWithoutWorkspaceInput
   }
 
-  export type WorkspaceUncheckedCreateWithoutTrackingUserAccessInput = {
+  export type WorkspaceUncheckedCreateWithoutTrackingUserAccessOnWorkspaceInput = {
     id?: string
     name: string
     domain: string
@@ -12428,22 +19654,29 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    trackUserAccessWorkspace?: UserUncheckedCreateNestedOneWithoutLastAccessWorkspaceInput
-    users?: UserUncheckedCreateNestedManyWithoutWorkspacesInput
+    createdBy: string
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput
+    teamspaces?: TeamspaceUncheckedCreateNestedManyWithoutWorkspaceInput
     notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
-  export type WorkspaceCreateOrConnectWithoutTrackingUserAccessInput = {
+  export type WorkspaceCreateOrConnectWithoutTrackingUserAccessOnWorkspaceInput = {
     where: WorkspaceWhereUniqueInput
-    create: XOR<WorkspaceCreateWithoutTrackingUserAccessInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessInput>
+    create: XOR<WorkspaceCreateWithoutTrackingUserAccessOnWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessOnWorkspaceInput>
   }
 
   export type UserUpsertWithoutTrackingUserAccessInput = {
     update: XOR<UserUpdateWithoutTrackingUserAccessInput, UserUncheckedUpdateWithoutTrackingUserAccessInput>
     create: XOR<UserCreateWithoutTrackingUserAccessInput, UserUncheckedCreateWithoutTrackingUserAccessInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutTrackingUserAccessInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutTrackingUserAccessInput, UserUncheckedUpdateWithoutTrackingUserAccessInput>
   }
 
   export type UserUpdateWithoutTrackingUserAccessInput = {
@@ -12455,12 +19688,16 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
-    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
-    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUpdateManyWithoutDeletedByUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTrackingUserAccessInput = {
@@ -12475,17 +19712,27 @@ export namespace Prisma {
     lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
-    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUncheckedUpdateManyWithoutDeletedByUserNestedInput
   }
 
-  export type WorkspaceUpsertWithoutTrackingUserAccessInput = {
-    update: XOR<WorkspaceUpdateWithoutTrackingUserAccessInput, WorkspaceUncheckedUpdateWithoutTrackingUserAccessInput>
-    create: XOR<WorkspaceCreateWithoutTrackingUserAccessInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessInput>
+  export type WorkspaceUpsertWithoutTrackingUserAccessOnWorkspaceInput = {
+    update: XOR<WorkspaceUpdateWithoutTrackingUserAccessOnWorkspaceInput, WorkspaceUncheckedUpdateWithoutTrackingUserAccessOnWorkspaceInput>
+    create: XOR<WorkspaceCreateWithoutTrackingUserAccessOnWorkspaceInput, WorkspaceUncheckedCreateWithoutTrackingUserAccessOnWorkspaceInput>
+    where?: WorkspaceWhereInput
   }
 
-  export type WorkspaceUpdateWithoutTrackingUserAccessInput = {
+  export type WorkspaceUpdateToOneWithWhereWithoutTrackingUserAccessOnWorkspaceInput = {
+    where?: WorkspaceWhereInput
+    data: XOR<WorkspaceUpdateWithoutTrackingUserAccessOnWorkspaceInput, WorkspaceUncheckedUpdateWithoutTrackingUserAccessOnWorkspaceInput>
+  }
+
+  export type WorkspaceUpdateWithoutTrackingUserAccessOnWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
@@ -12494,15 +19741,16 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    trackUserAccessWorkspace?: UserUpdateOneWithoutLastAccessWorkspaceNestedInput
-    users?: UserUpdateManyWithoutWorkspacesNestedInput
+    createdBy?: StringFieldUpdateOperationsInput | string
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutWorkspaceNestedInput
+    teamspaces?: TeamspaceUpdateManyWithoutWorkspaceNestedInput
     notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
+    favorites?: FavoriteUpdateManyWithoutWorkspaceNestedInput
   }
 
-  export type WorkspaceUncheckedUpdateWithoutTrackingUserAccessInput = {
+  export type WorkspaceUncheckedUpdateWithoutTrackingUserAccessOnWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
@@ -12511,109 +19759,119 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    trackUserAccessWorkspace?: UserUncheckedUpdateOneWithoutLastAccessWorkspaceNestedInput
-    users?: UserUncheckedUpdateManyWithoutWorkspacesNestedInput
+    createdBy?: StringFieldUpdateOperationsInput | string
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
+    teamspaces?: TeamspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
     notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
-  export type UserCreateWithoutLastAccessWorkspaceInput = {
+  export type TrackingUserAccessOnWorkspaceCreateWithoutWorkspaceInput = {
     id?: string
-    name?: string | null
-    email?: string | null
-    emailVerified?: Date | string | null
-    image?: string | null
+    createdAt?: Date | string
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    user: UserCreateNestedOneWithoutTrackingUserAccessInput
+  }
+
+  export type TrackingUserAccessOnWorkspaceUncheckedCreateWithoutWorkspaceInput = {
+    id?: string
+    createdAt?: Date | string
+    lastAccessNotebookId?: string | null
+    lastAccessPageId?: string | null
+    userId: string
+  }
+
+  export type TrackingUserAccessOnWorkspaceCreateOrConnectWithoutWorkspaceInput = {
+    where: TrackingUserAccessOnWorkspaceWhereUniqueInput
+    create: XOR<TrackingUserAccessOnWorkspaceCreateWithoutWorkspaceInput, TrackingUserAccessOnWorkspaceUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type UserOnWorkspaceCreateWithoutWorkspaceInput = {
+    id?: string
+    role?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    stripeCustomerId?: string | null
-    accounts?: AccountCreateNestedManyWithoutUserInput
-    sessions?: SessionCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
-    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
+    user: UserCreateNestedOneWithoutUserOnWorkspaceInput
   }
 
-  export type UserUncheckedCreateWithoutLastAccessWorkspaceInput = {
+  export type UserOnWorkspaceUncheckedCreateWithoutWorkspaceInput = {
     id?: string
-    name?: string | null
-    email?: string | null
-    emailVerified?: Date | string | null
-    image?: string | null
+    role?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    stripeCustomerId?: string | null
-    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
-    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
+    userId: string
   }
 
-  export type UserCreateOrConnectWithoutLastAccessWorkspaceInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
+  export type UserOnWorkspaceCreateOrConnectWithoutWorkspaceInput = {
+    where: UserOnWorkspaceWhereUniqueInput
+    create: XOR<UserOnWorkspaceCreateWithoutWorkspaceInput, UserOnWorkspaceUncheckedCreateWithoutWorkspaceInput>
   }
 
-  export type UserCreateWithoutWorkspacesInput = {
+  export type UserOnWorkspaceCreateManyWorkspaceInputEnvelope = {
+    data: Enumerable<UserOnWorkspaceCreateManyWorkspaceInput>
+    skipDuplicates?: boolean
+  }
+
+  export type TeamspaceCreateWithoutWorkspaceInput = {
     id?: string
-    name?: string | null
-    email?: string | null
-    emailVerified?: Date | string | null
-    image?: string | null
+    name: string
+    description?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    stripeCustomerId?: string | null
-    accounts?: AccountCreateNestedManyWithoutUserInput
-    sessions?: SessionCreateNestedManyWithoutUserInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
-    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
-    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
+    isOrigin?: boolean | null
+    archivedAt?: Date | string | null
+    createdBy: string
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutTeamspaceInput
+    notebooks?: NotebookCreateNestedManyWithoutTeamspaceInput
   }
 
-  export type UserUncheckedCreateWithoutWorkspacesInput = {
+  export type TeamspaceUncheckedCreateWithoutWorkspaceInput = {
     id?: string
-    name?: string | null
-    email?: string | null
-    emailVerified?: Date | string | null
-    image?: string | null
+    name: string
+    description?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    stripeCustomerId?: string | null
-    lastAccessWorkspaceId?: string | null
-    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
-    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
-    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
+    isOrigin?: boolean | null
+    archivedAt?: Date | string | null
+    createdBy: string
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutTeamspaceInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutTeamspaceInput
   }
 
-  export type UserCreateOrConnectWithoutWorkspacesInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutWorkspacesInput, UserUncheckedCreateWithoutWorkspacesInput>
+  export type TeamspaceCreateOrConnectWithoutWorkspaceInput = {
+    where: TeamspaceWhereUniqueInput
+    create: XOR<TeamspaceCreateWithoutWorkspaceInput, TeamspaceUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type TeamspaceCreateManyWorkspaceInputEnvelope = {
+    data: Enumerable<TeamspaceCreateManyWorkspaceInput>
+    skipDuplicates?: boolean
   }
 
   export type NotebookCreateWithoutWorkspaceInput = {
     id?: string
     title: string
-    description: string
+    description?: string | null
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     pages?: PageCreateNestedManyWithoutNotebookInput
+    teamspace?: TeamspaceCreateNestedOneWithoutNotebooksInput
+    user: UserCreateNestedOneWithoutNotebooksInput
   }
 
   export type NotebookUncheckedCreateWithoutWorkspaceInput = {
     id?: string
     title: string
-    description: string
+    description?: string | null
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    teamspaceId?: string | null
+    createdBy: string
     pages?: PageUncheckedCreateNestedManyWithoutNotebookInput
   }
 
@@ -12627,100 +19885,104 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type TrackingUserAccessCreateWithoutWorkspaceInput = {
+  export type FavoriteCreateWithoutWorkspaceInput = {
     id?: string
-    lastAccessNotebookId?: string | null
-    lastAccessPageId?: string | null
     createdAt?: Date | string
-    user?: UserCreateNestedOneWithoutTrackingUserAccessInput
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutFavoritesInput
+    page?: PageCreateNestedOneWithoutFavoritesInput
   }
 
-  export type TrackingUserAccessUncheckedCreateWithoutWorkspaceInput = {
+  export type FavoriteUncheckedCreateWithoutWorkspaceInput = {
     id?: string
-    userId?: string | null
-    lastAccessNotebookId?: string | null
-    lastAccessPageId?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    pageId: string
   }
 
-  export type TrackingUserAccessCreateOrConnectWithoutWorkspaceInput = {
-    where: TrackingUserAccessWhereUniqueInput
-    create: XOR<TrackingUserAccessCreateWithoutWorkspaceInput, TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>
+  export type FavoriteCreateOrConnectWithoutWorkspaceInput = {
+    where: FavoriteWhereUniqueInput
+    create: XOR<FavoriteCreateWithoutWorkspaceInput, FavoriteUncheckedCreateWithoutWorkspaceInput>
   }
 
-  export type TrackingUserAccessCreateManyWorkspaceInputEnvelope = {
-    data: Enumerable<TrackingUserAccessCreateManyWorkspaceInput>
+  export type FavoriteCreateManyWorkspaceInputEnvelope = {
+    data: Enumerable<FavoriteCreateManyWorkspaceInput>
     skipDuplicates?: boolean
   }
 
-  export type UserUpsertWithoutLastAccessWorkspaceInput = {
-    update: XOR<UserUpdateWithoutLastAccessWorkspaceInput, UserUncheckedUpdateWithoutLastAccessWorkspaceInput>
-    create: XOR<UserCreateWithoutLastAccessWorkspaceInput, UserUncheckedCreateWithoutLastAccessWorkspaceInput>
+  export type TrackingUserAccessOnWorkspaceUpsertWithoutWorkspaceInput = {
+    update: XOR<TrackingUserAccessOnWorkspaceUpdateWithoutWorkspaceInput, TrackingUserAccessOnWorkspaceUncheckedUpdateWithoutWorkspaceInput>
+    create: XOR<TrackingUserAccessOnWorkspaceCreateWithoutWorkspaceInput, TrackingUserAccessOnWorkspaceUncheckedCreateWithoutWorkspaceInput>
+    where?: TrackingUserAccessOnWorkspaceWhereInput
   }
 
-  export type UserUpdateWithoutLastAccessWorkspaceInput = {
+  export type TrackingUserAccessOnWorkspaceUpdateToOneWithWhereWithoutWorkspaceInput = {
+    where?: TrackingUserAccessOnWorkspaceWhereInput
+    data: XOR<TrackingUserAccessOnWorkspaceUpdateWithoutWorkspaceInput, TrackingUserAccessOnWorkspaceUncheckedUpdateWithoutWorkspaceInput>
+  }
+
+  export type TrackingUserAccessOnWorkspaceUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    accounts?: AccountUpdateManyWithoutUserNestedInput
-    sessions?: SessionUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
-    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutTrackingUserAccessNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutLastAccessWorkspaceInput = {
+  export type TrackingUserAccessOnWorkspaceUncheckedUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
-    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type UserUpsertWithWhereUniqueWithoutWorkspacesInput = {
-    where: UserWhereUniqueInput
-    update: XOR<UserUpdateWithoutWorkspacesInput, UserUncheckedUpdateWithoutWorkspacesInput>
-    create: XOR<UserCreateWithoutWorkspacesInput, UserUncheckedCreateWithoutWorkspacesInput>
+  export type UserOnWorkspaceUpsertWithWhereUniqueWithoutWorkspaceInput = {
+    where: UserOnWorkspaceWhereUniqueInput
+    update: XOR<UserOnWorkspaceUpdateWithoutWorkspaceInput, UserOnWorkspaceUncheckedUpdateWithoutWorkspaceInput>
+    create: XOR<UserOnWorkspaceCreateWithoutWorkspaceInput, UserOnWorkspaceUncheckedCreateWithoutWorkspaceInput>
   }
 
-  export type UserUpdateWithWhereUniqueWithoutWorkspacesInput = {
-    where: UserWhereUniqueInput
-    data: XOR<UserUpdateWithoutWorkspacesInput, UserUncheckedUpdateWithoutWorkspacesInput>
+  export type UserOnWorkspaceUpdateWithWhereUniqueWithoutWorkspaceInput = {
+    where: UserOnWorkspaceWhereUniqueInput
+    data: XOR<UserOnWorkspaceUpdateWithoutWorkspaceInput, UserOnWorkspaceUncheckedUpdateWithoutWorkspaceInput>
   }
 
-  export type UserUpdateManyWithWhereWithoutWorkspacesInput = {
-    where: UserScalarWhereInput
-    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutUsersInput>
+  export type UserOnWorkspaceUpdateManyWithWhereWithoutWorkspaceInput = {
+    where: UserOnWorkspaceScalarWhereInput
+    data: XOR<UserOnWorkspaceUpdateManyMutationInput, UserOnWorkspaceUncheckedUpdateManyWithoutWorkspaceInput>
   }
 
-  export type UserScalarWhereInput = {
-    AND?: Enumerable<UserScalarWhereInput>
-    OR?: Enumerable<UserScalarWhereInput>
-    NOT?: Enumerable<UserScalarWhereInput>
-    id?: StringFilter | string
-    name?: StringNullableFilter | string | null
-    email?: StringNullableFilter | string | null
-    emailVerified?: DateTimeNullableFilter | Date | string | null
-    image?: StringNullableFilter | string | null
-    createdAt?: DateTimeFilter | Date | string
-    updatedAt?: DateTimeFilter | Date | string
-    stripeCustomerId?: StringNullableFilter | string | null
-    lastAccessWorkspaceId?: StringNullableFilter | string | null
+  export type TeamspaceUpsertWithWhereUniqueWithoutWorkspaceInput = {
+    where: TeamspaceWhereUniqueInput
+    update: XOR<TeamspaceUpdateWithoutWorkspaceInput, TeamspaceUncheckedUpdateWithoutWorkspaceInput>
+    create: XOR<TeamspaceCreateWithoutWorkspaceInput, TeamspaceUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type TeamspaceUpdateWithWhereUniqueWithoutWorkspaceInput = {
+    where: TeamspaceWhereUniqueInput
+    data: XOR<TeamspaceUpdateWithoutWorkspaceInput, TeamspaceUncheckedUpdateWithoutWorkspaceInput>
+  }
+
+  export type TeamspaceUpdateManyWithWhereWithoutWorkspaceInput = {
+    where: TeamspaceScalarWhereInput
+    data: XOR<TeamspaceUpdateManyMutationInput, TeamspaceUncheckedUpdateManyWithoutWorkspaceInput>
+  }
+
+  export type TeamspaceScalarWhereInput = {
+    AND?: Enumerable<TeamspaceScalarWhereInput>
+    OR?: Enumerable<TeamspaceScalarWhereInput>
+    NOT?: Enumerable<TeamspaceScalarWhereInput>
+    id?: StringFilter<"Teamspace"> | string
+    name?: StringFilter<"Teamspace"> | string
+    description?: StringNullableFilter<"Teamspace"> | string | null
+    createdAt?: DateTimeFilter<"Teamspace"> | Date | string
+    updatedAt?: DateTimeFilter<"Teamspace"> | Date | string
+    isOrigin?: BoolNullableFilter<"Teamspace"> | boolean | null
+    archivedAt?: DateTimeNullableFilter<"Teamspace"> | Date | string | null
+    workspaceId?: StringNullableFilter<"Teamspace"> | string | null
+    createdBy?: StringFilter<"Teamspace"> | string
   }
 
   export type NotebookUpsertWithWhereUniqueWithoutWorkspaceInput = {
@@ -12736,36 +19998,203 @@ export namespace Prisma {
 
   export type NotebookUpdateManyWithWhereWithoutWorkspaceInput = {
     where: NotebookScalarWhereInput
-    data: XOR<NotebookUpdateManyMutationInput, NotebookUncheckedUpdateManyWithoutNotebooksInput>
+    data: XOR<NotebookUpdateManyMutationInput, NotebookUncheckedUpdateManyWithoutWorkspaceInput>
   }
 
-  export type NotebookScalarWhereInput = {
-    AND?: Enumerable<NotebookScalarWhereInput>
-    OR?: Enumerable<NotebookScalarWhereInput>
-    NOT?: Enumerable<NotebookScalarWhereInput>
-    id?: StringFilter | string
-    title?: StringFilter | string
-    description?: StringFilter | string
-    published?: BoolFilter | boolean
-    createdAt?: DateTimeFilter | Date | string
-    updatedAt?: DateTimeFilter | Date | string
-    workspaceId?: StringFilter | string
+  export type FavoriteUpsertWithWhereUniqueWithoutWorkspaceInput = {
+    where: FavoriteWhereUniqueInput
+    update: XOR<FavoriteUpdateWithoutWorkspaceInput, FavoriteUncheckedUpdateWithoutWorkspaceInput>
+    create: XOR<FavoriteCreateWithoutWorkspaceInput, FavoriteUncheckedCreateWithoutWorkspaceInput>
   }
 
-  export type TrackingUserAccessUpsertWithWhereUniqueWithoutWorkspaceInput = {
-    where: TrackingUserAccessWhereUniqueInput
-    update: XOR<TrackingUserAccessUpdateWithoutWorkspaceInput, TrackingUserAccessUncheckedUpdateWithoutWorkspaceInput>
-    create: XOR<TrackingUserAccessCreateWithoutWorkspaceInput, TrackingUserAccessUncheckedCreateWithoutWorkspaceInput>
+  export type FavoriteUpdateWithWhereUniqueWithoutWorkspaceInput = {
+    where: FavoriteWhereUniqueInput
+    data: XOR<FavoriteUpdateWithoutWorkspaceInput, FavoriteUncheckedUpdateWithoutWorkspaceInput>
   }
 
-  export type TrackingUserAccessUpdateWithWhereUniqueWithoutWorkspaceInput = {
-    where: TrackingUserAccessWhereUniqueInput
-    data: XOR<TrackingUserAccessUpdateWithoutWorkspaceInput, TrackingUserAccessUncheckedUpdateWithoutWorkspaceInput>
+  export type FavoriteUpdateManyWithWhereWithoutWorkspaceInput = {
+    where: FavoriteScalarWhereInput
+    data: XOR<FavoriteUpdateManyMutationInput, FavoriteUncheckedUpdateManyWithoutWorkspaceInput>
   }
 
-  export type TrackingUserAccessUpdateManyWithWhereWithoutWorkspaceInput = {
-    where: TrackingUserAccessScalarWhereInput
-    data: XOR<TrackingUserAccessUpdateManyMutationInput, TrackingUserAccessUncheckedUpdateManyWithoutTrackingUserAccessInput>
+  export type WorkspaceCreateWithoutTeamspacesInput = {
+    id?: string
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceCreateNestedOneWithoutWorkspaceInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutWorkspaceInput
+    notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
+    favorites?: FavoriteCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceUncheckedCreateWithoutTeamspacesInput = {
+    id?: string
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedOneWithoutWorkspaceInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceCreateOrConnectWithoutTeamspacesInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutTeamspacesInput, WorkspaceUncheckedCreateWithoutTeamspacesInput>
+  }
+
+  export type UserOnTeamspaceCreateWithoutTeamspaceInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    operation?: number
+    user: UserCreateNestedOneWithoutUserOnTeamspaceInput
+  }
+
+  export type UserOnTeamspaceUncheckedCreateWithoutTeamspaceInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    operation?: number
+    userId: string
+  }
+
+  export type UserOnTeamspaceCreateOrConnectWithoutTeamspaceInput = {
+    where: UserOnTeamspaceWhereUniqueInput
+    create: XOR<UserOnTeamspaceCreateWithoutTeamspaceInput, UserOnTeamspaceUncheckedCreateWithoutTeamspaceInput>
+  }
+
+  export type UserOnTeamspaceCreateManyTeamspaceInputEnvelope = {
+    data: Enumerable<UserOnTeamspaceCreateManyTeamspaceInput>
+    skipDuplicates?: boolean
+  }
+
+  export type NotebookCreateWithoutTeamspaceInput = {
+    id?: string
+    title: string
+    description?: string | null
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    pages?: PageCreateNestedManyWithoutNotebookInput
+    workspace: WorkspaceCreateNestedOneWithoutNotebooksInput
+    user: UserCreateNestedOneWithoutNotebooksInput
+  }
+
+  export type NotebookUncheckedCreateWithoutTeamspaceInput = {
+    id?: string
+    title: string
+    description?: string | null
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspaceId: string
+    createdBy: string
+    pages?: PageUncheckedCreateNestedManyWithoutNotebookInput
+  }
+
+  export type NotebookCreateOrConnectWithoutTeamspaceInput = {
+    where: NotebookWhereUniqueInput
+    create: XOR<NotebookCreateWithoutTeamspaceInput, NotebookUncheckedCreateWithoutTeamspaceInput>
+  }
+
+  export type NotebookCreateManyTeamspaceInputEnvelope = {
+    data: Enumerable<NotebookCreateManyTeamspaceInput>
+    skipDuplicates?: boolean
+  }
+
+  export type WorkspaceUpsertWithoutTeamspacesInput = {
+    update: XOR<WorkspaceUpdateWithoutTeamspacesInput, WorkspaceUncheckedUpdateWithoutTeamspacesInput>
+    create: XOR<WorkspaceCreateWithoutTeamspacesInput, WorkspaceUncheckedCreateWithoutTeamspacesInput>
+    where?: WorkspaceWhereInput
+  }
+
+  export type WorkspaceUpdateToOneWithWhereWithoutTeamspacesInput = {
+    where?: WorkspaceWhereInput
+    data: XOR<WorkspaceUpdateWithoutTeamspacesInput, WorkspaceUncheckedUpdateWithoutTeamspacesInput>
+  }
+
+  export type WorkspaceUpdateWithoutTeamspacesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUpdateOneWithoutWorkspaceNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutWorkspaceNestedInput
+    notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
+    favorites?: FavoriteUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateWithoutTeamspacesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUncheckedUpdateOneWithoutWorkspaceNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type UserOnTeamspaceUpsertWithWhereUniqueWithoutTeamspaceInput = {
+    where: UserOnTeamspaceWhereUniqueInput
+    update: XOR<UserOnTeamspaceUpdateWithoutTeamspaceInput, UserOnTeamspaceUncheckedUpdateWithoutTeamspaceInput>
+    create: XOR<UserOnTeamspaceCreateWithoutTeamspaceInput, UserOnTeamspaceUncheckedCreateWithoutTeamspaceInput>
+  }
+
+  export type UserOnTeamspaceUpdateWithWhereUniqueWithoutTeamspaceInput = {
+    where: UserOnTeamspaceWhereUniqueInput
+    data: XOR<UserOnTeamspaceUpdateWithoutTeamspaceInput, UserOnTeamspaceUncheckedUpdateWithoutTeamspaceInput>
+  }
+
+  export type UserOnTeamspaceUpdateManyWithWhereWithoutTeamspaceInput = {
+    where: UserOnTeamspaceScalarWhereInput
+    data: XOR<UserOnTeamspaceUpdateManyMutationInput, UserOnTeamspaceUncheckedUpdateManyWithoutTeamspaceInput>
+  }
+
+  export type NotebookUpsertWithWhereUniqueWithoutTeamspaceInput = {
+    where: NotebookWhereUniqueInput
+    update: XOR<NotebookUpdateWithoutTeamspaceInput, NotebookUncheckedUpdateWithoutTeamspaceInput>
+    create: XOR<NotebookCreateWithoutTeamspaceInput, NotebookUncheckedCreateWithoutTeamspaceInput>
+  }
+
+  export type NotebookUpdateWithWhereUniqueWithoutTeamspaceInput = {
+    where: NotebookWhereUniqueInput
+    data: XOR<NotebookUpdateWithoutTeamspaceInput, NotebookUncheckedUpdateWithoutTeamspaceInput>
+  }
+
+  export type NotebookUpdateManyWithWhereWithoutTeamspaceInput = {
+    where: NotebookScalarWhereInput
+    data: XOR<NotebookUpdateManyMutationInput, NotebookUncheckedUpdateManyWithoutTeamspaceInput>
   }
 
   export type PageCreateWithoutNotebookInput = {
@@ -12776,8 +20205,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    updatedByUser?: UserCreateNestedOneWithoutPagesUserUpdatedInput
-    deletedByUser?: UserCreateNestedOneWithoutPagesUserDeletedInput
+    createdByUser: UserCreateNestedOneWithoutPagesCreatedInput
+    deletedByUser?: UserCreateNestedOneWithoutPagesDeletedInput
+    updatedByUser: UserCreateNestedOneWithoutPagesUpdatedInput
+    favorites?: FavoriteCreateNestedManyWithoutPageInput
   }
 
   export type PageUncheckedCreateWithoutNotebookInput = {
@@ -12786,10 +20217,12 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: boolean
     createdAt?: Date | string
-    updatedBy?: string | null
     updatedAt?: Date | string
-    deletedBy?: string | null
     deletedAt?: Date | string | null
+    createdBy: string
+    deletedBy?: string | null
+    updatedBy: string
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutPageInput
   }
 
   export type PageCreateOrConnectWithoutNotebookInput = {
@@ -12811,12 +20244,13 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    trackUserAccessWorkspace?: UserCreateNestedOneWithoutLastAccessWorkspaceInput
-    users?: UserCreateNestedManyWithoutWorkspacesInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutWorkspaceInput
+    createdBy: string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceCreateNestedOneWithoutWorkspaceInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutWorkspaceInput
+    teamspaces?: TeamspaceCreateNestedManyWithoutWorkspaceInput
+    favorites?: FavoriteCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateWithoutNotebooksInput = {
@@ -12828,17 +20262,96 @@ export namespace Prisma {
     stripeSubscriptionId?: string | null
     stripePriceId?: string | null
     stripeCurrentPeriodEnd?: Date | string | null
-    createdBy: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    trackUserAccessWorkspace?: UserUncheckedCreateNestedOneWithoutLastAccessWorkspaceInput
-    users?: UserUncheckedCreateNestedManyWithoutWorkspacesInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutWorkspaceInput
+    createdBy: string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedOneWithoutWorkspaceInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput
+    teamspaces?: TeamspaceUncheckedCreateNestedManyWithoutWorkspaceInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceCreateOrConnectWithoutNotebooksInput = {
     where: WorkspaceWhereUniqueInput
     create: XOR<WorkspaceCreateWithoutNotebooksInput, WorkspaceUncheckedCreateWithoutNotebooksInput>
+  }
+
+  export type TeamspaceCreateWithoutNotebooksInput = {
+    id?: string
+    name: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isOrigin?: boolean | null
+    archivedAt?: Date | string | null
+    createdBy: string
+    workspace?: WorkspaceCreateNestedOneWithoutTeamspacesInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutTeamspaceInput
+  }
+
+  export type TeamspaceUncheckedCreateWithoutNotebooksInput = {
+    id?: string
+    name: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isOrigin?: boolean | null
+    archivedAt?: Date | string | null
+    workspaceId?: string | null
+    createdBy: string
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutTeamspaceInput
+  }
+
+  export type TeamspaceCreateOrConnectWithoutNotebooksInput = {
+    where: TeamspaceWhereUniqueInput
+    create: XOR<TeamspaceCreateWithoutNotebooksInput, TeamspaceUncheckedCreateWithoutNotebooksInput>
+  }
+
+  export type UserCreateWithoutNotebooksInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput
+    favorites?: FavoriteCreateNestedManyWithoutUserInput
+    PagesCreated?: PageCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageCreateNestedManyWithoutDeletedByUserInput
+  }
+
+  export type UserUncheckedCreateWithoutNotebooksInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutUserInput
+    PagesCreated?: PageUncheckedCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageUncheckedCreateNestedManyWithoutDeletedByUserInput
+  }
+
+  export type UserCreateOrConnectWithoutNotebooksInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutNotebooksInput, UserUncheckedCreateWithoutNotebooksInput>
   }
 
   export type PageUpsertWithWhereUniqueWithoutNotebookInput = {
@@ -12854,28 +20367,18 @@ export namespace Prisma {
 
   export type PageUpdateManyWithWhereWithoutNotebookInput = {
     where: PageScalarWhereInput
-    data: XOR<PageUpdateManyMutationInput, PageUncheckedUpdateManyWithoutPagesInput>
-  }
-
-  export type PageScalarWhereInput = {
-    AND?: Enumerable<PageScalarWhereInput>
-    OR?: Enumerable<PageScalarWhereInput>
-    NOT?: Enumerable<PageScalarWhereInput>
-    id?: StringFilter | string
-    title?: StringFilter | string
-    content?: JsonNullableFilter
-    published?: BoolFilter | boolean
-    createdAt?: DateTimeFilter | Date | string
-    updatedBy?: StringNullableFilter | string | null
-    updatedAt?: DateTimeFilter | Date | string
-    deletedBy?: StringNullableFilter | string | null
-    deletedAt?: DateTimeNullableFilter | Date | string | null
-    notebookId?: StringFilter | string
+    data: XOR<PageUpdateManyMutationInput, PageUncheckedUpdateManyWithoutNotebookInput>
   }
 
   export type WorkspaceUpsertWithoutNotebooksInput = {
     update: XOR<WorkspaceUpdateWithoutNotebooksInput, WorkspaceUncheckedUpdateWithoutNotebooksInput>
     create: XOR<WorkspaceCreateWithoutNotebooksInput, WorkspaceUncheckedCreateWithoutNotebooksInput>
+    where?: WorkspaceWhereInput
+  }
+
+  export type WorkspaceUpdateToOneWithWhereWithoutNotebooksInput = {
+    where?: WorkspaceWhereInput
+    data: XOR<WorkspaceUpdateWithoutNotebooksInput, WorkspaceUncheckedUpdateWithoutNotebooksInput>
   }
 
   export type WorkspaceUpdateWithoutNotebooksInput = {
@@ -12887,12 +20390,13 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    trackUserAccessWorkspace?: UserUpdateOneWithoutLastAccessWorkspaceNestedInput
-    users?: UserUpdateManyWithoutWorkspacesNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutWorkspaceNestedInput
+    createdBy?: StringFieldUpdateOperationsInput | string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUpdateOneWithoutWorkspaceNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutWorkspaceNestedInput
+    teamspaces?: TeamspaceUpdateManyWithoutWorkspaceNestedInput
+    favorites?: FavoriteUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateWithoutNotebooksInput = {
@@ -12904,110 +20408,127 @@ export namespace Prisma {
     stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
     stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    trackUserAccessWorkspace?: UserUncheckedUpdateOneWithoutLastAccessWorkspaceNestedInput
-    users?: UserUncheckedUpdateManyWithoutWorkspacesNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutWorkspaceNestedInput
+    createdBy?: StringFieldUpdateOperationsInput | string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUncheckedUpdateOneWithoutWorkspaceNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
+    teamspaces?: TeamspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
-  export type UserCreateWithoutPagesUserUpdatedInput = {
-    id?: string
-    name?: string | null
-    email?: string | null
-    emailVerified?: Date | string | null
-    image?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    stripeCustomerId?: string | null
-    accounts?: AccountCreateNestedManyWithoutUserInput
-    sessions?: SessionCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
-    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
-    pagesUserDeleted?: PageCreateNestedOneWithoutDeletedByUserInput
+  export type TeamspaceUpsertWithoutNotebooksInput = {
+    update: XOR<TeamspaceUpdateWithoutNotebooksInput, TeamspaceUncheckedUpdateWithoutNotebooksInput>
+    create: XOR<TeamspaceCreateWithoutNotebooksInput, TeamspaceUncheckedCreateWithoutNotebooksInput>
+    where?: TeamspaceWhereInput
   }
 
-  export type UserUncheckedCreateWithoutPagesUserUpdatedInput = {
-    id?: string
-    name?: string | null
-    email?: string | null
-    emailVerified?: Date | string | null
-    image?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    stripeCustomerId?: string | null
-    lastAccessWorkspaceId?: string | null
-    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
-    pagesUserDeleted?: PageUncheckedCreateNestedOneWithoutDeletedByUserInput
+  export type TeamspaceUpdateToOneWithWhereWithoutNotebooksInput = {
+    where?: TeamspaceWhereInput
+    data: XOR<TeamspaceUpdateWithoutNotebooksInput, TeamspaceUncheckedUpdateWithoutNotebooksInput>
   }
 
-  export type UserCreateOrConnectWithoutPagesUserUpdatedInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutPagesUserUpdatedInput, UserUncheckedCreateWithoutPagesUserUpdatedInput>
+  export type TeamspaceUpdateWithoutNotebooksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    workspace?: WorkspaceUpdateOneWithoutTeamspacesNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutTeamspaceNestedInput
   }
 
-  export type UserCreateWithoutPagesUserDeletedInput = {
-    id?: string
-    name?: string | null
-    email?: string | null
-    emailVerified?: Date | string | null
-    image?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    stripeCustomerId?: string | null
-    accounts?: AccountCreateNestedManyWithoutUserInput
-    sessions?: SessionCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessCreateNestedManyWithoutUserInput
-    lastAccessWorkspace?: WorkspaceCreateNestedOneWithoutTrackUserAccessWorkspaceInput
-    pagesUserUpdated?: PageCreateNestedOneWithoutUpdatedByUserInput
+  export type TeamspaceUncheckedUpdateWithoutNotebooksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutTeamspaceNestedInput
   }
 
-  export type UserUncheckedCreateWithoutPagesUserDeletedInput = {
-    id?: string
-    name?: string | null
-    email?: string | null
-    emailVerified?: Date | string | null
-    image?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    stripeCustomerId?: string | null
-    lastAccessWorkspaceId?: string | null
-    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
-    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
-    workspaces?: WorkspaceUncheckedCreateNestedManyWithoutUsersInput
-    trackingUserAccess?: TrackingUserAccessUncheckedCreateNestedManyWithoutUserInput
-    pagesUserUpdated?: PageUncheckedCreateNestedOneWithoutUpdatedByUserInput
+  export type UserUpsertWithoutNotebooksInput = {
+    update: XOR<UserUpdateWithoutNotebooksInput, UserUncheckedUpdateWithoutNotebooksInput>
+    create: XOR<UserCreateWithoutNotebooksInput, UserUncheckedCreateWithoutNotebooksInput>
+    where?: UserWhereInput
   }
 
-  export type UserCreateOrConnectWithoutPagesUserDeletedInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutPagesUserDeletedInput, UserUncheckedCreateWithoutPagesUserDeletedInput>
+  export type UserUpdateToOneWithWhereWithoutNotebooksInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutNotebooksInput, UserUncheckedUpdateWithoutNotebooksInput>
+  }
+
+  export type UserUpdateWithoutNotebooksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutNotebooksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUncheckedUpdateManyWithoutDeletedByUserNestedInput
   }
 
   export type NotebookCreateWithoutPagesInput = {
     id?: string
     title: string
-    description: string
+    description?: string | null
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     workspace: WorkspaceCreateNestedOneWithoutNotebooksInput
+    teamspace?: TeamspaceCreateNestedOneWithoutNotebooksInput
+    user: UserCreateNestedOneWithoutNotebooksInput
   }
 
   export type NotebookUncheckedCreateWithoutPagesInput = {
     id?: string
     title: string
-    description: string
+    description?: string | null
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     workspaceId: string
+    teamspaceId?: string | null
+    createdBy: string
   }
 
   export type NotebookCreateOrConnectWithoutPagesInput = {
@@ -13015,107 +20536,997 @@ export namespace Prisma {
     create: XOR<NotebookCreateWithoutPagesInput, NotebookUncheckedCreateWithoutPagesInput>
   }
 
-  export type UserUpsertWithoutPagesUserUpdatedInput = {
-    update: XOR<UserUpdateWithoutPagesUserUpdatedInput, UserUncheckedUpdateWithoutPagesUserUpdatedInput>
-    create: XOR<UserCreateWithoutPagesUserUpdatedInput, UserUncheckedCreateWithoutPagesUserUpdatedInput>
+  export type UserCreateWithoutPagesCreatedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput
+    favorites?: FavoriteCreateNestedManyWithoutUserInput
+    notebooks?: NotebookCreateNestedManyWithoutUserInput
+    PagesUpdated?: PageCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageCreateNestedManyWithoutDeletedByUserInput
   }
 
-  export type UserUpdateWithoutPagesUserUpdatedInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    accounts?: AccountUpdateManyWithoutUserNestedInput
-    sessions?: SessionUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
-    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
-    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
+  export type UserUncheckedCreateWithoutPagesCreatedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutUserInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutUserInput
+    PagesUpdated?: PageUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageUncheckedCreateNestedManyWithoutDeletedByUserInput
   }
 
-  export type UserUncheckedUpdateWithoutPagesUserUpdatedInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
-    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
-    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
+  export type UserCreateOrConnectWithoutPagesCreatedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPagesCreatedInput, UserUncheckedCreateWithoutPagesCreatedInput>
   }
 
-  export type UserUpsertWithoutPagesUserDeletedInput = {
-    update: XOR<UserUpdateWithoutPagesUserDeletedInput, UserUncheckedUpdateWithoutPagesUserDeletedInput>
-    create: XOR<UserCreateWithoutPagesUserDeletedInput, UserUncheckedCreateWithoutPagesUserDeletedInput>
+  export type UserCreateWithoutPagesDeletedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput
+    favorites?: FavoriteCreateNestedManyWithoutUserInput
+    notebooks?: NotebookCreateNestedManyWithoutUserInput
+    PagesCreated?: PageCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageCreateNestedManyWithoutUpdatedByUserInput
   }
 
-  export type UserUpdateWithoutPagesUserDeletedInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    accounts?: AccountUpdateManyWithoutUserNestedInput
-    sessions?: SessionUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
-    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
-    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
+  export type UserUncheckedCreateWithoutPagesDeletedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutUserInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutUserInput
+    PagesCreated?: PageUncheckedCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageUncheckedCreateNestedManyWithoutUpdatedByUserInput
   }
 
-  export type UserUncheckedUpdateWithoutPagesUserDeletedInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
-    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    workspaces?: WorkspaceUncheckedUpdateManyWithoutUsersNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
-    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
+  export type UserCreateOrConnectWithoutPagesDeletedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPagesDeletedInput, UserUncheckedCreateWithoutPagesDeletedInput>
+  }
+
+  export type UserCreateWithoutPagesUpdatedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput
+    favorites?: FavoriteCreateNestedManyWithoutUserInput
+    notebooks?: NotebookCreateNestedManyWithoutUserInput
+    PagesCreated?: PageCreateNestedManyWithoutCreatedByUserInput
+    PagesDeleted?: PageCreateNestedManyWithoutDeletedByUserInput
+  }
+
+  export type UserUncheckedCreateWithoutPagesUpdatedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutUserInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutUserInput
+    PagesCreated?: PageUncheckedCreateNestedManyWithoutCreatedByUserInput
+    PagesDeleted?: PageUncheckedCreateNestedManyWithoutDeletedByUserInput
+  }
+
+  export type UserCreateOrConnectWithoutPagesUpdatedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPagesUpdatedInput, UserUncheckedCreateWithoutPagesUpdatedInput>
+  }
+
+  export type FavoriteCreateWithoutPageInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutFavoritesInput
+    workspace?: WorkspaceCreateNestedOneWithoutFavoritesInput
+  }
+
+  export type FavoriteUncheckedCreateWithoutPageInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    workspaceId: string
+  }
+
+  export type FavoriteCreateOrConnectWithoutPageInput = {
+    where: FavoriteWhereUniqueInput
+    create: XOR<FavoriteCreateWithoutPageInput, FavoriteUncheckedCreateWithoutPageInput>
+  }
+
+  export type FavoriteCreateManyPageInputEnvelope = {
+    data: Enumerable<FavoriteCreateManyPageInput>
+    skipDuplicates?: boolean
   }
 
   export type NotebookUpsertWithoutPagesInput = {
     update: XOR<NotebookUpdateWithoutPagesInput, NotebookUncheckedUpdateWithoutPagesInput>
     create: XOR<NotebookCreateWithoutPagesInput, NotebookUncheckedCreateWithoutPagesInput>
+    where?: NotebookWhereInput
+  }
+
+  export type NotebookUpdateToOneWithWhereWithoutPagesInput = {
+    where?: NotebookWhereInput
+    data: XOR<NotebookUpdateWithoutPagesInput, NotebookUncheckedUpdateWithoutPagesInput>
   }
 
   export type NotebookUpdateWithoutPagesInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workspace?: WorkspaceUpdateOneRequiredWithoutNotebooksNestedInput
+    teamspace?: TeamspaceUpdateOneWithoutNotebooksNestedInput
+    user?: UserUpdateOneRequiredWithoutNotebooksNestedInput
   }
 
   export type NotebookUncheckedUpdateWithoutPagesInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workspaceId?: StringFieldUpdateOperationsInput | string
+    teamspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UserUpsertWithoutPagesCreatedInput = {
+    update: XOR<UserUpdateWithoutPagesCreatedInput, UserUncheckedUpdateWithoutPagesCreatedInput>
+    create: XOR<UserCreateWithoutPagesCreatedInput, UserUncheckedCreateWithoutPagesCreatedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPagesCreatedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPagesCreatedInput, UserUncheckedUpdateWithoutPagesCreatedInput>
+  }
+
+  export type UserUpdateWithoutPagesCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUpdateManyWithoutUserNestedInput
+    PagesUpdated?: PageUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPagesCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutUserNestedInput
+    PagesUpdated?: PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUpsertWithoutPagesDeletedInput = {
+    update: XOR<UserUpdateWithoutPagesDeletedInput, UserUncheckedUpdateWithoutPagesDeletedInput>
+    create: XOR<UserCreateWithoutPagesDeletedInput, UserUncheckedCreateWithoutPagesDeletedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPagesDeletedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPagesDeletedInput, UserUncheckedUpdateWithoutPagesDeletedInput>
+  }
+
+  export type UserUpdateWithoutPagesDeletedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUpdateManyWithoutUpdatedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPagesDeletedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  }
+
+  export type UserUpsertWithoutPagesUpdatedInput = {
+    update: XOR<UserUpdateWithoutPagesUpdatedInput, UserUncheckedUpdateWithoutPagesUpdatedInput>
+    create: XOR<UserCreateWithoutPagesUpdatedInput, UserUncheckedCreateWithoutPagesUpdatedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPagesUpdatedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPagesUpdatedInput, UserUncheckedUpdateWithoutPagesUpdatedInput>
+  }
+
+  export type UserUpdateWithoutPagesUpdatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUpdateManyWithoutCreatedByUserNestedInput
+    PagesDeleted?: PageUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPagesUpdatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    PagesDeleted?: PageUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type FavoriteUpsertWithWhereUniqueWithoutPageInput = {
+    where: FavoriteWhereUniqueInput
+    update: XOR<FavoriteUpdateWithoutPageInput, FavoriteUncheckedUpdateWithoutPageInput>
+    create: XOR<FavoriteCreateWithoutPageInput, FavoriteUncheckedCreateWithoutPageInput>
+  }
+
+  export type FavoriteUpdateWithWhereUniqueWithoutPageInput = {
+    where: FavoriteWhereUniqueInput
+    data: XOR<FavoriteUpdateWithoutPageInput, FavoriteUncheckedUpdateWithoutPageInput>
+  }
+
+  export type FavoriteUpdateManyWithWhereWithoutPageInput = {
+    where: FavoriteScalarWhereInput
+    data: XOR<FavoriteUpdateManyMutationInput, FavoriteUncheckedUpdateManyWithoutPageInput>
+  }
+
+  export type UserCreateWithoutFavoritesInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput
+    notebooks?: NotebookCreateNestedManyWithoutUserInput
+    PagesCreated?: PageCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageCreateNestedManyWithoutDeletedByUserInput
+  }
+
+  export type UserUncheckedCreateWithoutFavoritesInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutUserInput
+    PagesCreated?: PageUncheckedCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageUncheckedCreateNestedManyWithoutDeletedByUserInput
+  }
+
+  export type UserCreateOrConnectWithoutFavoritesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFavoritesInput, UserUncheckedCreateWithoutFavoritesInput>
+  }
+
+  export type WorkspaceCreateWithoutFavoritesInput = {
+    id?: string
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceCreateNestedOneWithoutWorkspaceInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutWorkspaceInput
+    teamspaces?: TeamspaceCreateNestedManyWithoutWorkspaceInput
+    notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceUncheckedCreateWithoutFavoritesInput = {
+    id?: string
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedOneWithoutWorkspaceInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput
+    teamspaces?: TeamspaceUncheckedCreateNestedManyWithoutWorkspaceInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceCreateOrConnectWithoutFavoritesInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutFavoritesInput, WorkspaceUncheckedCreateWithoutFavoritesInput>
+  }
+
+  export type PageCreateWithoutFavoritesInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    notebook: NotebookCreateNestedOneWithoutPagesInput
+    createdByUser: UserCreateNestedOneWithoutPagesCreatedInput
+    deletedByUser?: UserCreateNestedOneWithoutPagesDeletedInput
+    updatedByUser: UserCreateNestedOneWithoutPagesUpdatedInput
+  }
+
+  export type PageUncheckedCreateWithoutFavoritesInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    notebookId: string
+    createdBy: string
+    deletedBy?: string | null
+    updatedBy: string
+  }
+
+  export type PageCreateOrConnectWithoutFavoritesInput = {
+    where: PageWhereUniqueInput
+    create: XOR<PageCreateWithoutFavoritesInput, PageUncheckedCreateWithoutFavoritesInput>
+  }
+
+  export type UserUpsertWithoutFavoritesInput = {
+    update: XOR<UserUpdateWithoutFavoritesInput, UserUncheckedUpdateWithoutFavoritesInput>
+    create: XOR<UserCreateWithoutFavoritesInput, UserUncheckedCreateWithoutFavoritesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFavoritesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFavoritesInput, UserUncheckedUpdateWithoutFavoritesInput>
+  }
+
+  export type UserUpdateWithoutFavoritesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFavoritesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type WorkspaceUpsertWithoutFavoritesInput = {
+    update: XOR<WorkspaceUpdateWithoutFavoritesInput, WorkspaceUncheckedUpdateWithoutFavoritesInput>
+    create: XOR<WorkspaceCreateWithoutFavoritesInput, WorkspaceUncheckedCreateWithoutFavoritesInput>
+    where?: WorkspaceWhereInput
+  }
+
+  export type WorkspaceUpdateToOneWithWhereWithoutFavoritesInput = {
+    where?: WorkspaceWhereInput
+    data: XOR<WorkspaceUpdateWithoutFavoritesInput, WorkspaceUncheckedUpdateWithoutFavoritesInput>
+  }
+
+  export type WorkspaceUpdateWithoutFavoritesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUpdateOneWithoutWorkspaceNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutWorkspaceNestedInput
+    teamspaces?: TeamspaceUpdateManyWithoutWorkspaceNestedInput
+    notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateWithoutFavoritesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUncheckedUpdateOneWithoutWorkspaceNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
+    teamspaces?: TeamspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type PageUpsertWithoutFavoritesInput = {
+    update: XOR<PageUpdateWithoutFavoritesInput, PageUncheckedUpdateWithoutFavoritesInput>
+    create: XOR<PageCreateWithoutFavoritesInput, PageUncheckedCreateWithoutFavoritesInput>
+    where?: PageWhereInput
+  }
+
+  export type PageUpdateToOneWithWhereWithoutFavoritesInput = {
+    where?: PageWhereInput
+    data: XOR<PageUpdateWithoutFavoritesInput, PageUncheckedUpdateWithoutFavoritesInput>
+  }
+
+  export type PageUpdateWithoutFavoritesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebook?: NotebookUpdateOneRequiredWithoutPagesNestedInput
+    createdByUser?: UserUpdateOneRequiredWithoutPagesCreatedNestedInput
+    deletedByUser?: UserUpdateOneWithoutPagesDeletedNestedInput
+    updatedByUser?: UserUpdateOneRequiredWithoutPagesUpdatedNestedInput
+  }
+
+  export type PageUncheckedUpdateWithoutFavoritesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebookId?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UserCreateWithoutUserOnWorkspaceInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput
+    favorites?: FavoriteCreateNestedManyWithoutUserInput
+    notebooks?: NotebookCreateNestedManyWithoutUserInput
+    PagesCreated?: PageCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageCreateNestedManyWithoutDeletedByUserInput
+  }
+
+  export type UserUncheckedCreateWithoutUserOnWorkspaceInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutUserInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutUserInput
+    PagesCreated?: PageUncheckedCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageUncheckedCreateNestedManyWithoutDeletedByUserInput
+  }
+
+  export type UserCreateOrConnectWithoutUserOnWorkspaceInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUserOnWorkspaceInput, UserUncheckedCreateWithoutUserOnWorkspaceInput>
+  }
+
+  export type WorkspaceCreateWithoutUserOnWorkspaceInput = {
+    id?: string
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceCreateNestedOneWithoutWorkspaceInput
+    teamspaces?: TeamspaceCreateNestedManyWithoutWorkspaceInput
+    notebooks?: NotebookCreateNestedManyWithoutWorkspaceInput
+    favorites?: FavoriteCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceUncheckedCreateWithoutUserOnWorkspaceInput = {
+    id?: string
+    name: string
+    domain: string
+    stripeCustomerId?: string | null
+    stripeWorkspaceId?: string | null
+    stripeSubscriptionId?: string | null
+    stripePriceId?: string | null
+    stripeCurrentPeriodEnd?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedOneWithoutWorkspaceInput
+    teamspaces?: TeamspaceUncheckedCreateNestedManyWithoutWorkspaceInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutWorkspaceInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceCreateOrConnectWithoutUserOnWorkspaceInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutUserOnWorkspaceInput, WorkspaceUncheckedCreateWithoutUserOnWorkspaceInput>
+  }
+
+  export type UserUpsertWithoutUserOnWorkspaceInput = {
+    update: XOR<UserUpdateWithoutUserOnWorkspaceInput, UserUncheckedUpdateWithoutUserOnWorkspaceInput>
+    create: XOR<UserCreateWithoutUserOnWorkspaceInput, UserUncheckedCreateWithoutUserOnWorkspaceInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUserOnWorkspaceInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUserOnWorkspaceInput, UserUncheckedUpdateWithoutUserOnWorkspaceInput>
+  }
+
+  export type UserUpdateWithoutUserOnWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutUserOnWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type WorkspaceUpsertWithoutUserOnWorkspaceInput = {
+    update: XOR<WorkspaceUpdateWithoutUserOnWorkspaceInput, WorkspaceUncheckedUpdateWithoutUserOnWorkspaceInput>
+    create: XOR<WorkspaceCreateWithoutUserOnWorkspaceInput, WorkspaceUncheckedCreateWithoutUserOnWorkspaceInput>
+    where?: WorkspaceWhereInput
+  }
+
+  export type WorkspaceUpdateToOneWithWhereWithoutUserOnWorkspaceInput = {
+    where?: WorkspaceWhereInput
+    data: XOR<WorkspaceUpdateWithoutUserOnWorkspaceInput, WorkspaceUncheckedUpdateWithoutUserOnWorkspaceInput>
+  }
+
+  export type WorkspaceUpdateWithoutUserOnWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUpdateOneWithoutWorkspaceNestedInput
+    teamspaces?: TeamspaceUpdateManyWithoutWorkspaceNestedInput
+    notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
+    favorites?: FavoriteUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateWithoutUserOnWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    trackingUserAccessOnWorkspace?: TrackingUserAccessOnWorkspaceUncheckedUpdateOneWithoutWorkspaceNestedInput
+    teamspaces?: TeamspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type UserCreateWithoutUserOnTeamspaceInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceCreateNestedManyWithoutUserInput
+    favorites?: FavoriteCreateNestedManyWithoutUserInput
+    notebooks?: NotebookCreateNestedManyWithoutUserInput
+    PagesCreated?: PageCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageCreateNestedManyWithoutDeletedByUserInput
+  }
+
+  export type UserUncheckedCreateWithoutUserOnTeamspaceInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    stripeCustomerId?: string | null
+    lastAccessWorkspaceId?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedCreateNestedManyWithoutUserInput
+    favorites?: FavoriteUncheckedCreateNestedManyWithoutUserInput
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutUserInput
+    PagesCreated?: PageUncheckedCreateNestedManyWithoutCreatedByUserInput
+    PagesUpdated?: PageUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    PagesDeleted?: PageUncheckedCreateNestedManyWithoutDeletedByUserInput
+  }
+
+  export type UserCreateOrConnectWithoutUserOnTeamspaceInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUserOnTeamspaceInput, UserUncheckedCreateWithoutUserOnTeamspaceInput>
+  }
+
+  export type TeamspaceCreateWithoutUserOnTeamspaceInput = {
+    id?: string
+    name: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isOrigin?: boolean | null
+    archivedAt?: Date | string | null
+    createdBy: string
+    workspace?: WorkspaceCreateNestedOneWithoutTeamspacesInput
+    notebooks?: NotebookCreateNestedManyWithoutTeamspaceInput
+  }
+
+  export type TeamspaceUncheckedCreateWithoutUserOnTeamspaceInput = {
+    id?: string
+    name: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isOrigin?: boolean | null
+    archivedAt?: Date | string | null
+    workspaceId?: string | null
+    createdBy: string
+    notebooks?: NotebookUncheckedCreateNestedManyWithoutTeamspaceInput
+  }
+
+  export type TeamspaceCreateOrConnectWithoutUserOnTeamspaceInput = {
+    where: TeamspaceWhereUniqueInput
+    create: XOR<TeamspaceCreateWithoutUserOnTeamspaceInput, TeamspaceUncheckedCreateWithoutUserOnTeamspaceInput>
+  }
+
+  export type UserUpsertWithoutUserOnTeamspaceInput = {
+    update: XOR<UserUpdateWithoutUserOnTeamspaceInput, UserUncheckedUpdateWithoutUserOnTeamspaceInput>
+    create: XOR<UserCreateWithoutUserOnTeamspaceInput, UserUncheckedCreateWithoutUserOnTeamspaceInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUserOnTeamspaceInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUserOnTeamspaceInput, UserUncheckedUpdateWithoutUserOnTeamspaceInput>
+  }
+
+  export type UserUpdateWithoutUserOnTeamspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutUserOnTeamspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    userOnWorkspace?: UserOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    trackingUserAccess?: TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserNestedInput
+    favorites?: FavoriteUncheckedUpdateManyWithoutUserNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutUserNestedInput
+    PagesCreated?: PageUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    PagesUpdated?: PageUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    PagesDeleted?: PageUncheckedUpdateManyWithoutDeletedByUserNestedInput
+  }
+
+  export type TeamspaceUpsertWithoutUserOnTeamspaceInput = {
+    update: XOR<TeamspaceUpdateWithoutUserOnTeamspaceInput, TeamspaceUncheckedUpdateWithoutUserOnTeamspaceInput>
+    create: XOR<TeamspaceCreateWithoutUserOnTeamspaceInput, TeamspaceUncheckedCreateWithoutUserOnTeamspaceInput>
+    where?: TeamspaceWhereInput
+  }
+
+  export type TeamspaceUpdateToOneWithWhereWithoutUserOnTeamspaceInput = {
+    where?: TeamspaceWhereInput
+    data: XOR<TeamspaceUpdateWithoutUserOnTeamspaceInput, TeamspaceUncheckedUpdateWithoutUserOnTeamspaceInput>
+  }
+
+  export type TeamspaceUpdateWithoutUserOnTeamspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    workspace?: WorkspaceUpdateOneWithoutTeamspacesNestedInput
+    notebooks?: NotebookUpdateManyWithoutTeamspaceNestedInput
+  }
+
+  export type TeamspaceUncheckedUpdateWithoutUserOnTeamspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    notebooks?: NotebookUncheckedUpdateManyWithoutTeamspaceNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -13141,12 +21552,86 @@ export namespace Prisma {
     expires: Date | string
   }
 
-  export type TrackingUserAccessCreateManyUserInput = {
+  export type UserOnWorkspaceCreateManyUserInput = {
     id?: string
-    lastAccessWorkspaceId?: string | null
+    role?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspaceId: string
+  }
+
+  export type UserOnTeamspaceCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    operation?: number
+    teamspaceId: string
+  }
+
+  export type TrackingUserAccessOnWorkspaceCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
     lastAccessNotebookId?: string | null
     lastAccessPageId?: string | null
+    workspaceId: string
+  }
+
+  export type FavoriteCreateManyUserInput = {
+    id?: string
     createdAt?: Date | string
+    updatedAt?: Date | string
+    workspaceId: string
+    pageId: string
+  }
+
+  export type NotebookCreateManyUserInput = {
+    id?: string
+    title: string
+    description?: string | null
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspaceId: string
+    teamspaceId?: string | null
+  }
+
+  export type PageCreateManyCreatedByUserInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    notebookId: string
+    deletedBy?: string | null
+    updatedBy: string
+  }
+
+  export type PageCreateManyUpdatedByUserInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    notebookId: string
+    createdBy: string
+    deletedBy?: string | null
+  }
+
+  export type PageCreateManyDeletedByUserInput = {
+    id?: string
+    title: string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    notebookId: string
+    createdBy: string
+    updatedBy: string
   }
 
   export type AccountUpdateWithoutUserInput = {
@@ -13181,7 +21666,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type AccountUncheckedUpdateManyWithoutAccountsInput = {
+  export type AccountUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: StringFieldUpdateOperationsInput | string
     provider?: StringFieldUpdateOperationsInput | string
@@ -13211,191 +21696,501 @@ export namespace Prisma {
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type SessionUncheckedUpdateManyWithoutSessionsInput = {
+  export type SessionUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     sessionToken?: StringFieldUpdateOperationsInput | string
     accessToken?: NullableStringFieldUpdateOperationsInput | string | null
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type WorkspaceUpdateWithoutUsersInput = {
+  export type UserOnWorkspaceUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    domain?: StringFieldUpdateOperationsInput | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
+    role?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    trackUserAccessWorkspace?: UserUpdateOneWithoutLastAccessWorkspaceNestedInput
-    notebooks?: NotebookUpdateManyWithoutWorkspaceNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutWorkspaceNestedInput
+    workspace?: WorkspaceUpdateOneRequiredWithoutUserOnWorkspaceNestedInput
   }
 
-  export type WorkspaceUncheckedUpdateWithoutUsersInput = {
+  export type UserOnWorkspaceUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    domain?: StringFieldUpdateOperationsInput | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
+    role?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    trackUserAccessWorkspace?: UserUncheckedUpdateOneWithoutLastAccessWorkspaceNestedInput
-    notebooks?: NotebookUncheckedUpdateManyWithoutWorkspaceNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutWorkspaceNestedInput
+    workspaceId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type WorkspaceUncheckedUpdateManyWithoutWorkspacesInput = {
+  export type UserOnWorkspaceUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    domain?: StringFieldUpdateOperationsInput | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeSubscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    stripeCurrentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdBy?: StringFieldUpdateOperationsInput | string
+    role?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type TrackingUserAccessUpdateWithoutUserInput = {
+  export type UserOnTeamspaceUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    workspace?: WorkspaceUpdateOneWithoutTrackingUserAccessNestedInput
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operation?: IntFieldUpdateOperationsInput | number
+    teamspace?: TeamspaceUpdateOneRequiredWithoutUserOnTeamspaceNestedInput
   }
 
-  export type TrackingUserAccessUncheckedUpdateWithoutUserInput = {
+  export type UserOnTeamspaceUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operation?: IntFieldUpdateOperationsInput | number
+    teamspaceId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type TrackingUserAccessUncheckedUpdateManyWithoutTrackingUserAccessInput = {
+  export type UserOnTeamspaceUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operation?: IntFieldUpdateOperationsInput | number
+    teamspaceId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TrackingUserAccessOnWorkspaceUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
     lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    workspace?: WorkspaceUpdateOneRequiredWithoutTrackingUserAccessOnWorkspaceNestedInput
+  }
+
+  export type TrackingUserAccessOnWorkspaceUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    workspaceId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TrackingUserAccessOnWorkspaceUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
+    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
+    workspaceId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FavoriteUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneWithoutFavoritesNestedInput
+    page?: PageUpdateOneWithoutFavoritesNestedInput
+  }
+
+  export type FavoriteUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    pageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FavoriteUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    pageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type NotebookUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pages?: PageUpdateManyWithoutNotebookNestedInput
+    workspace?: WorkspaceUpdateOneRequiredWithoutNotebooksNestedInput
+    teamspace?: TeamspaceUpdateOneWithoutNotebooksNestedInput
+  }
+
+  export type NotebookUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    teamspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    pages?: PageUncheckedUpdateManyWithoutNotebookNestedInput
+  }
+
+  export type NotebookUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    teamspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PageUpdateWithoutCreatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebook?: NotebookUpdateOneRequiredWithoutPagesNestedInput
+    deletedByUser?: UserUpdateOneWithoutPagesDeletedNestedInput
+    updatedByUser?: UserUpdateOneRequiredWithoutPagesUpdatedNestedInput
+    favorites?: FavoriteUpdateManyWithoutPageNestedInput
+  }
+
+  export type PageUncheckedUpdateWithoutCreatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebookId?: StringFieldUpdateOperationsInput | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    favorites?: FavoriteUncheckedUpdateManyWithoutPageNestedInput
+  }
+
+  export type PageUncheckedUpdateManyWithoutCreatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebookId?: StringFieldUpdateOperationsInput | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PageUpdateWithoutUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebook?: NotebookUpdateOneRequiredWithoutPagesNestedInput
+    createdByUser?: UserUpdateOneRequiredWithoutPagesCreatedNestedInput
+    deletedByUser?: UserUpdateOneWithoutPagesDeletedNestedInput
+    favorites?: FavoriteUpdateManyWithoutPageNestedInput
+  }
+
+  export type PageUncheckedUpdateWithoutUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebookId?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    favorites?: FavoriteUncheckedUpdateManyWithoutPageNestedInput
+  }
+
+  export type PageUncheckedUpdateManyWithoutUpdatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebookId?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PageUpdateWithoutDeletedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebook?: NotebookUpdateOneRequiredWithoutPagesNestedInput
+    createdByUser?: UserUpdateOneRequiredWithoutPagesCreatedNestedInput
+    updatedByUser?: UserUpdateOneRequiredWithoutPagesUpdatedNestedInput
+    favorites?: FavoriteUpdateManyWithoutPageNestedInput
+  }
+
+  export type PageUncheckedUpdateWithoutDeletedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebookId?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    favorites?: FavoriteUncheckedUpdateManyWithoutPageNestedInput
+  }
+
+  export type PageUncheckedUpdateManyWithoutDeletedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: NullableJsonNullValueInput | InputJsonValue
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notebookId?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    updatedBy?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UserOnWorkspaceCreateManyWorkspaceInput = {
+    id?: string
+    role?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+  }
+
+  export type TeamspaceCreateManyWorkspaceInput = {
+    id?: string
+    name: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isOrigin?: boolean | null
+    archivedAt?: Date | string | null
+    createdBy: string
   }
 
   export type NotebookCreateManyWorkspaceInput = {
     id?: string
     title: string
-    description: string
+    description?: string | null
     published?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    teamspaceId?: string | null
+    createdBy: string
   }
 
-  export type TrackingUserAccessCreateManyWorkspaceInput = {
+  export type FavoriteCreateManyWorkspaceInput = {
     id?: string
-    userId?: string | null
-    lastAccessNotebookId?: string | null
-    lastAccessPageId?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    pageId: string
   }
 
-  export type UserUpdateWithoutWorkspacesInput = {
+  export type UserOnWorkspaceUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    accounts?: AccountUpdateManyWithoutUserNestedInput
-    sessions?: SessionUpdateManyWithoutUserNestedInput
-    trackingUserAccess?: TrackingUserAccessUpdateManyWithoutUserNestedInput
-    lastAccessWorkspace?: WorkspaceUpdateOneWithoutTrackUserAccessWorkspaceNestedInput
-    pagesUserUpdated?: PageUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUpdateOneWithoutDeletedByUserNestedInput
+    user?: UserUpdateOneRequiredWithoutUserOnWorkspaceNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutWorkspacesInput = {
+  export type UserOnWorkspaceUncheckedUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
-    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
-    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
-    trackingUserAccess?: TrackingUserAccessUncheckedUpdateManyWithoutUserNestedInput
-    pagesUserUpdated?: PageUncheckedUpdateOneWithoutUpdatedByUserNestedInput
-    pagesUserDeleted?: PageUncheckedUpdateOneWithoutDeletedByUserNestedInput
+    userId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type UserUncheckedUpdateManyWithoutUsersInput = {
+  export type UserOnWorkspaceUncheckedUpdateManyWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: NullableStringFieldUpdateOperationsInput | string | null
-    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessWorkspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TeamspaceUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    userOnTeamspace?: UserOnTeamspaceUpdateManyWithoutTeamspaceNestedInput
+    notebooks?: NotebookUpdateManyWithoutTeamspaceNestedInput
+  }
+
+  export type TeamspaceUncheckedUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    userOnTeamspace?: UserOnTeamspaceUncheckedUpdateManyWithoutTeamspaceNestedInput
+    notebooks?: NotebookUncheckedUpdateManyWithoutTeamspaceNestedInput
+  }
+
+  export type TeamspaceUncheckedUpdateManyWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isOrigin?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
   }
 
   export type NotebookUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     pages?: PageUpdateManyWithoutNotebookNestedInput
+    teamspace?: TeamspaceUpdateOneWithoutNotebooksNestedInput
+    user?: UserUpdateOneRequiredWithoutNotebooksNestedInput
   }
 
   export type NotebookUncheckedUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    teamspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
     pages?: PageUncheckedUpdateManyWithoutNotebookNestedInput
   }
 
-  export type NotebookUncheckedUpdateManyWithoutNotebooksInput = {
+  export type NotebookUncheckedUpdateManyWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    teamspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
   }
 
-  export type TrackingUserAccessUpdateWithoutWorkspaceInput = {
+  export type FavoriteUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
-    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneWithoutTrackingUserAccessNestedInput
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutFavoritesNestedInput
+    page?: PageUpdateOneWithoutFavoritesNestedInput
   }
 
-  export type TrackingUserAccessUncheckedUpdateWithoutWorkspaceInput = {
+  export type FavoriteUncheckedUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessNotebookId?: NullableStringFieldUpdateOperationsInput | string | null
-    lastAccessPageId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    pageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FavoriteUncheckedUpdateManyWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    pageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UserOnTeamspaceCreateManyTeamspaceInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    operation?: number
+    userId: string
+  }
+
+  export type NotebookCreateManyTeamspaceInput = {
+    id?: string
+    title: string
+    description?: string | null
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspaceId: string
+    createdBy: string
+  }
+
+  export type UserOnTeamspaceUpdateWithoutTeamspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operation?: IntFieldUpdateOperationsInput | number
+    user?: UserUpdateOneRequiredWithoutUserOnTeamspaceNestedInput
+  }
+
+  export type UserOnTeamspaceUncheckedUpdateWithoutTeamspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operation?: IntFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UserOnTeamspaceUncheckedUpdateManyWithoutTeamspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operation?: IntFieldUpdateOperationsInput | number
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type NotebookUpdateWithoutTeamspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pages?: PageUpdateManyWithoutNotebookNestedInput
+    workspace?: WorkspaceUpdateOneRequiredWithoutNotebooksNestedInput
+    user?: UserUpdateOneRequiredWithoutNotebooksNestedInput
+  }
+
+  export type NotebookUncheckedUpdateWithoutTeamspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
+    pages?: PageUncheckedUpdateManyWithoutNotebookNestedInput
+  }
+
+  export type NotebookUncheckedUpdateManyWithoutTeamspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    createdBy?: StringFieldUpdateOperationsInput | string
   }
 
   export type PageCreateManyNotebookInput = {
@@ -13404,10 +22199,11 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: boolean
     createdAt?: Date | string
-    updatedBy?: string | null
     updatedAt?: Date | string
-    deletedBy?: string | null
     deletedAt?: Date | string | null
+    createdBy: string
+    deletedBy?: string | null
+    updatedBy: string
   }
 
   export type PageUpdateWithoutNotebookInput = {
@@ -13418,8 +22214,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    updatedByUser?: UserUpdateOneWithoutPagesUserUpdatedNestedInput
-    deletedByUser?: UserUpdateOneWithoutPagesUserDeletedNestedInput
+    createdByUser?: UserUpdateOneRequiredWithoutPagesCreatedNestedInput
+    deletedByUser?: UserUpdateOneWithoutPagesDeletedNestedInput
+    updatedByUser?: UserUpdateOneRequiredWithoutPagesUpdatedNestedInput
+    favorites?: FavoriteUpdateManyWithoutPageNestedInput
   }
 
   export type PageUncheckedUpdateWithoutNotebookInput = {
@@ -13428,22 +22226,57 @@ export namespace Prisma {
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+    favorites?: FavoriteUncheckedUpdateManyWithoutPageNestedInput
   }
 
-  export type PageUncheckedUpdateManyWithoutPagesInput = {
+  export type PageUncheckedUpdateManyWithoutNotebookInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: NullableJsonNullValueInput | InputJsonValue
     published?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    deletedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FavoriteCreateManyPageInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    workspaceId: string
+  }
+
+  export type FavoriteUpdateWithoutPageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutFavoritesNestedInput
+    workspace?: WorkspaceUpdateOneWithoutFavoritesNestedInput
+  }
+
+  export type FavoriteUncheckedUpdateWithoutPageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FavoriteUncheckedUpdateManyWithoutPageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
   }
 
 

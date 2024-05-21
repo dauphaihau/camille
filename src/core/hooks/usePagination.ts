@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 interface Props {
   quantityRows: number,
@@ -10,7 +10,7 @@ interface Props {
 export const DOTS = '...';
 
 const range = (start, end) => {
-  let length = end - start + 1;
+  const length = end - start + 1;
   return Array.from({ length }, (_, idx) => idx + start);
 };
 
@@ -20,7 +20,7 @@ export const usePagination = (props: Props) => {
     quantityRows,
     rowsPerPage,
     siblingCount = 1,
-    currentPage
+    currentPage,
   } = props;
 
   return useMemo(() => {
@@ -55,15 +55,15 @@ export const usePagination = (props: Props) => {
     const lastPageIndex = totalPageCount;
 
     if (!shouldShowLeftDots && shouldShowRightDots) {
-      let leftItemCount = 3 + 2 * siblingCount;
-      let leftRange = range(1, leftItemCount);
+      const leftItemCount = 3 + (2 * siblingCount);
+      const leftRange = range(1, leftItemCount);
 
       return [...leftRange, DOTS, totalPageCount];
     }
 
     if (shouldShowLeftDots && !shouldShowRightDots) {
-      let rightItemCount = 3 + 2 * siblingCount;
-      let rightRange = range(
+      const rightItemCount = 3 + (2 * siblingCount);
+      const rightRange = range(
         totalPageCount - rightItemCount + 1,
         totalPageCount
       );
@@ -71,7 +71,7 @@ export const usePagination = (props: Props) => {
     }
 
     if (shouldShowLeftDots && shouldShowRightDots) {
-      let middleRange = range(leftSiblingIndex, rightSiblingIndex);
+      const middleRange = range(leftSiblingIndex, rightSiblingIndex);
       return [firstPageIndex, DOTS, ...middleRange, DOTS, lastPageIndex];
     }
   }, [quantityRows, rowsPerPage, siblingCount, currentPage]);

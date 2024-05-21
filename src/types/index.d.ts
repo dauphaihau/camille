@@ -1,5 +1,5 @@
-import { Icons } from "@/components/icons"
-import { User, Workspace } from "@prisma/client"
+import { Workspace } from '@prisma/client';
+import { Icons } from '@/components/icons';
 
 export type NavItem = {
   title: string
@@ -54,8 +54,13 @@ export type SubscriptionPlan = {
   limitedNotebooks: number
 }
 
+export type Response = {
+  code: string
+  message: string
+}
+
 export type WorkspaceSubscriptionPlan = SubscriptionPlan &
-  Pick<Workspace, "stripeWorkspaceId" | "stripeSubscriptionId"> & {
+  Pick<Workspace, 'stripeWorkspaceId' | 'stripeSubscriptionId'> & {
   // stripeCurrentPeriodEnd: number | undefined
   stripeCurrentPeriodEnd: number
   stripeCustomerId: string

@@ -1,6 +1,6 @@
-import * as React from "react"
+import * as React from 'react';
 
-import { cn } from "core/helpers"
+import { cn } from 'core/helpers';
 
 interface DashboardShellProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -10,8 +10,8 @@ export function DashboardShell({
   ...props
 }: DashboardShellProps) {
   return (
-    <div className={cn("grid items-start gap-8", className)} {...props}>
-      {children}
+    <div className={ cn('grid items-start gap-8', className) } { ...props }>
+      { children }
     </div>
-  )
+  );
 }

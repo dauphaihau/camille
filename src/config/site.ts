@@ -1,9 +1,9 @@
-import { SiteConfig } from "types"
+import { SiteConfig } from 'types';
 
 export const siteConfig: SiteConfig = {
-  name: "Camille",
+  name: 'Camille',
   links: {
-    twitter: "https://twitter.com/dauphaihau",
-    github: "https://github.com/dauphaihau/camille",
+    twitter: 'https://twitter.com/dauphaihau',
+    github: 'https://github.com/dauphaihau/camille',
   },
-}
+};

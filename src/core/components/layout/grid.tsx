@@ -1,6 +1,6 @@
-import { ComponentPropsWithoutRef } from "react";
-import { cn } from "core/helpers";
-import { ClassValue } from "clsx";
+import { ComponentPropsWithoutRef } from 'react';
+import { ClassValue } from 'clsx';
+import { cn } from 'core/helpers';
 
 enum COL {
   FIRST = 1,
@@ -97,7 +97,7 @@ const Grid = ({
 
   return (
     <div
-      className={cn('grid',
+      className={ cn('grid',
         GAP_MAPS[gap],
         sx && COL_SX_MAPS[sx],
         md && COL_MD_MAPS[md],
@@ -106,13 +106,13 @@ const Grid = ({
         GAP_X_MAPS[gapx],
         GAP_Y_MAPS[gapy],
         cn(classes)
-      )}
-      {...others}
+      ) }
+      { ...others }
     >
-      {children}
+      { children }
     </div>
   );
-}
+};
 
 Grid.displayName = 'Grid';
 export default Grid;

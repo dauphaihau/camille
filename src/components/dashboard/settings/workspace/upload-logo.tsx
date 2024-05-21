@@ -1,21 +1,19 @@
-'use client'
+'use client';
 
-import { Tooltip } from "core/components";
-import useStore from "lib/store";
+import { Tooltip } from 'core/components';
+import { useGetDetailWorkspace } from 'lib/request-client/workspace';
 
 export function UpdateLogo() {
-  const workspace = useStore(state => state.workspace)
+  const { data: { workspace } = {} } = useGetDetailWorkspace();
   return (
     <Tooltip>
       <Tooltip.Trigger>
         <div
           className='avatar bg-accent group-hover:bg-[#dcdbda] h-16 w-16
          rounded text-md text-primary-medium grid place-items-center
-         select-none
-
-         '
+         select-none'
         >
-          {workspace.name && workspace.name.charAt(0)}
+          { workspace?.name && workspace.name.charAt(0) }
         </div>
       </Tooltip.Trigger>
       <Tooltip.Content>

@@ -1,46 +1,34 @@
-import React from "react";
-import { redirect } from "next/navigation"
+import React from 'react';
+import { FormUpdateWorkspace } from 'components/dashboard/settings/workspace/form-update-workspace';
+import { DashboardSettingsHeader } from 'components/dashboard/settings/header';
+import { DashboardSettingsShell } from 'components/dashboard/settings/shell';
+import { DeleteWorkspaceButton } from 'components/dashboard/settings/workspace/delete-workspace-button';
+import { Grid } from 'core/components';
+import { UpdateLogo } from 'components/dashboard/settings/workspace/upload-logo';
 
-import { getCurrentUser } from "lib/session"
-import { FormUpdateWorkspace } from "components/dashboard/settings/workspace/form-update-workspace";
-import { getDetailWorkspace } from "lib/request/workspace";
-import { DashboardSettingsHeader } from "components/dashboard/settings/header";
-import { DashboardSettingsShell } from "components/dashboard/settings/shell"
-import { DeleteWorkspaceButton } from "components/dashboard/settings/workspace/delete-workspace-button";
-import { Grid } from "core/components";
-import { PATH } from "config/const";
-import { UpdateLogo } from "components/dashboard/settings/workspace/upload-logo";
-
-export default async function WorkspaceSettingPage({ params }) {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    redirect(PATH.LOGIN)
-  }
-
-  const workspace = await getDetailWorkspace(params.domainWorkspace)
+export default async function WorkspaceSettingPage() {
 
   return (
     <DashboardSettingsShell>
       <DashboardSettingsHeader
-        heading="Workspace"
-        text="Manage your workspace setting."
+        heading='Workspace'
+        text='Manage your workspace setting.'
       />
 
-      <Grid classes="gap-8 max-w-[600px] mx-auto">
+      <Grid classes='gap-8 max-w-[600px] mx-auto'>
         <div className='space-y-3'>
           <div>Logo</div>
-          <UpdateLogo/>
+          <UpdateLogo />
           <div className='text-sm text-[#6b6f7c]'>Pick a logo for your workspace. Recommend size is 256x256</div>
         </div>
 
-        <div className='border-gray-200 border-b'/>
+        <div className='border-gray-200 border-b' />
 
         <div className='space-y-3 w-1/2'>
           <div className='text-base'>General</div>
-          <FormUpdateWorkspace workspace={workspace}/>
+          <FormUpdateWorkspace />
         </div>
-        <div className='border-gray-200 border-b'/>
+        <div className='border-gray-200 border-b' />
 
         <div className='space-y-4'>
           <div>Danger zone</div>
@@ -48,9 +36,9 @@ export default async function WorkspaceSettingPage({ params }) {
             including but not limited to users,
             issues, and comments, you can do so below.
           </div>
-          <DeleteWorkspaceButton workspaceId={workspace.id}/>
+          <DeleteWorkspaceButton />
         </div>
       </Grid>
     </DashboardSettingsShell>
-  )
+  );
 }

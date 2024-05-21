@@ -1,64 +1,83 @@
-import { useCallback } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useState } from 'react';
+import { useParams } from 'next/navigation';
 
-import { Icons, Tooltip } from "core/components";
-import { cn } from "core/helpers";
-import { addToFavorite } from "lib/request-by-swr/page";
-import { toast } from "core/components";
-import { useKeyboardShortcut } from "core/hooks";
-import useStore, { useStoreMulti } from "lib/store";
+import * as React from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { Icons, Loading, Tooltip } from 'core/components';
+import { cn } from 'core/helpers';
+import { useAddPageToFavorite, useGetCurrentPage } from 'lib/request-client/page';
+import { toast } from 'core/components';
+import { useKeyboardShortcut } from 'core/hooks';
+import { useStoreMulti } from 'lib/store';
+import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { DashboardSlugs } from 'types/workspace';
 
-export default function FavoriteButton({ page }) {
-  const pathName = usePathname()
-  const router = useRouter()
-  const pageId = pathName && pathName.split('/')[3]
+export default function FavoriteButton() {
+  const queryClient = useQueryClient();
+  const slugs = useParams<DashboardSlugs>();
+
+  const { data: { workspace } = {} } = useGetDetailWorkspace();
+  const { data: page } = useGetCurrentPage();
+  const [isFavorite, setIsFavorite] = useState(page?.isFavorite);
+
   const {
-    workspace,
+    isPending: isPendingAddPageToFavorite,
+    mutateAsync: addPageToFavorite,
+    isError: isErrorAddPageToFavorite,
+  } = useAddPageToFavorite();
+
+  const {
     shortcutOverrideSystem,
-    setReFetchNotebookId
-  } = useStoreMulti('workspace', 'shortcutOverrideSystem', 'setReFetchNotebookId')
-
-  const user = useStore(state => state.user)
-
-  const isFavorite = user.favoritePages?.some(p => p.id === pageId)
+  } = useStoreMulti('shortcutOverrideSystem');
 
   async function handleAddToFavorite() {
-    if (!workspace) return null
-    const response = await addToFavorite({
+    if (!workspace || !page?.id) return;
+
+    await addPageToFavorite({
       workspaceId: workspace.id,
       pageId: page.id,
-    })
+    });
+    setIsFavorite(!isFavorite);
 
-    if (response.code !== '200') {
-      return toast({
-        title: "Something went wrong.",
-        message: "Your page was not add to favorite. Please try again.",
-        type: "error",
-      })
+    if (isErrorAddPageToFavorite) {
+      toast({
+        title: 'Something went wrong.',
+        message: 'Your page was not add to favorite. Please try again.',
+        type: 'error',
+      });
+      return;
     }
-
-    setReFetchNotebookId?.(page.notebookId)
-    router.refresh();
+    await queryClient.invalidateQueries({
+      queryKey: ['favorites-pages', workspace.id],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ['notebook', slugs?.notebookId],
+    });
   }
 
   const shortcutPinPage = ['Meta', 'P'];
   const handleShortcutPinPage = useCallback(() => {
-    handleAddToFavorite()
-  }, [handleAddToFavorite])
-  useKeyboardShortcut(shortcutPinPage, handleShortcutPinPage, { overrideSystem: shortcutOverrideSystem })
+    handleAddToFavorite();
+  }, [handleAddToFavorite]);
+  useKeyboardShortcut(shortcutPinPage, handleShortcutPinPage, { overrideSystem: shortcutOverrideSystem });
 
   return (
     <Tooltip>
       <Tooltip.Trigger>
-        <div className='btn-icon-header' onClick={handleAddToFavorite}>
+        <div
+          className='btn-icon-header'
+          onClick={ handleAddToFavorite }
+        >
           {
-            isFavorite ?
-              <Icons.star
-                className={cn('h-5 w-5',
-                  isFavorite && 'fill-[#eec264]'
-                )}
-              />
-              : <Icons.starOutline className='h-5 w-5'/>
+            isPendingAddPageToFavorite ?
+              <Loading /> :
+              isFavorite ?
+                <Icons.star
+                  className={ cn('h-5 w-5',
+                    isFavorite && 'fill-[#eec264]'
+                  ) }
+                /> :
+                <Icons.starOutline className='h-5 w-5' />
           }
         </div>
       </Tooltip.Trigger>

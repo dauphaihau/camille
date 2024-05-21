@@ -1,46 +1,14 @@
-import { Notebook, Page, Teamspace, User, UserOnWorkspace, Workspace } from "@prisma/client";
-
-type favoritePages = Page & {notebook: Notebook}
-
-type StateUser = Partial<User & {
-  userOnWorkspace: UserOnWorkspace
-  privateNotebooks: Notebook[]
-  favoritePages: favoritePages[]
-}>
+import { Notebook, Page } from '@prisma/client';
 
 export interface IStoreState {
   page: Partial<Page>,
   setPage: (page) => void,
 
-  reFetchNotebookId: string,
-  setReFetchNotebookId: (notebookId: string) => void,
-
-  reFetchTeamspaceId: string,
-  setReFetchTeamspaceId: (teamspaceId: string) => void,
-
-  stateRouter: any
+  stateRouter: object
   setStateRouter: (state: object) => void
 
-  statePageBreadcrumb: any
+  statePageBreadcrumb: Partial<{ notebook: Pick<Notebook, 'id' | 'title'>, pageData: Page }>
   setStatePageBreadcrumb: (state: object) => void
-
-  workspace: Partial<Workspace & {
-    notebooks: Notebook[]
-    teamspaces: Teamspace[]
-    isStandard: boolean
-    totalMembers: number
-    totalNotebooks: number
-  }>,
-  setWorkspace: (state) => void
-  // setWorkspace: (state: Workspace) => void
-
-  setUser: (state: StateUser) => void
-  user: StateUser,
-
-  userOnWorkspace: Partial<{
-    user: User
-  } & UserOnWorkspace>
-  setUserOnWorkspace: (userOnWorkspace: object) => void,
 
   setShowSidebar: () => void,
   showSidebar: boolean,
@@ -51,6 +19,6 @@ export interface IStoreState {
   setShowPagesInTrashPopover: (val: boolean) => void,
   showPagesInTrashPopover: boolean,
 
-  setShowLimitedNotebookBar: (showLimitedNotebookBar?: boolean | undefined) => void,
+  setShowLimitedNotebookBar: (show?: boolean | undefined) => void,
   showLimitedNotebookBar: boolean,
 }

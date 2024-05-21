@@ -1,6 +1,6 @@
-import { User, Workspace } from "@prisma/client";
+import { User, Workspace } from '@prisma/client';
 
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
   interface JWT {
     id: User.id
     image: string
@@ -8,7 +8,7 @@ declare module "next-auth/jwt" {
   }
 }
 
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session {
     user: User & {
       workspaceLastVisited: Workspace

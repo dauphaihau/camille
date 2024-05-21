@@ -10,7 +10,7 @@ A note-taking web application where you can think, write, and plan
 4. NextAuth.js (Authentication)
 5. Stripe (Payment)
 6. Prisma (Object-Relational Mapping)
-7. PlanetScale (Database)
+7. MySQL (Relational Database)
 
 ## Work In Progress
 The app is being under maintenance, as more work needs to be done.
@@ -36,12 +36,19 @@ and feel free to share your opinion, constructive criticism, or comments about m
 And More ! There's always room for improvement!
 
 ## Installation
-Install deps:
+1. Copy .env.example to .env and update the variables
+
+2. Sync schema prisma with your cloud database
+```bash
+npx prisma db push
+```
+
+3. Install deps:
 ```bash
 pnpm install
 ```
 
-Copy .env.example to .env and update the variables.:
+4. Launch app
 ```bash
 pnpm dev
 ```

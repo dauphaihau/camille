@@ -1,72 +1,63 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import * as z from 'zod'
+import { NextApiRequest, NextApiResponse } from 'next';
+import * as z from 'zod';
 import { getServerSession } from 'next-auth/next';
 
-import { withMethods } from 'lib/api-middlewares/with-methods'
-import { db } from 'lib/db'
-import { pagePatchSchema } from 'lib/validations/page'
+import { withMethods } from 'lib/api-middlewares/with-methods';
+import { db } from 'lib/db';
+import { updatePageSchema } from 'lib/validations/page';
 import { authOptions } from 'lib/auth';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-  const session = await getServerSession(req, res, authOptions)
+  const session = await getServerSession(req, res, authOptions);
 
   if (!session) {
-    return res.status(403).end()
+    return res.status(403).end();
   }
 
-  // get detail page
-  if (req.method === 'GET') {
-    try {
-      const page = await db.page.findFirst({
-        where: {
-          id: req.query.pageId as string,
-        },
-      })
-      return res.json(page)
-    } catch (error) {
-      return res.status(500).end()
-    }
-  }
-
-  // update title, content page
+  // update page
   if (req.method === 'PATCH') {
     try {
-      const pageId = req.query.pageId as string
+      const pageId = req.query.pageId;
+
+      if (typeof pageId != 'string') {
+        return res.status(400).end();
+      }
 
       const page = await db.page.findUnique({
         where: {
           id: pageId,
         },
-      })
+      });
 
-      const body = pagePatchSchema.parse(req.body)
+      if (!page) {
+        return res.status(404).end();
+      }
 
-      // TODO: Implement sanitization for content.
+      const body = updatePageSchema.parse(req.body);
 
-      if (!page) return
+      if (body?.title && !body.title) {
+        body.title = 'Untitled page';
+      }
 
       await db.page.update({
         where: {
           id: page.id,
         },
         data: {
-          title: body.title || page.title,
-          content: body.content,
-          updatedBy: session.user.id
+          ...body,
+          updatedBy: session.user.id,
         },
-      })
+      });
 
-      return res.send({ code: '200', message: 'update page success' })
+      return res.send({ code: '200', message: 'update page success' });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(422).json(error.issues)
+        return res.status(422).json(error.issues);
       }
-
-      return res.status(422).end()
-      // return res.status(500).end()
+      return res.status(422).end();
     }
   }
 }
 
-export default withMethods(['GET', 'PATCH'], handler)
+export default withMethods(['PATCH'], handler);

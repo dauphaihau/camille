@@ -3,3 +3,4 @@ export * from './usePagination';
 export * from './useMediaQuery';
 export * from './useScrollDirection';
 export * from './useKeyboardShortcut';
+export * from './useDebounce';

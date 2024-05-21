@@ -1,9 +1,24 @@
-import * as z from "zod"
+import * as z from 'zod';
+import { pageSchema, workspaceSchema } from '../../../prisma/zod';
 
-export const pagePatchSchema = z.object({
-  title: z.string().max(128).optional(),
-  // title: z.string().min(3).max(128).optional(),
-
-  // TODO: Type this properly from editorjs block types?
+const customPageSchema = pageSchema.merge(z.object({
   content: z.any().optional(),
-})
+}));
+
+export const addPageToFavoriteSchema = z.object({
+  pageId: pageSchema.shape.id,
+  workspaceId: workspaceSchema.shape.id,
+});
+
+export const updatePageSchema = customPageSchema.pick({
+  title: true,
+  content: true,
+  published: true,
+}).partial();
+
+export const createPageSchema = customPageSchema.pick({
+  notebookId: true,
+}).merge(customPageSchema.pick({
+  title: true,
+  content: true,
+})).partial();

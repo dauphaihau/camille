@@ -1,101 +1,102 @@
-'use client'
+'use client';
 
-import { FormProvider, useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import React from 'react';
 
-import { toast, Button, Col, Input } from "core/components";
-import { PATH, ROLE_USER_ON_WORKSPACE } from "config/const";
-import { updateInfoGeneralWorkspace } from "lib/request-by-swr/workspace";
-import useStore from "lib/store";
+import {
+  Button, Col, Input, toast
+} from 'core/components';
+import { PATH, ROLE_USER_ON_WORKSPACE } from 'config/const';
+import {
+  useGetDetailWorkspace,
+  useUpdateInfoGeneralWorkspace
+} from 'lib/request-client/workspace';
+import { IUpdateWorkspace } from 'types/workspace';
 
-export function FormUpdateWorkspace({ workspace }) {
+export function FormUpdateWorkspace() {
   const router = useRouter();
-  const user = useStore(state => state.user)
-  const [isLoading, setIsLoading] = React.useState(false)
+  const { data: { user, workspace } = {} } = useGetDetailWorkspace();
 
-  const methods = useForm({
+  const {
+    isPending: isPendingUpdateWorkspace,
+    mutateAsync: updateWorkspace,
+    data: responseUpdatedWorkspace,
+    isError: isErrorUpdateWorkspace,
+  } = useUpdateInfoGeneralWorkspace();
+
+  const methodsRhf = useForm<IUpdateWorkspace>({
     mode: 'onChange',
     defaultValues: {
-      name: workspace.name,
-      domain: workspace.domain
-    }
+      name: workspace?.name,
+      domain: workspace?.domain ?? '',
+    },
+    disabled: user && user.userOnWorkspace?.role === ROLE_USER_ON_WORKSPACE.MEMBER,
   });
 
-  useEffect(() => {
-    let suggestDomain = methods.watch('domain')
-    .toLowerCase()
-    .replace(/ +/g, '-')
-    .replace(/[^a-z0-9._-]/gi, '');
-
-    if (suggestDomain.at(-1) === '-') {
-      suggestDomain.substring(0, suggestDomain.length - 1)
-    }
-
-    if (suggestDomain.at(0) === '-') {
-      suggestDomain = suggestDomain.substring(1)
-    }
-    methods.setValue('domain', suggestDomain)
-  }, [methods.watch('domain')])
-
-  async function onSubmit(values) {
-    setIsLoading(true)
+  async function onSubmit(values: IUpdateWorkspace) {
 
     // omit field not change
     Object.keys(values).forEach((key) => {
-      if (workspace[key] === values[key]) {
-        delete values[key]
+      if (workspace && workspace[key] === values[key]) {
+        delete values[key];
       }
-    })
+    });
 
     // validate domain
     if (values.domain && PATH[values.domain.toUpperCase()]) {
-      methods.setError('domain', { type: 'custom', message: 'Not allowed' })
-      setIsLoading(false)
-      return
+      methodsRhf.setError('domain', { type: 'custom', message: 'Not allowed' });
+      return;
     }
 
-    const response = await updateInfoGeneralWorkspace({ ...values, workspaceId: workspace.id })
+    await updateWorkspace({ ...values, workspaceId: workspace?.id as string });
 
-    setIsLoading(false)
-
-    if (response.code !== '200') {
-      if (response.code === '409') {
-        return methods.setError('domain', { type: 'custom', message: 'Used' });
-      }
+    if (isErrorUpdateWorkspace) {
       return toast({
-        message: "Your update settings request failed. Please try again.",
-        type: "error",
-      })
+        message: 'Your update settings request-server failed. Please try again.',
+        type: 'error',
+      });
+    }
+
+    if (responseUpdatedWorkspace?.code === '409') {
+      return methodsRhf.setError('domain', { type: 'custom', message: 'Used' });
     }
 
     // await getSession()
-    router.refresh()
+    router.refresh();
 
     if (values?.domain) {
-      router.push(`/${values.domain}${PATH.SETTINGS}${PATH.WORKSPACE}`)
+      router.push(`/${values.domain}${PATH.SETTINGS}${PATH.WORKSPACE}`);
     }
 
-    methods.reset({}, { keepValues: true });
+    methodsRhf.reset({}, { keepValues: true });
 
-    return toast({
-      message: "Your settings was update success",
-      type: "success",
-    })
+    toast({
+      message: 'Your settings was update success',
+      type: 'success',
+    });
   }
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <Col gap={4}>
-          <Input disabled={user.userOnWorkspace?.role === ROLE_USER_ON_WORKSPACE.MEMBER} id='name' label='Name'/>
-          <Input disabled={user.userOnWorkspace?.role === ROLE_USER_ON_WORKSPACE.MEMBER} id='domain' label='Domain'/>
-          <Button
-            disabled={!methods.formState.isDirty}
-            isLoading={isLoading} classes='mt-2' type='submit' width='fit'
-          >Update</Button>
-        </Col>
-      </form>
-    </FormProvider>
+    <form onSubmit={ methodsRhf.handleSubmit(onSubmit) }>
+      <Col gap={ 4 }>
+        <Input
+          { ...methodsRhf.register('name') }
+          label='Name'
+        />
+        <Input
+          { ...methodsRhf.register('domain') }
+          label='Domain'
+        />
+        <Button
+          disabled={ !methodsRhf.formState.isDirty }
+          isLoading={ isPendingUpdateWorkspace }
+          classes='mt-2'
+          type='submit'
+          width='fit'
+        >Update
+        </Button>
+      </Col>
+    </form>
   );
 }

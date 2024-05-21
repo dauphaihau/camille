@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { cn } from 'core/helpers';
 import * as React from 'react';
-import { RegisterOptions, useFormContext } from 'react-hook-form';
+import { forwardRef } from 'react';
+import { cn } from 'core/helpers';
 
 export type InputProps = {
   /** Input label */
@@ -11,9 +11,10 @@ export type InputProps = {
    * id to be initialized with React Hook Form,
    * must be the same with the pre-defined types.
    */
-  id: string;
+  id?: string;
   /** Small text below input, useful for additional information */
   helperText?: string;
+  error?: string | boolean;
   /**
    * Input type
    * @example text, email, password
@@ -23,99 +24,94 @@ export type InputProps = {
   classesLabelLeft?: string
   labelLeft?: string
   /** Disables the input and shows defaultValue (can be set from React Hook Form) */
-  readOnly?: boolean;
-  /** Disable error style (not disabling error validation) */
-  hideError?: boolean;
 
   sizeInput?: 'xs' | 'sm' | 'md';
-
   /** Manual validation using RHF, it is encouraged to use yup resolver instead */
-  validation?: RegisterOptions;
 } & React.ComponentPropsWithoutRef<'input'>;
 
-export function Input({
-  label,
-  helperText,
-  id,
-  classes,
-  classesLabelLeft,
-  sizeInput = 'sm',
-  type = 'text',
-  readOnly = false,
-  hideError = false,
-  validation,
-  labelLeft,
-  ...others
-}: InputProps) {
+const sizes = {
+  xs: 'px-[14px] h-[28px] text-xs',
+  sm: 'px-4 h-[36px] text-sm',
+  md: 'px-[22px] h-[42px] text-base',
+};
+
+export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 
   const {
-    register,
-    formState: { errors },
-  } = useFormContext();
-
-  const arrSize = [
-    sizeInput === 'xs' && ['px-[14px] h-[28px] text-xs'],
-    sizeInput === 'sm' && ['px-4 h-[34px] text-sm'],
-    sizeInput === 'md' && ['px-[22px] h-[42px] text-base'],
-  ]
+    label,
+    helperText,
+    id,
+    classes,
+    classesLabelLeft,
+    sizeInput = 'sm',
+    type = 'text',
+    labelLeft,
+    error,
+    ...others
+  } = props;
 
   return (
     <div className='w-full'>
-      {label && <label htmlFor={id} className='text-sm font-medium text-[#3c4149] dark:text-white'>{label}</label>}
-      <div
-        className={cn('',
-          'group relative')}
-      >
-        {/*<div className='input__contentLeft'>{contentLeft}</div>*/}
+      {
+        label &&
+        <label
+          htmlFor={ id }
+          className='text-sm font-medium text-[#3c4149] dark:text-white mb-1'
+        >
+          { label }
+        </label>
+      }
+      <div className={ cn('group relative') }>
+        { /*<div className='input__contentLeft'>{contentLeft}</div>*/ }
         <span
-          className={cn('absolute flex items-center justify-center top-0 left-0 bottom-0',
-            arrSize,
+          className={ cn('absolute flex items-center justify-center top-0 left-0 bottom-0',
+            sizes[sizeInput],
             classesLabelLeft
-          )}
-        >{labelLeft}</span>
-        {/*<div className='input__contentRight'>{contentRight}</div>*/}
-        {/*<Clear/>*/}
+          ) }
+        >{ labelLeft }
+        </span>
+        { /*<Clear/>*/ }
         <input
-          // autoFocus={false}
-          // ref={ref}
-          type={type}
-          // value={value}
-          // name={name}
-          // onChange={handleOnChange}
-          {...register(id, validation)}
-          className={cn(
+          type={ type }
+          ref={ ref }
+          className={ cn(
             `
-          bg-[#f7f7f7] focus:bg-white
-          border border-solid border-gray-300 hover:border-black
+          bg-[#f7f7f5] focus:bg-white
+          border border-solid 
+          focus:border focus:outline-none focus:ring-1 
+          
           rounded placeholder-gray-500
           transition duration-200 ease-in-out
-          focus:ring-black focus:border focus:border-black focus:outline-none
           w-full appearance-none
           text-gray-900 text-xs lg:text-sm
           dark:bg-[#16161a]
           dark:border-0 dark:text-white
           
-          disabled:bg-red-300
           disabled:cursor-not-allowed
           disabled:hover:border-gray-300
           disabled:bg-[#e5e5e5] 
           disabled:text-[#aeb5bc]
         `,
-            arrSize,
+            sizes[sizeInput],
+            error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 hover:border-black focus:border-black focus:ring-black',
             'p-2.5 md:pr-5',
             // { 'pl-10': contentLeft },
             classes
-          )}
-          {...others}
+          ) }
+          { ...others }
         />
       </div>
-      {helperText && <p className='text-red-500 text-sm mt-2'>{helperText}</p>}
-      {errors[id] && <p className='text-red-500 text-sm mt-2'>
-        {errors[id]?.message as unknown as string}
-      </p>}
+      { !error && helperText && <p className='text-sm mt-2'>{ helperText }</p> }
+      {
+        typeof error === 'string' && error && (
+          <p className='text-red-500 text-sm mt-2'>
+            { error }
+          </p>
+        )
+      }
 
     </div>
   );
-}
+});
 
 Input.displayName = 'Input';

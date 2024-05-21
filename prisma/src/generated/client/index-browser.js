@@ -4,7 +4,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const {
   Decimal,
   objectEnumValues,
-  makeStrictEnum
+  makeStrictEnum,
+  Public,
 } = require('./runtime/index-browser')
 
 
@@ -13,12 +14,12 @@ const Prisma = {}
 exports.Prisma = Prisma
 
 /**
- * Prisma Client JS version: 4.11.0
- * Query Engine version: 8fde8fef4033376662cad983758335009d522acb
+ * Prisma Client JS version: 4.16.2
+ * Query Engine version: e9771e62de70f79a5e1c604a2d7c8e2a0a874b48
  */
 Prisma.prismaVersion = {
-  client: "4.11.0",
-  engine: "8fde8fef4033376662cad983758335009d522acb"
+  client: "4.16.2",
+  engine: "e9771e62de70f79a5e1c604a2d7c8e2a0a874b48"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -66,8 +67,19 @@ Prisma.raw = () => {
   throw new Error(`raw is unable to be run in the browser.
 In case this error is unexpected for you, please report it in https://github.com/prisma/prisma/issues`,
 )}
-Prisma.validator = () => (val) => val
+Prisma.validator = Public.validator
 
+/**
+* Extensions
+*/
+Prisma.getExtensionContext = () => {
+  throw new Error(`Extensions.getExtensionContext is unable to be run in the browser.
+In case this error is unexpected for you, please report it in https://github.com/prisma/prisma/issues`,
+)}
+Prisma.defineExtension = () => {
+  throw new Error(`Extensions.defineExtension is unable to be run in the browser.
+In case this error is unexpected for you, please report it in https://github.com/prisma/prisma/issues`,
+)}
 
 /**
  * Shorthand utilities for JSON filtering
@@ -85,13 +97,16 @@ Prisma.NullTypes = {
 /**
  * Enums
  */
-// Based on
-// https://github.com/microsoft/TypeScript/issues/3192#issuecomment-261720275
-function makeEnum(x) { return x; }
 
-exports.Prisma.AccountScalarFieldEnum = makeEnum({
+exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
+  Serializable: 'Serializable'
+});
+
+exports.Prisma.AccountScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
   type: 'type',
   provider: 'provider',
   providerAccountId: 'providerAccountId',
@@ -103,73 +118,19 @@ exports.Prisma.AccountScalarFieldEnum = makeEnum({
   id_token: 'id_token',
   session_state: 'session_state',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-});
-
-exports.Prisma.JsonNullValueFilter = makeEnum({
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull,
-  AnyNull: Prisma.AnyNull
-});
-
-exports.Prisma.NotebookScalarFieldEnum = makeEnum({
-  id: 'id',
-  title: 'title',
-  description: 'description',
-  published: 'published',
-  createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  workspaceId: 'workspaceId'
-});
+  userId: 'userId'
+};
 
-exports.Prisma.NullableJsonNullValueInput = makeEnum({
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull
-});
-
-exports.Prisma.PageScalarFieldEnum = makeEnum({
-  id: 'id',
-  title: 'title',
-  content: 'content',
-  published: 'published',
-  createdAt: 'createdAt',
-  updatedBy: 'updatedBy',
-  updatedAt: 'updatedAt',
-  deletedBy: 'deletedBy',
-  deletedAt: 'deletedAt',
-  notebookId: 'notebookId'
-});
-
-exports.Prisma.SessionScalarFieldEnum = makeEnum({
+exports.Prisma.SessionScalarFieldEnum = {
   id: 'id',
   sessionToken: 'sessionToken',
   accessToken: 'accessToken',
   expires: 'expires',
   userId: 'userId'
-});
+};
 
-exports.Prisma.SortOrder = makeEnum({
-  asc: 'asc',
-  desc: 'desc'
-});
-
-exports.Prisma.TrackingUserAccessScalarFieldEnum = makeEnum({
-  id: 'id',
-  userId: 'userId',
-  lastAccessWorkspaceId: 'lastAccessWorkspaceId',
-  lastAccessNotebookId: 'lastAccessNotebookId',
-  lastAccessPageId: 'lastAccessPageId',
-  createdAt: 'createdAt'
-});
-
-exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
-  ReadUncommitted: 'ReadUncommitted',
-  ReadCommitted: 'ReadCommitted',
-  RepeatableRead: 'RepeatableRead',
-  Serializable: 'Serializable'
-});
-
-exports.Prisma.UserScalarFieldEnum = makeEnum({
+exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
   email: 'email',
@@ -179,18 +140,27 @@ exports.Prisma.UserScalarFieldEnum = makeEnum({
   updatedAt: 'updatedAt',
   stripeCustomerId: 'stripeCustomerId',
   lastAccessWorkspaceId: 'lastAccessWorkspaceId'
-});
+};
 
-exports.Prisma.VerificationTokenScalarFieldEnum = makeEnum({
+exports.Prisma.VerificationTokenScalarFieldEnum = {
   id: 'id',
   identifier: 'identifier',
   token: 'token',
   expires: 'expires',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
-});
+};
 
-exports.Prisma.WorkspaceScalarFieldEnum = makeEnum({
+exports.Prisma.TrackingUserAccessOnWorkspaceScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  lastAccessNotebookId: 'lastAccessNotebookId',
+  lastAccessPageId: 'lastAccessPageId',
+  userId: 'userId',
+  workspaceId: 'workspaceId'
+};
+
+exports.Prisma.WorkspaceScalarFieldEnum = {
   id: 'id',
   name: 'name',
   domain: 'domain',
@@ -199,22 +169,112 @@ exports.Prisma.WorkspaceScalarFieldEnum = makeEnum({
   stripeSubscriptionId: 'stripeSubscriptionId',
   stripePriceId: 'stripePriceId',
   stripeCurrentPeriodEnd: 'stripeCurrentPeriodEnd',
-  createdBy: 'createdBy',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-});
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy'
+};
+
+exports.Prisma.TeamspaceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  isOrigin: 'isOrigin',
+  archivedAt: 'archivedAt',
+  workspaceId: 'workspaceId',
+  createdBy: 'createdBy'
+};
+
+exports.Prisma.NotebookScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  published: 'published',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  workspaceId: 'workspaceId',
+  teamspaceId: 'teamspaceId',
+  createdBy: 'createdBy'
+};
+
+exports.Prisma.PageScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  content: 'content',
+  published: 'published',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt',
+  notebookId: 'notebookId',
+  createdBy: 'createdBy',
+  deletedBy: 'deletedBy',
+  updatedBy: 'updatedBy'
+};
+
+exports.Prisma.FavoriteScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  workspaceId: 'workspaceId',
+  pageId: 'pageId'
+};
+
+exports.Prisma.UserOnWorkspaceScalarFieldEnum = {
+  id: 'id',
+  role: 'role',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  workspaceId: 'workspaceId'
+};
+
+exports.Prisma.UserOnTeamspaceScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  operation: 'operation',
+  userId: 'userId',
+  teamspaceId: 'teamspaceId'
+};
+
+exports.Prisma.SortOrder = {
+  asc: 'asc',
+  desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
 
 
-exports.Prisma.ModelName = makeEnum({
+exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
   User: 'User',
   VerificationToken: 'VerificationToken',
-  TrackingUserAccess: 'TrackingUserAccess',
+  TrackingUserAccessOnWorkspace: 'TrackingUserAccessOnWorkspace',
   Workspace: 'Workspace',
+  Teamspace: 'Teamspace',
   Notebook: 'Notebook',
-  Page: 'Page'
-});
+  Page: 'Page',
+  Favorite: 'Favorite',
+  UserOnWorkspace: 'UserOnWorkspace',
+  UserOnTeamspace: 'UserOnTeamspace'
+};
 
 /**
  * Create the Client

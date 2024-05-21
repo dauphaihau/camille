@@ -1,6 +1,6 @@
-import { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { ComponentPropsWithoutRef } from 'react';
+import { ClassValue } from 'clsx';
 import { cn } from 'core/helpers';
-import { ClassValue } from "clsx";
 
 enum GAP {
   FIRST = 1,
@@ -62,23 +62,25 @@ type ColType = {
 } & ComponentPropsWithoutRef<'div'>
 
 const Col = ({
-  children, classes, gap = 0, justify, align, content, wrap, reverse, self, ...others
+  children, classes, gap = 0, justify, align,
+  // content, wrap,
+  reverse, self, ...others
 }: Partial<ColType>) => {
   return (
     <div
-      className={cn('flex flex-col',
+      className={ cn('flex flex-col',
         GAP_MAPS[gap],
         justify && JUSTIFY_MAPS[justify],
         align && ALIGN_ITEM_MAPS[align],
         self && ALIGN_SELF_MAPS[self],
         reverse && 'flex-col-reverse',
         cn(classes)
-      )}
-      {...others}
+      ) }
+      { ...others }
     >
-      {children}
+      { children }
     </div>
   );
-}
+};
 
 export default Col;

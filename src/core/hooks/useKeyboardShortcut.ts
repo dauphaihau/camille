@@ -1,4 +1,6 @@
-import { useEffect, useCallback, useRef, useMemo } from "react";
+import {
+  useCallback, useEffect, useMemo, useRef 
+} from 'react';
 
 // import {
 //   overrideSystemHandling,
@@ -20,12 +22,12 @@ export const overrideSystemHandling = (e) => {
 // Function stolen from this Stack Overflow answer:
 // https: stackoverflow.com/a/9229821
 export const uniq_fast = (a) => {
-  var seen = {};
-  var out = [];
-  var len = a.length;
-  var j = 0;
-  for (var i = 0; i < len; i++) {
-    var item = a[i];
+  const seen = {};
+  const out = [];
+  const len = a.length;
+  let j = 0;
+  for (let i = 0; i < len; i++) {
+    const item = a[i];
     if (seen[item] !== 1) {
       seen[item] = 1;
       out[j++] = item;
@@ -94,7 +96,7 @@ export const checkHeldKeysRecursive = (
   );
 };
 
-const BLACKLISTED_DOM_TARGETS = ["TEXTAREA", "INPUT"];
+const BLACKLISTED_DOM_TARGETS = ['TEXTAREA', 'INPUT'];
 
 const DEFAULT_OPTIONS = {
   overrideSystem: false,
@@ -107,17 +109,17 @@ export const useKeyboardShortcut = (shortcutKeys, callback, userOptions) => {
   const options = { ...DEFAULT_OPTIONS, ...userOptions };
   if (!Array.isArray(shortcutKeys))
     throw new Error(
-      "The first parameter to `useKeyboardShortcut` must be an ordered array of `KeyboardEvent.key` strings."
+      'The first parameter to `useKeyboardShortcut` must be an ordered array of `KeyboardEvent.key` strings.'
     );
 
   if (!shortcutKeys.length)
     throw new Error(
-      "The first parameter to `useKeyboardShortcut` must contain atleast one `KeyboardEvent.key` string."
+      'The first parameter to `useKeyboardShortcut` must contain atleast one `KeyboardEvent.key` string.'
     );
 
-  if (!callback || typeof callback !== "function")
+  if (!callback || typeof callback !== 'function')
     throw new Error(
-      "The second parameter to `useKeyboardShortcut` must be a function that will be envoked when the keys are pressed."
+      'The second parameter to `useKeyboardShortcut` must be a function that will be envoked when the keys are pressed.'
     );
 
   const shortcutKeysId = useMemo(() => shortcutKeys.join(), [shortcutKeys]);
@@ -196,7 +198,7 @@ export const useKeyboardShortcut = (shortcutKeys, callback, userOptions) => {
       const raisedKeyHeldIndex = heldKeys.current.indexOf(raisedKey);
       if (!(raisedKeyHeldIndex >= 0)) return;
 
-      let nextHeldKeys = [];
+      const nextHeldKeys = [];
       let loopIndex;
       for (loopIndex = 0; loopIndex < heldKeys.current.length; ++loopIndex) {
         if (loopIndex !== raisedKeyHeldIndex) {
@@ -216,11 +218,11 @@ export const useKeyboardShortcut = (shortcutKeys, callback, userOptions) => {
   }, []);
 
   useEffect(() => {
-    window.addEventListener("keydown", keydownListener);
-    window.addEventListener("keyup", keyupListener);
+    window.addEventListener('keydown', keydownListener);
+    window.addEventListener('keyup', keyupListener);
     return () => {
-      window.removeEventListener("keydown", keydownListener);
-      window.removeEventListener("keyup", keyupListener);
+      window.removeEventListener('keydown', keydownListener);
+      window.removeEventListener('keyup', keyupListener);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keydownListener, keyupListener, shortcutKeysId]);

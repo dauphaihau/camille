@@ -1,12 +1,13 @@
-// import { withContentlayer } from "next-contentlayer"
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
   experimental: {
-    appDir: true,
+    // appDir: true,
+    serverActions: true,
     serverComponentsExternalPackages: ["@prisma/client"]
   },
+  swcMinify: true,
   typescript: {
     // !! WARN !!
     // Dangerously allow production builds to successfully complete even if
@@ -24,5 +25,4 @@ const nextConfig = {
   }
 }
 
-// export default withContentlayer(nextConfig)
 module.exports = nextConfig

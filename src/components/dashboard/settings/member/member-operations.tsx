@@ -1,200 +1,261 @@
-"use client"
+'use client';
 
-import { useRouter } from "next/navigation"
-import { useReducer } from "react"
-import * as React from "react";
-import { User, UserOnWorkspace } from "@prisma/client"
+import { useRouter } from 'next/navigation';
+import { useReducer } from 'react';
+import * as React from 'react';
+import { User, UserOnWorkspace } from '@prisma/client';
 
-import { DropdownMenu, toast, Button, Icons, Row } from "core/components"
-import { Alert } from "core/components/alert"
-import { cn } from "core/helpers";
-import { PATH, ROLE_USER_ON_WORKSPACE } from "config/const";
-import { deleteMember, memberLeave, updateRoleMember } from "lib/request-by-swr/settings-member";
-import { LoadingDialog } from "components/dialog/loading-dialog";
-import { useStoreMulti } from "lib/store";
+import {
+  Button, DropdownMenu, Icons, Row, toast
+} from 'core/components';
+import { Alert } from 'core/components/alert';
+import { cn } from 'core/helpers';
+import { PATH, ROLE_USER_ON_WORKSPACE } from 'config/const';
+import {
+  useDeleteMember, useGetMembersByCurWorkspace, useLeaveWorkspace, useUpdateRoleMember
+} from 'lib/request-client/settings-member';
+import { LoadingDialog } from 'components/dialog/loading-dialog';
+import { useGetDetailWorkspace } from 'lib/request-client/workspace';
 
 interface MemberOperationsProps {
-  member: Pick<User, "id" | 'name'> & Pick<UserOnWorkspace, "role">,
+  member: Pick<User, 'id' | 'name'> & Pick<UserOnWorkspace, 'role'>,
   placeOnSidebar?: boolean
   currentUserIsAdmin: boolean
-  members: UserOnWorkspace[]
 }
 
-const initialState: {[k: string]: boolean} = {
-  showDropdown: false,
-  showDeleteAlert: false,
-  showUpdateRoleAlert: false,
-  isDeleteLoading: false,
-  isUpdateLoading: false,
-  userLeaveWorkspace: false,
+interface State {
+  showDropdown: boolean,
+  showDeleteMemberAlert: boolean,
+  showUpdateRoleAlert: boolean,
+  showLeaveWorkspaceAlert: boolean,
+  userLeaveWorkspace: boolean,
 }
 
-export function MemberOperations({ member, members, currentUserIsAdmin }: MemberOperationsProps) {
-  const router = useRouter()
-  const { user, workspace } = useStoreMulti('user', 'workspace')
-  const [event, setEvent] = useReducer((prev, next) => ({
-    ...prev, ...next
-  }), initialState)
+export function MemberOperations(
+  { member, currentUserIsAdmin }: MemberOperationsProps
+) {
+  const router = useRouter();
+  const { data: { user, workspace } = {} } = useGetDetailWorkspace();
+  const { data: members, refetch } = useGetMembersByCurWorkspace();
 
-  if (!user.userOnWorkspace || !workspace || !user) {
-    return null
-  }
+  const {
+    isPending: isPendingUpdateRoleMember,
+    mutateAsync: updateRoleMember,
+    isError: isErrorUpdateRoleMember,
+  } = useUpdateRoleMember();
 
-  async function handleDelete() {
-    if (workspace && member) {
-      setEvent({ isDeleteLoading: true })
-      let response;
-      if (event.userLeaveWorkspace && user.userOnWorkspace) {
-        response = await memberLeave()
-      } else {
-        response = await deleteMember(member.id)
-      }
+  const {
+    isPending: isPendingDeleteMember,
+    mutateAsync: deleteMember,
+    isError: isErrorDeleteMember,
+  } = useDeleteMember(member.id);
 
-      setEvent({ isDeleteLoading: false })
+  const {
+    isPending: isPendingLeaveWorkspace,
+    mutateAsync: leaveWorkspace,
+    isError: isErrorLeaveWorkspace,
+  } = useLeaveWorkspace();
 
-      if (response.code !== '200') {
-        if (response.code === '403') {
-          return toast({
-            message: response.message,
-            type: "error",
-          })
-        }
-
-        return toast({
-          message: "Something went wrong, please try again.",
-          type: "error",
-        })
-      }
-
-      setEvent({ showDeleteAlert: false })
-
-      // // redirect first workspace in list workspaces user can access
-      if (event.userLeaveWorkspace) {
-        if (response?.data?.workspace?.domain) {
-          return router.push(`/${response.data.workspace.domain}`)
-        }
-        // setEvent({ userLeaveWorkspace: false })
-        return router.push(PATH.WORKSPACE)
-      }
-
-      router.refresh()
+  const [state, setState] = useReducer(
+    (state: State, newState: Partial<State>) => ({
+      ...state, ...newState,
+    }),
+    {
+      showDropdown: false,
+      showDeleteMemberAlert: false,
+      showLeaveWorkspaceAlert: false,
+      showUpdateRoleAlert: false,
+      userLeaveWorkspace: false,
     }
+  );
+
+  if (!user || !user.userOnWorkspace || !workspace) {
+    return null;
   }
 
-  async function handleUpdateRole(role) {
-    if (!workspace || member.role === role || !user) return
+  async function handleDeleteMember() {
+    if (!workspace || !member) return;
+    const response = await deleteMember();
 
-    setEvent({ isUpdateLoading: true })
+    if (isErrorDeleteMember) {
+      toast({
+        message: 'Something went wrong, please try again.',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (response?.code === '403') {
+      toast({
+        message: response.message,
+        type: 'error',
+      });
+      return;
+    }
+
+    setState({ showDeleteMemberAlert: false });
+
+    await refetch();
+  }
+
+  async function handleLeaveWorkspace() {
+    const response = await leaveWorkspace();
+
+    if (isErrorLeaveWorkspace) {
+      toast({
+        message: 'Something went wrong, please try again.',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (response?.code === '403') {
+      toast({
+        message: response.message,
+        type: 'error',
+      });
+      return;
+    }
+
+    setState({ showLeaveWorkspaceAlert: false });
+
+    // // redirect first workspace in list workspaces user can access
+    if (response?.data?.workspace?.domain) {
+      return router.push(`/${response.data.workspace.domain}`);
+    }
+    return router.push(PATH.WORKSPACE);
+  }
+
+  async function handleUpdateRole(role: ROLE_USER_ON_WORKSPACE) {
+    if (!workspace || member.role === role || !user) return;
+
     if (role === ROLE_USER_ON_WORKSPACE.MEMBER) {
-      if (member.id === user.id) {
-        const admins = members.filter((m) => m.role === ROLE_USER_ON_WORKSPACE.ADMIN)
-        if (admins.length === 1) return setEvent({ showUpdateRoleAlert: open })
+      if (members && member.id === user.id) {
+        const admins = members.filter((m) => m.role === ROLE_USER_ON_WORKSPACE.ADMIN);
+        if (admins.length === 1) return setState({ showUpdateRoleAlert: true });
       }
     }
 
     if (!workspace.isStandard) {
-      return router.push(`/${workspace.domain}/settings/plans`)
+      return router.push(`/${workspace.domain}${PATH.SETTINGS}/plans`);
     }
 
     if (workspace && member) {
-      setEvent({ isDeleteLoading: true })
-      const response = await updateRoleMember({ userId: member.id, workspaceId: workspace.id, role })
-      setEvent({ isDeleteLoading: false })
+      await updateRoleMember({ userId: member.id, workspaceId: workspace.id, role });
 
-      if (response.code !== '200') {
-        return toast({
-          title: "Something went wrong.",
-          message: "Your member was not update. Please try again.",
-          type: "error",
-        })
+      if (isErrorUpdateRoleMember) {
+        toast({
+          title: 'Something went wrong.',
+          message: 'Your member was not update. Please try again.',
+          type: 'error',
+        });
+        return;
       }
-      setEvent({ isUpdateLoading: true })
-      router.refresh()
+      await refetch();
     }
   }
 
+  const handleShowLeaveWorkspaceAlert = () => {
+    setState({ showLeaveWorkspaceAlert: true });
+  };
+
+  const handleShowDeleteMemberAlert = () => {
+    setState({ showDeleteMemberAlert: true });
+  };
+
   return (
     <>
-      <LoadingDialog open={event.isDeleteLoading} message={'Updating...'}/>
+      <LoadingDialog
+        open={ isPendingUpdateRoleMember }
+        message='Updating...'
+      />
       <DropdownMenu
-        open={event.showDropdown}
-        onOpenChange={(open) => setEvent({ showDropdown: open })}
+        open={ state.showDropdown }
+        onOpenChange={ (open) => setState({ showDropdown: open }) }
       >
-        <DropdownMenu.Trigger disabled={!currentUserIsAdmin && user.id !== member.id}>
+        <DropdownMenu.Trigger disabled={ !currentUserIsAdmin && user.id !== member.id }>
           <Icons.ellipsisHorizontal
-            size={12}
-            className={cn('btn-icon group-hover/member:visible text-[#686662]')}
+            size={ 12 }
+            className={ cn('btn-icon group-hover/member:visible text-[#686662]') }
           />
         </DropdownMenu.Trigger>
+
         <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            className='absolute w-[265px] top-0 left-[-13rem]'
-          >
+          <DropdownMenu.Content className='absolute w-[265px] top-0 left-[-13rem]'>
             {
-              // userOnWorkspace.role === ROLE_USER_ON_WORKSPACE.ADMIN && <>
-              // user.id === member.id && member.role === ROLE_USER_ON_WORKSPACE.ADMIN && <>
-              currentUserIsAdmin && <>
-                <DropdownMenu.Item onClick={() => handleUpdateRole(ROLE_USER_ON_WORKSPACE.ADMIN)}>
-                  <Row align='center' classes='gap-3'>
-                    <div>
-                      <div className='font-medium'>Admin</div>
-                      <div className='text-[#787673] text-xs'>
+              currentUserIsAdmin && (
+                <>
+                  <DropdownMenu.Item onClick={ () => handleUpdateRole(ROLE_USER_ON_WORKSPACE.ADMIN) }>
+                    <Row
+                      align='center'
+                      classes='gap-3'
+                    >
+                      <div>
+                        <div className='font-medium'>Admin</div>
+                        <div className='text-[#787673] text-xs'>
                         Can change workspace settings and invite new members to the workspace.
+                        </div>
                       </div>
-                    </div>
-                    {member.role === ROLE_USER_ON_WORKSPACE.ADMIN && <Icons.check className='text-2xl'/>}
-                  </Row>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item onClick={() => handleUpdateRole(ROLE_USER_ON_WORKSPACE.MEMBER)}>
-                  <Row align='center' classes='gap-3'>
-                    <div>
-                      <Row gap={2} align='center'>
-                        <div className='font-medium'>Member</div>
-                        {
-                          !workspace.isStandard &&
+                      { member.role === ROLE_USER_ON_WORKSPACE.ADMIN && <Icons.check className='text-2xl' /> }
+                    </Row>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item onClick={ () => handleUpdateRole(ROLE_USER_ON_WORKSPACE.MEMBER) }>
+                    <Row
+                      align='center'
+                      classes='gap-3'
+                    >
+                      <div>
+                        <Row
+                          gap={ 2 }
+                          align='center'
+                        >
+                          <div className='font-medium'>Member</div>
+                          {
+                            !workspace.isStandard &&
                           <div>
-                            <div className="bg-[#e6e6e4] text-[#71706c] text-[9px] py-0.5 px-[6px] rounded-sm leading-none uppercase font-medium">
+                            <div className='bg-[#e6e6e4] text-[#71706c] text-[9px] py-0.5 px-[6px] rounded-sm leading-none uppercase font-medium'>
                               Standard plan
                             </div>
                           </div>
-                        }
-                      </Row>
-                      <div className='text-[#787673] text-xs'>
+                          }
+                        </Row>
+                        <div className='text-[#787673] text-xs'>
                         Cannot change workspace settings or invite new members to the workspace.
+                        </div>
                       </div>
-                    </div>
-                    {member.role === ROLE_USER_ON_WORKSPACE.MEMBER && <Icons.check className='text-2xl'/>}
-                  </Row>
+                      { member.role === ROLE_USER_ON_WORKSPACE.MEMBER && <Icons.check className='text-2xl' /> }
+                    </Row>
+                  </DropdownMenu.Item>
+                </>
+              )
+            }
+            {
+              member.id === user.id && (
+                <DropdownMenu.Item
+                  className='text-red-400 focus:text-red-400 font-semibold'
+                  // onClick={ () => setState({ showDeleteMemberAlert: true, userLeaveWorkspace: true }) }
+                  onClick={ handleShowLeaveWorkspaceAlert }
+                >Leave workspace
                 </DropdownMenu.Item>
-              </>
+              )
             }
             {
-              // member.id === userOnWorkspace.user.id ?
-              // member.id === userOnWorkspace.user.id &&
-              member.id === user.id &&
-              <DropdownMenu.Item
-                className='text-red-400 focus:text-red-400 font-semibold'
-                onClick={() => setEvent({ showDeleteAlert: true, userLeaveWorkspace: true })}
-              >Leave workspace</DropdownMenu.Item>
-            }
-
-            {
-              currentUserIsAdmin && member.id !== user.id &&
-              <DropdownMenu.Item
-                className='text-red-400 focus:text-red-400 font-semibold'
-                onClick={() => setEvent({ showDeleteAlert: true })}
-              >
+              currentUserIsAdmin && member.id !== user.id && (
+                <DropdownMenu.Item
+                  className='text-red-400 focus:text-red-400 font-semibold'
+                  onClick={ handleShowDeleteMemberAlert }
+                >
                 Remove from workspace
-              </DropdownMenu.Item>
+                </DropdownMenu.Item>
+              )
             }
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
 
-
       <Alert
-        open={event.showUpdateRoleAlert}
-        onOpenChange={(open) => setEvent({ showUpdateRoleAlert: open })}
+        open={ state.showUpdateRoleAlert }
+        onOpenChange={ (open) => setState({ showUpdateRoleAlert: open }) }
       >
         <Alert.Content>
           <Alert.Header>
@@ -202,7 +263,7 @@ export function MemberOperations({ member, members, currentUserIsAdmin }: Member
             <Alert.Description>A workspace must have at least 1 admin</Alert.Description>
           </Alert.Header>
           <Alert.Footer>
-            <Alert.Action onClick={() => setEvent({ showUpdateRoleAlert: false })}>
+            <Alert.Action onClick={ () => setState({ showUpdateRoleAlert: false }) }>
               <Button variant='default'>Okay</Button>
             </Alert.Action>
           </Alert.Footer>
@@ -210,48 +271,69 @@ export function MemberOperations({ member, members, currentUserIsAdmin }: Member
       </Alert>
 
       <Alert
-        open={event.showDeleteAlert}
-        onOpenChange={(open) => setEvent({ showDeleteAlert: open })}
+        open={ state.showDeleteMemberAlert }
+        onOpenChange={ (open) => setState({ showDeleteMemberAlert: open }) }
+      >
+        <Alert.Content>
+          <Alert.Header>
+            <Alert.Title>Are you sure you want to remove this person?</Alert.Title>
+            <Alert.Description>
+              They will lose access to the workspace, and any private notebooks will be lost.
+            </Alert.Description>
+          </Alert.Header>
+          <Alert.Footer>
+            <Alert.Cancel>Cancel</Alert.Cancel>
+            <Alert.Action onClick={ handleDeleteMember }>
+              <Button
+                color='red'
+                isLoading={ isPendingDeleteMember }
+              >Remove
+              </Button>
+            </Alert.Action>
+          </Alert.Footer>
+
+        </Alert.Content>
+      </Alert>
+
+      <Alert
+        open={ state.showLeaveWorkspaceAlert }
+        onOpenChange={ (open) => setState({ showLeaveWorkspaceAlert: open }) }
       >
         {
-          event.userLeaveWorkspace && workspace && workspace.totalMembers === 1 ?
+          workspace && workspace.totalMembers === 1 ?
             <Alert.Content>
               <Alert.Header>
                 <Alert.Title>Oops!</Alert.Title>
                 <Alert.Description>A workspace must have at least 1 admin</Alert.Description>
-                {/*<Alert.Description>You cannot remove the last admin.</Alert.Description>*/}
               </Alert.Header>
               <Alert.Footer>
-                <Alert.Action onClick={() => setEvent({ showDeleteAlert: false })}>
+                <Alert.Action onClick={ () => setState({ showLeaveWorkspaceAlert: false }) }>
                   <Button variant='default'>Okay</Button>
                 </Alert.Action>
               </Alert.Footer>
-            </Alert.Content>
-            :
+            </Alert.Content> :
+
             <Alert.Content>
               <Alert.Header>
-                <Alert.Title>
-                  {
-                    event.userLeaveWorkspace ? 'Are you sure you want to remove your own access?' :
-                      'Are you sure you want to remove this person?'
-                  }
-                </Alert.Title>
+                <Alert.Title>Are you sure you want to remove your own access?</Alert.Title>
                 <Alert.Description>
-                  {
-                    event.userLeaveWorkspace ? 'You will lose access to the workspace, and any private pages will be lost.'
-                      : 'They will lose access to the workspace, and any private notebooks will be lost.'
-                  }
+                  You will lose access to the workspace, and any private notebooks will be lost.
                 </Alert.Description>
               </Alert.Header>
               <Alert.Footer>
                 <Alert.Cancel>Cancel</Alert.Cancel>
-                <Alert.Action onClick={handleDelete}>
-                  <Button color='red' isLoading={event.isDeleteLoading}>Remove</Button>
+                <Alert.Action onClick={ handleLeaveWorkspace }>
+                  <Button
+                    color='red'
+                    isLoading={ isPendingLeaveWorkspace }
+                  >Remove
+                  </Button>
                 </Alert.Action>
               </Alert.Footer>
+
             </Alert.Content>
         }
       </Alert>
     </>
-  )
+  );
 }

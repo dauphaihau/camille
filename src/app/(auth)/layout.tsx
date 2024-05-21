@@ -1,14 +1,14 @@
-import React, { ReactNode } from "react";
-import Link from "next/link";
+import React, { ReactNode } from 'react';
+import Link from 'next/link';
 
-import { Col, Row } from "core/components";
+import { Col, Row } from 'core/components';
 
 interface AuthProps {
   children: ReactNode
 }
 
 export default function AuthLayout({
-  children
+  children,
 }: AuthProps) {
   return (
     <Col className='min-h-screen max-w-6xl mx-auto'>
@@ -20,13 +20,13 @@ export default function AuthLayout({
         >
           <Link
             href='/'
-            className={'font-bold text-xl hover:opacity-50'}
+            className='font-bold text-xl hover:opacity-50'
           >
             Camille
           </Link>
         </Row>
       </header>
-      <main>{children}</main>
+      <main>{ children }</main>
     </Col>
   );
 }
