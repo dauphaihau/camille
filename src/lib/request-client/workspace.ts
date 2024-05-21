@@ -6,8 +6,12 @@ import { fetcher } from 'core/helpers';
 import {
   DashboardSlugs, ICreateWorkspace, IGetDetailWorkspace, IResponseDeleteWorkspace, IUpdateWorkspace
 } from 'types/workspace';
-import { getDetailWorkspace, getWorkspacesByUser } from 'lib/request-server/workspace';
-import { Response } from 'types';
+import {
+  createWorkspace,
+  getDetailWorkspace,
+  getWorkspacesByUser,
+  updateWorkspace
+} from 'lib/request-server/workspace';
 
 export function useGetDetailWorkspace() {
   const params = useParams<DashboardSlugs>();
@@ -37,16 +41,23 @@ export function useGetWorkspacesByUser(enabled: boolean) {
 
 export function useUpdateInfoGeneralWorkspace() {
   return useMutation({
-    mutationFn: (payload: IUpdateWorkspace) => {
-      return fetcher<Response>('/api/settings/workspace', payload, 'PATCH');
-    },
+    // mutationFn: (payload: IUpdateWorkspace) => {
+    //   return fetcher<Response>('/api/settings/workspace', payload, 'PATCH');
+    // },
+    mutationFn: (payload: IUpdateWorkspace) => updateWorkspace(payload),
   });
 }
 
 export function useCreateWorkspace() {
   return useMutation({
-    mutationFn: (payload: ICreateWorkspace) => {
-      return fetcher<Response>('/api/settings/workspace', payload);
-    },
+    mutationFn: (payload: ICreateWorkspace) => createWorkspace(payload),
   });
 }
+
+// export function useCreateWorkspace() {
+//   return useMutation({
+//     mutationFn: (payload: ICreateWorkspace) => {
+//       return fetcher<Response>('/api/settings/workspace', payload);
+//     },
+//   });
+// }

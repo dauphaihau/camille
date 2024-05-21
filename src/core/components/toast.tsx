@@ -64,7 +64,7 @@ Toast.Description = function ToastDescription({
 
 interface ToastOpts {
   title?: string
-  message: string
+  message?: string
   type?: 'success' | 'error' | 'default'
   duration?: number
   position?: ToastPosition
@@ -73,7 +73,7 @@ interface ToastOpts {
 export function toast(opts: ToastOpts) {
   const {
     // title,
-    message, type = 'default', duration = 3000, position = 'bottom-center',
+    message = '', type = 'default', duration = 3000, position = 'bottom-center',
   } = opts;
 
   return hotToast.custom(

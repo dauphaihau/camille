@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 import { getSession } from 'next-auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Button, Col, Input } from 'core/components';
-import { toast } from 'core/components';
+import { StatusCodes } from 'http-status-codes';
+import {
+  Button, Col, Input, toast
+} from 'core/components';
 import { createWorkspaceSchema } from 'lib/validations/workspace';
 import { LoadingDialog } from 'components/dialog/loading-dialog';
 import { PATH } from 'config/const';
@@ -35,7 +37,6 @@ export default function FormCreateWorkspace() {
   const {
     isPending: isPendingCreateWorkspace,
     mutateAsync: createWorkspace,
-    data: responseCreatedWorkspace,
     isError: isErrorCreateWorkspace,
   } = useCreateWorkspace();
 
@@ -71,9 +72,9 @@ export default function FormCreateWorkspace() {
       return;
     }
 
-    await createWorkspace(values);
+    const response = await createWorkspace(values);
 
-    if (isErrorCreateWorkspace) {
+    if (isErrorCreateWorkspace || !response) {
       toast({
         message: 'Something went wrong.',
         type: 'error',
@@ -81,9 +82,10 @@ export default function FormCreateWorkspace() {
       return;
     }
 
-    if (responseCreatedWorkspace && responseCreatedWorkspace?.code === '409') {
+    console.log('response-created-workspace', response);
+    if (response.code === StatusCodes.CONFLICT) {
       toast({
-        message: responseCreatedWorkspace.message,
+        message: response.message,
         type: 'error',
       });
       return;

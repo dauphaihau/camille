@@ -58,6 +58,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           title: 'Untitled notebook',
         },
       });
+
       return res.send({ code: '200', message: 'create workspace successfully' });
       // return res.end()
     } catch (error) {
