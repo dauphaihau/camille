@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createNotebookSchema, createNotebookTsSchema, updateNotebookSchema } from 'lib/validations/notebook';
+import { createNotebookSchema, createNotebookTsSchema, updateNotebookSchema } from 'validations/notebook';
 
 export type ICreateNotebook = z.infer<typeof createNotebookSchema>;
 

@@ -1,20 +1,18 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
+import { StatusCodes } from 'http-status-codes';
 import {
   Button, Col, Dialog, Icons, Input, toast
 } from 'core/components';
-import { PATH, ROLE_USER_ON_WORKSPACE } from 'config/const';
-import { useDeleteWorkspace, useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { ROLE_USER_ON_WORKSPACE } from 'config/const';
+import { useDeleteWorkspace, useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import { LoadingDialog } from 'components/dialog/loading-dialog';
 
 export function DeleteWorkspaceButton() {
-  const router = useRouter();
-  const formHandler = useForm();
+  const methodsRhf = useForm();
 
   const [open, setOpen] = useState(false);
 
@@ -22,39 +20,22 @@ export function DeleteWorkspaceButton() {
 
   const {
     isPending: isPendingDeleteWorkspace,
-    isError: isErrorDeleteWorkspace,
     mutateAsync: deleteWorkspace,
   } = useDeleteWorkspace();
 
   useEffect(() => {
-    formHandler.reset();
+    methodsRhf.reset();
   }, [open]);
 
   async function onSubmit() {
     const response = await deleteWorkspace();
 
-    if (isErrorDeleteWorkspace || !response) {
+    if (response.code === StatusCodes.INTERNAL_SERVER_ERROR) {
       toast({
         message: 'Delete workspace failed. Please try again.',
         type: 'error',
       });
       return;
-    }
-
-    if (response.code === '409') {
-      toast({
-        message: 'Domain exists',
-        type: 'error',
-      });
-      return;
-    }
-
-    await getSession();
-
-    if (response.domain) {
-      router.push(`/${response.domain}`);
-    } else {
-      router.push(PATH.WORKSPACE);
     }
   }
 
@@ -96,18 +77,18 @@ export function DeleteWorkspaceButton() {
           </Col>
 
           <form
-            onSubmit={ formHandler.handleSubmit(onSubmit) }
+            onSubmit={ methodsRhf.handleSubmit(onSubmit) }
             className='space-y-4'
           >
             <Input
-              { ...formHandler.register('nameWorkspace') }
+              { ...methodsRhf.register('nameWorkspace') }
               placeholder={ workspace?.name }
               sizeInput='md'
             />
             <div className='flex justify-end pt-4 gap-1'>
               <Button
                 color='red'
-                disabled={ formHandler.watch('nameWorkspace') !== workspace?.name }
+                disabled={ methodsRhf.watch('nameWorkspace') !== workspace?.name }
                 type='submit'
               >
                   Permanently delete workspace

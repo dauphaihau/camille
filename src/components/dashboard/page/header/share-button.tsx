@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button, Popover, Tooltip
 } from 'core/components';
-import { useGetCurrentPage } from 'lib/request-client/page';
+import { useGetCurrentPage } from 'services/query-hooks/page';
 import { Tabs } from 'core/components/tabs';
-import useStore from 'lib/store';
+import useStore from 'stores/layout-store';
 import { useKeyboardShortcut } from 'core/hooks';
 import PublishTab from './publish-tab';
 

@@ -7,12 +7,13 @@ import { SidebarDashboard } from 'components/dashboard/layout/sidebar';
 import { Col, Row } from 'core/components';
 import { cn } from 'core/helpers';
 import { useDebounce, useKeyboardShortcut } from 'core/hooks';
-import { useStoreMulti } from 'lib/store';
-import { LimitedNotebookBar } from 'components/dashboard/layout/limited-notebook-bar';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useStoreMulti } from 'stores/layout-store';
+import { LimitedPagesBar } from 'components/dashboard/layout/limited-pages-bar';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import { DashboardSlugs } from 'types/workspace';
-import { useUpdateTrackingUser } from 'lib/request-client/tracking';
+import { useUpdateTrackingUser } from 'services/query-hooks/user';
 import { PublishedPageBar } from '../dashboard/layout/published-page-bar';
+import { TrashedPageBar } from '../dashboard/layout/trashed-page-bar';
 
 type WorkspaceProps = {
   children: ReactNode
@@ -25,8 +26,9 @@ export const WorkspaceWrapper = ({ children }: Partial<WorkspaceProps>) => {
   const {
     showSidebar,
     setShowSidebar,
-    setShowLimitedNotebookBar, setPage,
-  } = useStoreMulti('showSidebar', 'setShowLimitedNotebookBar', 'setShowSidebar', 'setPage');
+    showLimitedPagesBar,
+    setShowLimitedPagesBar, setPage, setWorkspace,
+  } = useStoreMulti('showSidebar', 'setShowLimitedPagesBar', 'setShowSidebar', 'setPage', 'setWorkspace', 'showLimitedPagesBar');
 
   const { data: { workspace } = {} } = useGetDetailWorkspace();
 
@@ -44,22 +46,30 @@ export const WorkspaceWrapper = ({ children }: Partial<WorkspaceProps>) => {
 
   const paramsUpdateTracking = {
     lastAccessWorkspaceId: (workspace && workspace?.id) ?? '',
-    lastAccessNotebookId: slugs?.notebookId ?? '',
     lastAccessPageId: slugs?.pageId ?? '',
   };
 
   const debouncedUpdatePage = useDebounce(() => updateTrackingUser(paramsUpdateTracking), 1000);
 
   useEffect(() => {
+    if (workspace) {
+      setWorkspace(workspace);
+    }
+  },[]);
+
+  useEffect(() => {
     if (isSettingPage) return;
+
     if (segments.length === 1) {
-      setPage(undefined);
+      setPage(null);
     }
     debouncedUpdatePage();
-    setShowLimitedNotebookBar(false);
+
+    if (showLimitedPagesBar) {
+      setShowLimitedPagesBar(false);
+    }
   }, [
     paramsUpdateTracking.lastAccessWorkspaceId,
-    paramsUpdateTracking.lastAccessNotebookId,
     paramsUpdateTracking.lastAccessPageId,
   ]);
 
@@ -69,10 +79,11 @@ export const WorkspaceWrapper = ({ children }: Partial<WorkspaceProps>) => {
         <SidebarDashboard />
         <div className='w-full'>
           <PublishedPageBar />
-          <LimitedNotebookBar />
+          <LimitedPagesBar />
+          <TrashedPageBar />
           <main
             className={ cn('flex mx-auto flex-1 flex-col',
-              { 'max-w-[708px] mt-[60px]': isSettingPage || !slugs?.pageId }
+              { 'max-w-[708px] mt-[60px]': isSettingPage }
             ) }
           >
             { children }

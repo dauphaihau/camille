@@ -7,13 +7,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { updatePageSchema } from 'lib/validations/page';
+import { updatePageSchema } from 'validations/page';
 import { toast } from 'core/components';
-import { useGetCurrentPage, useGetFavoritesPages, useUpdatePage } from 'lib/request-client/page';
-import { useStoreMulti } from 'lib/store';
+import { useGetCurrentPage, useGetFavoritesPages, useUpdatePage } from 'services/query-hooks/page';
+import { useStoreMulti } from 'stores/layout-store';
 import { useDebounce } from 'core/hooks';
 import { IUpdatePage } from 'types/page';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import { DashboardSlugs } from 'types/workspace';
 
 interface EditorProps {
@@ -30,7 +30,7 @@ export function Editor({ readOnly = false }: EditorProps) {
 
   const { data: { workspace } = {} } = useGetDetailWorkspace();
   const { data: favoritesPages } = useGetFavoritesPages();
-  const { data: pageData, refetch } = useGetCurrentPage();
+  const { data: pageData, refetch: refetchGetCurrentPage } = useGetCurrentPage();
 
   const editorInstance = useRef<EditorJS>();
   const titleInstance = useRef<HTMLTextAreaElement>(null);
@@ -39,14 +39,14 @@ export function Editor({ readOnly = false }: EditorProps) {
 
   const {
     setShortcutOverrideSystem,
-    // page: pageContext,
+    page: pageContext,
     setPage,
   } = useStoreMulti('setShortcutOverrideSystem', 'page', 'setPage');
 
   const {
     mutateAsync: updatePage,
     isError: isErrorUpdatePage,
-  } = useUpdatePage(pageData?.id);
+  } = useUpdatePage();
 
   async function initializeEditor() {
     const EditorJS = (await import('@editorjs/editorjs')).default;
@@ -63,15 +63,16 @@ export function Editor({ readOnly = false }: EditorProps) {
     if (!editorInstance.current) {
       const editor = new EditorJS({
         holder: EDITOR_HOLDER_ID,
-        readOnly,
+        readOnly: readOnly || Boolean(pageData?.deletedAt),
         onReady() {
           editorInstance.current = editor;
         },
         // onChange: async (api: API, event: CustomEvent) => {
         onChange: async () => {
-          if (editorInstance.current && !readOnly) {
+          console.log('-page-data-deleted-at-', !(pageData?.deletedAt));
+          if (editorInstance.current && !readOnly && !(pageData?.deletedAt) && pageData?.id) {
             const blocks = await editorInstance.current.save();
-            await handleUpdatePage({ content: blocks });
+            await handleUpdatePage({ id: pageData.id, content: blocks });
             router.refresh();
           }
         },
@@ -100,7 +101,6 @@ export function Editor({ readOnly = false }: EditorProps) {
   useEffect(() => {
     if (typeof window !== 'undefined' && pageData) {
       setIsMounted(true);
-      // setStatePageBreadcrumb({ notebook: pageData.notebook, pageData });
     }
   }, []);
 
@@ -146,7 +146,9 @@ export function Editor({ readOnly = false }: EditorProps) {
   }, [editorInstance.current]);
 
   async function handleUpdatePage(values: IUpdatePage) {
-    if (!pageData) return;
+    if (!pageData?.id) return;
+
+    values.id = pageData.id;
     await updatePage(values);
 
     if (isErrorUpdatePage) {
@@ -157,12 +159,19 @@ export function Editor({ readOnly = false }: EditorProps) {
       });
       return;
     }
-    await refetch();
+    await refetchGetCurrentPage();
 
     if (values?.title) {
-      await queryClient.invalidateQueries({
-        queryKey: ['notebook', slugs?.notebookId],
-      });
+      if (pageData.teamspaceId) {
+        await queryClient.invalidateQueries({
+          queryKey: ['teamspace-pages', pageData.teamspaceId],
+        });
+      }
+      else {
+        await queryClient.invalidateQueries({
+          queryKey: ['private-pages', workspace?.id],
+        });
+      }
 
       if (favoritesPages && favoritesPages.some((page) => page.id === pageData.id)) {
         await queryClient.invalidateQueries({
@@ -173,8 +182,9 @@ export function Editor({ readOnly = false }: EditorProps) {
   }
 
   const onChangeTitle = async (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (!pageData?.id) return;
     setPage({ ...pageData, title: event.target.value });
-    await debouncedUpdatePage({ title: event.target.value });
+    await debouncedUpdatePage({ id: pageData?.id, title: event.target.value });
   };
 
   return (
@@ -186,14 +196,13 @@ export function Editor({ readOnly = false }: EditorProps) {
         <div className='prose prose-stone max-w-[708px] mx-auto pb-[30vh]'>
           <div className='flex flex-col justify-end mt-28 mb-2 w-[708px]'>
             <TextareaAutosize
-              disabled={ readOnly }
+              disabled={ readOnly || Boolean(pageData?.deletedAt) }
               ref={ titleInstance }
               name='title'
               id='title'
               maxLength={ 128 }
               defaultValue={ pageData?.title }
-              // value={ pageContext?.title }
-              // value={ slugs?.pageId === pageContext?.id ? pageContext?.title : pageData?.title }
+              value={ slugs?.pageId === pageContext?.id ? pageContext?.title : pageData?.title }
               placeholder='Page title'
               className='w-full resize-none appearance-none text-4xl font-bold focus:outline-none z-0 placeholder-[#e1e1e0]'
               onChange={ onChangeTitle }
@@ -201,7 +210,7 @@ export function Editor({ readOnly = false }: EditorProps) {
           </div>
           <div id={ EDITOR_HOLDER_ID } />
           {
-            !readOnly &&
+            !readOnly && !(pageData?.deletedAt) &&
             <p className='text-sm text-[#9b9a97]'>
               Use{ ' ' }
               <kbd className='rounded-md border bg-slate-50 px-1 text-xs uppercase'>

@@ -24,6 +24,7 @@ export function formatDate(input: Date | string | number, options?: object): str
   });
 }
 
+// Extends the return of the HTTPError class
 export async function fetcher<TResponseBody = unknown>(
   url: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,20 +39,6 @@ export async function fetcher<TResponseBody = unknown>(
       'Content-Type': 'application/json',
     },
   };
-  // let res: Response;
-  //
-  // try {
-  //   res = await fetcher(url, options);
-  // } catch (error) {
-  //   throw new Error(`Error when trying to ${method} ${url}: ${error}`, {
-  //     cause: error,
-  //   });
-  // }
-  //
-  // if (res?.ok) {
-  //   return (await res.json()) as TResponseBody;
-  // }
-
   return fetch(url, options).then(r => r.json() as TResponseBody).catch(err => err);
 }
 
@@ -94,7 +81,7 @@ export const isBoolean = (value: unknown) => {
 
 export const omitFieldNullish = (obj: object) => {
   return Object.entries(obj)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .filter(([_, v]) => v || v === 0)
     .reduce(
       (acc, [k, v]) => ({ ...acc, [k]: v === Object(v) ? omitFieldNullish(v) : v }),

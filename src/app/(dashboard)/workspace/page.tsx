@@ -1,5 +1,5 @@
 import { getCurrentUser } from 'lib/session';
-import FormCreateWorkspace from 'components/dashboard/workspace/form-create-workspace';
+import CreateWorkspaceForm from 'components/dashboard/workspace/create-workspace-form';
 import BackButton from 'components/dashboard/workspace/back-button';
 import { Box, Col, Row } from 'core/components';
 
@@ -24,7 +24,7 @@ export default async function CreateWorkspacePage() {
             projects, cycles and tasks.
           </p>
         </Box>
-        <FormCreateWorkspace />
+        <CreateWorkspaceForm />
       </Box>
     </Box>
   );

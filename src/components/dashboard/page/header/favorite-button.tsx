@@ -1,24 +1,25 @@
-import { useCallback, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Icons, Loading, Tooltip } from 'core/components';
 import { cn } from 'core/helpers';
-import { useAddPageToFavorite, useGetCurrentPage } from 'lib/request-client/page';
+import { useAddPageToFavorite, useGetCurrentPage } from 'services/query-hooks/page';
 import { toast } from 'core/components';
 import { useKeyboardShortcut } from 'core/hooks';
-import { useStoreMulti } from 'lib/store';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
-import { DashboardSlugs } from 'types/workspace';
+import { useStoreMulti } from 'stores/layout-store';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 
 export default function FavoriteButton() {
   const queryClient = useQueryClient();
-  const slugs = useParams<DashboardSlugs>();
 
   const { data: { workspace } = {} } = useGetDetailWorkspace();
   const { data: page } = useGetCurrentPage();
   const [isFavorite, setIsFavorite] = useState(page?.isFavorite);
+
+  useEffect(() => {
+    setIsFavorite(page?.isFavorite);
+  },[page?.isFavorite]);
 
   const {
     isPending: isPendingAddPageToFavorite,
@@ -50,9 +51,16 @@ export default function FavoriteButton() {
     await queryClient.invalidateQueries({
       queryKey: ['favorites-pages', workspace.id],
     });
-    await queryClient.invalidateQueries({
-      queryKey: ['notebook', slugs?.notebookId],
-    });
+    if (page.teamspaceId) {
+      await queryClient.invalidateQueries({
+        queryKey: ['teamspace-pages', page.teamspaceId],
+      });
+    }
+    else {
+      await queryClient.invalidateQueries({
+        queryKey: ['private-pages', workspace.id],
+      });
+    }
   }
 
   const shortcutPinPage = ['Meta', 'P'];
@@ -73,11 +81,11 @@ export default function FavoriteButton() {
               <Loading /> :
               isFavorite ?
                 <Icons.star
-                  className={ cn('h-5 w-5',
+                  className={ cn('h-5 w-5 ',
                     isFavorite && 'fill-[#eec264]'
                   ) }
                 /> :
-                <Icons.starOutline className='h-5 w-5' />
+                <Icons.starOutline className='h-5 w-5 stroke-[2px]' />
           }
         </div>
       </Tooltip.Trigger>

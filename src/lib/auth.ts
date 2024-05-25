@@ -6,16 +6,17 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { createTransport } from 'nodemailer';
 
 import { db } from 'lib/db';
+import { env } from './env';
 
 const configEmail = {
-  service: process.env.SMTP_SERVICE,
+  service: env.SMTP_SERVICE,
   auth: {
-    user: process.env.SMTP_USERNAME,
-    pass: process.env.SMTP_PASSWORD,
+    user: env.SMTP_USERNAME,
+    pass: env.SMTP_PASSWORD,
   },
   secure: true,
   port: 465,
-  normalizeHeaderKey: (key: string) => key.toUpperCase(),
+  // normalizeHeaderKey: (key: string) => key.toUpperCase(),
 };
 
 export const authOptions: NextAuthOptions = {
@@ -28,17 +29,17 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      clientId: env.GITHUB_CLIENT_ID as string,
+      clientSecret: env.GITHUB_CLIENT_SECRET as string,
       allowDangerousEmailAccountLinking: true,
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: env.GOOGLE_CLIENT_ID as string,
+      clientSecret: env.GOOGLE_CLIENT_SECRET as string,
       allowDangerousEmailAccountLinking: true,
     }),
     EmailProvider({
-      from: process.env.SMTP_FROM,
+      from: env.SMTP_FROM,
       sendVerificationRequest: async ({
         identifier: email,
         url,
@@ -99,16 +100,16 @@ export const authOptions: NextAuthOptions = {
 
       if (dbUser) {
         let workspaceLastVisited;
-        // if (dbUser?.lastAccessWorkspaceId) {
-        //   workspaceLastVisited = await db.workspace.findFirst({
-        //     where: { id: dbUser.lastAccessWorkspaceId as string },
-        //     select: {
-        //       id: true,
-        //       name: true,
-        //       domain: true,
-        //     },
-        //   });
-        // }
+        if (dbUser?.lastAccessWorkspaceId) {
+          workspaceLastVisited = await db.workspace.findFirst({
+            where: { id: dbUser.lastAccessWorkspaceId },
+            select: {
+              id: true,
+              name: true,
+              domain: true,
+            },
+          });
+        }
 
         return {
           id: dbUser.id,
@@ -123,7 +124,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: env.NEXTAUTH_SECRET,
   debug: true,
 };
 

@@ -4,38 +4,36 @@ import { useState } from 'react';
 
 import { Box, Icons, Row } from 'core/components';
 import { cn } from 'core/helpers';
-import { useGetNotebooksByTeamspace } from 'lib/request-client/teamspace';
-import { NewNotebookDialog } from 'components/dialog/new-notebook-dialog';
-import { NotebookOperations } from 'components/dashboard/notebook-operations';
-import { TeamspaceOperations } from '../../teamspace/teamspace-operations';
-import { NotebookItemSidebar } from './notebook-item-sidebar';
+import { useGetPagesByTeamspace } from 'services/query-hooks/page';
+import { AddPageButtonSidebar } from './add-page-button-sidebar';
+import { TeamspaceOperationsSidebar } from './teamspace-operations-sidebar';
 import { PageItemSidebar } from './page-item-sidebar';
+import { PageOperationsSidebar } from './page-operations-sidebar';
 
 interface TeamspaceItemProps {
   teamspace: Pick<Teamspace, 'id' | 'name' | 'isOrigin'>;
 }
 
 export default function TeamspaceItemSidebar({ teamspace }: TeamspaceItemProps) {
-  const [showNotebooks, setShowPages] = useState(false);
+  const [showPages, setShowPages] = useState(false);
   const {
     isLoading,
-    data: detailTeamspace,
-  } = useGetNotebooksByTeamspace(showNotebooks ? teamspace.id : undefined);
-
+    data: pages,
+  } = useGetPagesByTeamspace(showPages ? teamspace.id : undefined);
 
   return (
     <div className='group/teamspace'>
       <Row
         align='center'
         justify='center'
-        classes={ cn('item-sidebar pr-2 pl-[5px]') }
+        classes={ cn('item-sidebar pr-2 pl-[1px]') }
       >
         <div
           className='flex flex-1 gap-1 items-center pl-1.5'
-          onClick={ () => setShowPages(!showNotebooks) }
+          onClick={ () => setShowPages(!showPages) }
         >
           <Box
-            classes={ ['avatar h-5 w-5 rounded-[0.25em] text-sm text-primary-medium flex justify-center font-medium',
+            classes={ ['avatar h-5 w-5 rounded text-sm text-primary-medium flex justify-center font-medium',
               teamspace.isOrigin ? 'text-[#cc782f] bg-[#f5dfcc]' : 'bg-[#dcdbda] text-primary-medium',
             ] }
           >
@@ -46,35 +44,36 @@ export default function TeamspaceItemSidebar({ teamspace }: TeamspaceItemProps) 
           </div>
           <Icons.arrowRightSline
             size={ 12 }
-            className={ `btn-icon hover:bg-accent invisible group-hover/teamspace:visible ${showNotebooks ? 'rotate-90' : 'rotate-0'}` }
+            className={ cn(
+              'btn-icon hover:bg-accent invisible group-hover/teamspace:visible',
+              showPages ? 'rotate-90' : 'rotate-0'
+            ) }
           />
         </div>
 
-        <div className='flex gap-1'>
-          <TeamspaceOperations teamspace={ teamspace } />
-          <NewNotebookDialog teamspaceId={ teamspace.id } />
+        <div className='flex gap-1 group-hover/teamspace:visible invisible'>
+          <TeamspaceOperationsSidebar teamspace={ teamspace } />
+          <AddPageButtonSidebar teamspaceId={ teamspace.id } />
         </div>
-
       </Row>
+
       {
-        showNotebooks &&
-        <div className='px-1'>
+        showPages &&
+        <div className='pl-1'>
           {
             isLoading ?
               <PageItemSidebar.Skeleton notebook /> :
-              detailTeamspace && detailTeamspace.notebooks.length > 0 ?
-                detailTeamspace.notebooks.map((notebook) => (
-                  <NotebookItemSidebar
-                    classes='group-hover/notebook:pr-[4px]'
-                    key={ notebook.id }
-                    notebook={ notebook }
+              pages && pages.length > 0 ?
+                pages.map((page) => (
+                  <PageItemSidebar
+                    key={ page.id }
+                    page={ page }
                   >
-                    <NotebookOperations
+                    <PageOperationsSidebar
                       teamspaceId={ teamspace.id }
-                      placeOnSidebar
-                      notebook={ { id: notebook.id, title: notebook.title } }
+                      page={ page }
                     />
-                  </NotebookItemSidebar>
+                  </PageItemSidebar>
                 )) :
                 <p className='font-semibold text-sm text-[#999895] pl-8'>No teamspaces inside</p>
           }

@@ -6,8 +6,8 @@ import { Grid, Input, Row } from 'core/components';
 import AddMemberDialog from 'components/dialog/add-member-dialog';
 import { capitalizeEachWord } from 'core/helpers';
 import { ROLE_USER_ON_WORKSPACE } from 'config/const';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
-import { useGetMembersByCurWorkspace } from 'lib/request-client/settings-member';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
+import { useGetMembersByCurWorkspace } from 'services/query-hooks/member';
 import { MemberOperations } from './member-operations';
 
 export function MemberList() {

@@ -5,7 +5,6 @@ import { CompleteUser, relatedUserSchema, CompleteWorkspace, relatedWorkspaceSch
 export const trackingUserAccessOnWorkspaceSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
-  lastAccessNotebookId: z.string().nullish(),
   lastAccessPageId: z.string().nullish(),
   userId: z.string(),
   workspaceId: z.string(),

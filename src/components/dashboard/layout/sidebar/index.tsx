@@ -8,17 +8,17 @@ import { wordInString } from 'core/helpers';
 import { PATH } from 'config/const';
 import { SearchAllDialog } from 'components/dialog/search-all-dialog';
 import { useKeyboardShortcut } from 'core/hooks';
-import { NewNotebookDialog } from 'components/dialog/new-notebook-dialog';
-import useStore from 'lib/store';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
-import { PrivateNotebooksSidebar } from './private-notebooks-sidebar';
+import useStore from 'stores/layout-store';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import { WorkspaceUserDropdown } from './workspace-user-dropdown';
 import { PagesInTrashPopover } from './pages-in-trash-popover';
 import { FavoritePagesSidebar } from './favorite-pages-sidebar';
 import { TeamspaceListSidebar } from './teamspace-list-sidebar';
-import { CalcLimitNotebooks } from './calc-limit-notebooks';
+import { CalcLimitPages } from './calc-limit-pages';
 import { SettingsSidebar } from './settings-sidebar';
 import { ItemSidebar } from './item-sidebar';
+import { PrivatePagesSidebar } from './private-pages-sidebar';
+import { AddPageButtonSidebar } from './add-page-button-sidebar';
 
 export function SidebarDashboard() {
   const pathname = usePathname();
@@ -41,10 +41,15 @@ export function SidebarDashboard() {
 
   if (!showSidebar) return null;
 
+  const redirectToSettings = () => {
+    router.push(`/${workspace?.domain}${PATH.SETTINGS}${PATH.WORKSPACE}`);
+    setUrlBeforeNavigateSettingPage(pathname ?? PATH.HOME);
+  };
+
   return (
     <aside
       style={ { boxShadow: 'rgba(0, 0, 0, 0.025) -1px 0px 0px 0px inset' } }
-      className='group w-[240px] flex-col flex-grow-0 flex-shrink-0 md:flex bg-[#fafafa] h-screen overflow-hidden'
+      className='group/sidebar w-[240px] flex-col flex-grow-0 flex-shrink-0 md:flex bg-[#fafafa] h-screen overflow-hidden'
     >
       {
         isSettingPage ?
@@ -52,15 +57,11 @@ export function SidebarDashboard() {
 
           <>
             <WorkspaceUserDropdown />
-            <Box classes='px-1 mb-3'>
+
+            <Box classes='px-2 mb-3'>
               <SearchAllDialog />
               <ItemSidebar
-                onClick={ () => {
-                  router.push(`/${workspace?.domain}/settings/workspace`);
-                  pathname ?
-                    setUrlBeforeNavigateSettingPage(pathname) :
-                    setUrlBeforeNavigateSettingPage(PATH.HOME);
-                } }
+                onClick={ redirectToSettings }
                 icon='settings'
                 title='Settings'
                 titleTooltip='Quickly jump to settings'
@@ -68,29 +69,32 @@ export function SidebarDashboard() {
               />
 
               <PagesInTrashPopover />
-              <NewNotebookDialog
-                trigger={
-                  <ItemSidebar
-                    title='New notebook'
-                    icon='fillPlusCircle'
-                    titleTooltip='Create a new notebook'
-                  />
-                }
-              />
+              <AddPageButtonSidebar>
+                <ItemSidebar
+                  title='New page'
+                  icon='fillPlusCircle'
+                  titleTooltip='Create a new page'
+                />
+              </AddPageButtonSidebar>
             </Box>
+
             { scrollTop > 0 && <div className='border-t border-primary-light' /> }
-            <nav
+
+            <div
               onScroll={ (e) => setScrollTop(e.currentTarget.scrollTop) }
               className='flex-1 overflow-y-scroll overflow-x-hidden'
             >
-              <Col gap={ 2 }>
+              <Col
+                gap={ 2 }
+                classes='px-1'
+              >
                 <FavoritePagesSidebar />
                 <TeamspaceListSidebar />
-                <PrivateNotebooksSidebar />
+                <PrivatePagesSidebar />
               </Col>
-            </nav>
+            </div>
 
-            <CalcLimitNotebooks />
+            <CalcLimitPages />
           </>
       }
     </aside>

@@ -6,8 +6,8 @@ import {
   Col, Icons, Row
 } from 'core/components';
 import { toast } from 'core/components';
-import { SUFFIX_DOMAIN_SHARE_TO_WEB } from 'config/const';
-import { useGetCurrentPage, useUpdatePage } from 'lib/request-client/page';
+import { SUFFIX_DOMAIN_SHARE_PUBLIC } from 'config/const';
+import { useGetCurrentPage, useUpdatePage } from 'services/query-hooks/page';
 import { DashboardSlugs } from 'types/workspace';
 
 export default function PublishTab() {
@@ -24,17 +24,17 @@ export default function PublishTab() {
   const {
     mutateAsync: updatePage,
     isError: isErrorUpdatePage,
-  } = useUpdatePage(page?.id);
+  } = useUpdatePage();
 
   useEffect(() => {
     if (slugs && typeof window !== 'undefined') {
-      const { domainWorkspace, notebookId, pageId } = slugs;
-      const link = `${window.location.origin}/${domainWorkspace + SUFFIX_DOMAIN_SHARE_TO_WEB}/${notebookId}/${pageId}`;
+      const { domainWorkspace, pageId } = slugs;
+      const link = `${window.location.origin}/${domainWorkspace + SUFFIX_DOMAIN_SHARE_PUBLIC}/${pageId}`;
       if (link) {
         setState({ ...state, publicLink: link });
       }
     }
-  },[]);
+  }, []);
 
   async function copyToClipBoard() {
     if (!state.publicLink) {
@@ -52,8 +52,12 @@ export default function PublishTab() {
   }
 
   const onChangePublish = async (value: boolean) => {
+    if (!page?.id) return;
     setState({ ...state, published: value });
-    await updatePage({ published: value });
+    await updatePage({
+      id: page?.id,
+      published: value,
+    });
 
     if (isErrorUpdatePage) {
       toast({

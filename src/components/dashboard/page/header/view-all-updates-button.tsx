@@ -5,7 +5,7 @@ export default function ViewAllUpdatesButton() {
     <Tooltip>
       <Tooltip.Trigger>
         <div className='btn-icon-header'>
-          <Icons.clock className='h-5 w-5' />
+          <Icons.clock className='h-5 w-5 stroke-[0.5px]' />
         </div>
       </Tooltip.Trigger>
       <Tooltip.Content>

@@ -7,7 +7,7 @@ import { cn } from 'core/helpers';
 import {
   Box, Col, Icons, Row
 } from 'core/components';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import { TitleOfItemsSidebar } from './title-of-items-sidebar';
 
 export function SettingsSidebar({ urlBeforeNavigateSettingPage }) {

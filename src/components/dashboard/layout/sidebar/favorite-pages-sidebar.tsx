@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import { Box, Row } from 'core/components';
-import { useGetFavoritesPages } from 'lib/request-client/page';
+import { useGetFavoritesPages } from 'services/query-hooks/page';
 import { PageItemSidebar } from './page-item-sidebar';
 import { TitleOfItemsSidebar } from './title-of-items-sidebar';
 import { PageOperationsSidebar } from './page-operations-sidebar';
@@ -12,6 +12,10 @@ import { PageOperationsSidebar } from './page-operations-sidebar';
 export function FavoritePagesSidebar() {
   const [showPages, setShowPages] = useState(true);
   const { data: favoritesPages } = useGetFavoritesPages();
+
+  if (!favoritesPages || favoritesPages.length === 0) {
+    return null;
+  }
 
   return (
     <Box classes={ showPages ? 'mb-2' : '' }>
@@ -30,17 +34,13 @@ export function FavoritePagesSidebar() {
         showPages &&
         <div className='px-1'>
           {
-            favoritesPages && favoritesPages.length > 0 &&
             favoritesPages.map((page) => (
               <PageItemSidebar
-                favorite
                 key={ page.id }
                 page={ page }
-                notebook={ page.notebook }
               >
                 <PageOperationsSidebar
                   placeOnGroup='favorites'
-                  notebook={ page.notebook }
                   page={ page }
                 />
               </PageItemSidebar>

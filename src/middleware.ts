@@ -1,29 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { withAuth } from 'next-auth/middleware';
-import { SUFFIX_DOMAIN_SHARE_TO_WEB } from './config/const';
+import { SUFFIX_DOMAIN_SHARE_PUBLIC } from './config/const';
+
+const legacyPrefixes = ['/', '/pricing'];
 
 export default withAuth(
   async function middleware(req: NextRequest) {
     const token = await getToken({ req });
+    const { pathname } = req.nextUrl;
 
     const isAuth = !!token;
     const isAuthPage =
-      req.nextUrl.pathname.startsWith('/login') ||
-      req.nextUrl.pathname.startsWith('/register');
+      pathname.startsWith('/login') ||
+      pathname.startsWith('/register');
 
-    if (isAuthPage) {
-      if (isAuth) {
+    const currentDomain = pathname.split('/')[1];
+    const isSharePage = currentDomain.includes(SUFFIX_DOMAIN_SHARE_PUBLIC);
+    if (isSharePage) {
+      return NextResponse.next();
+    }
+
+    if (!isAuth && legacyPrefixes.some((prefix) => pathname.startsWith(prefix))) {
+      return NextResponse.next();
+    }
+
+    if (isAuth) {
+      if (isAuthPage) {
         return NextResponse.redirect(new URL('/', req.url));
       }
-    } else {
-      const domain = req.nextUrl.pathname.split('/')[1];
-      const isSharePage = domain.includes(SUFFIX_DOMAIN_SHARE_TO_WEB);
-
-      if (!isAuth && !isSharePage) {
-        return NextResponse.redirect(new URL('/login', req.url));
-      }
     }
+    else {
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
+
   },
   {
     callbacks: {

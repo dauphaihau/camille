@@ -1,6 +1,4 @@
-import {
-  Favorite, Notebook, Page, User
-} from '@prisma/client';
+import { Page } from '@prisma/client';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { useParams } from 'next/navigation';
@@ -10,35 +8,30 @@ import {
   Col, Icons, Row, Tooltip
 } from 'core/components';
 import { cn, getRandomInt } from 'core/helpers';
-import useStore from 'lib/store';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useStoreMulti } from 'stores/layout-store';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import { DashboardSlugs } from 'types/workspace';
 
 interface PageItemProps {
-  page: Pick<Page, 'id' | 'title' | 'content' | 'updatedAt' | 'updatedBy' | 'notebookId'> & {
-    favorites?: Favorite[]
-    createdByUser: Pick<User, 'email'>
-  };
-  notebook?: Pick<Notebook, 'id' | 'title'>;
-  favorite?: boolean;
+  page: Pick<Page, 'id' | 'title' | 'content' | 'updatedAt' | 'updatedBy'>;
   children: ReactNode;
 }
 
 export function PageItemSidebar({
-  page, favorite, notebook, children,
+  page, children,
 }: PageItemProps) {
   const slugs = useParams<DashboardSlugs>();
-  const setStatePageBreadcrumb = useStore(state => state.setStatePageBreadcrumb);
-  const pageContext = useStore(state => state.page);
+  const { page: pageContext, setPage } = useStoreMulti('setPage', 'page');
   const { data: { workspace } = {} } = useGetDetailWorkspace();
 
   return (
+
     <Row
       align='center'
       justify='between'
-      classes={ ['group/favorite item-sidebar pr-[8px] mb-0.5',
-        favorite ? 'pl-[6px]' : 'pl-[20px]',
-        { ['bg-accent-light-active']: slugs?.pageId === page.id },
+      classes={ [
+        'group/page item-sidebar pr-2 mb-0.5 pl-[7px]',
+        { ['bg-accent-light-active']: slugs?.pageId === page?.id },
       ] }
     >
       <Row
@@ -61,7 +54,7 @@ export function PageItemSidebar({
           <div className='btn-icon-sidebar'>
             <Tooltip>
               <Tooltip.Trigger>
-                { page.content ? <Icons.pageText /> : <Icons.page /> }
+                { page?.content ? <Icons.pageText /> : <Icons.page /> }
               </Tooltip.Trigger>
               <Tooltip.Content className='ml-1.5'>
                 Change icon are developing
@@ -71,20 +64,20 @@ export function PageItemSidebar({
         </Row>
 
         <Link
-          onClick={ () => setStatePageBreadcrumb({ notebook, page }) }
-          href={ `/${workspace?.domain}/${page.notebookId}/${page.id}` }
+          onClick={ () => setPage(null) }
+          href={ `/${workspace?.domain}/${page.id}` }
           className={ cn('font-semibold text-sm text-primary flex-auto min-w-0',
             'truncate overflow-hidden',
-            { ['text-secondary']: slugs?.pageId === page.id }
+            { ['text-secondary']: slugs?.pageId === page?.id }
           ) }
         >
-          { pageContext?.id === page.id ? pageContext.title : page.title }
+          { pageContext?.id === page?.id ? pageContext?.title : page?.title }
         </Link>
 
         <Row classes='flex-0 flex-shrink-0'>
           <Row
             gap={ 1 }
-            classes='invisible w-0 group-hover/favorite:visible group-hover/favorite:w-auto'
+            classes='invisible w-0 group-hover/page:visible group-hover/page:w-auto'
           >
             { children }
           </Row>
@@ -105,9 +98,9 @@ PageItemSidebar.Skeleton = function PageItemSkeleton({ notebook }: { notebook?: 
           <Row
             key={ i }
             align='center'
-            classes={ notebook ? 'pl-[5px]' : 'pl-[20px]' }
+            classes={ notebook ? 'pl-[5px]' : 'pl-5' }
           >
-            <div className='w-[20px] h-[20px] flex justify-center items-center'>
+            <div className='w-5 h-5 flex justify-center items-center'>
               <Icons.arrowRightSline
                 size={ 25 }
                 className='animate-pulse fill-[#efefed] rounded'

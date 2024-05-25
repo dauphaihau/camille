@@ -11,10 +11,10 @@ import {
   Col, Dialog, Icons, Loading, Row
 } from 'core/components';
 import { cn, formatDate } from 'core/helpers';
-import { useSearchPage } from 'lib/request-client/page';
+import { useSearchPage } from 'services/query-hooks/page';
 import { useDebounce, useKeyboardShortcut } from 'core/hooks';
-import useStore from 'lib/store';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import useStore from 'stores/layout-store';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import { ItemSidebar } from '../dashboard/layout/sidebar/item-sidebar';
 
 export function SearchAllDialog() {
@@ -90,7 +90,7 @@ export function SearchAllDialog() {
             <Link
               key={ idx }
               onClick={ () => setOpen(false) }
-              href={ `/${workspace?.domain}/${p.notebookId}/${p.id}` }
+              href={ `/${workspace?.domain}/${p.id}` }
               className='font-semibold block text-[14px] hover:bg-accent-light py-1.5 rounded-[3px] px-2 mx-1 cursor-pointer group relative'
             >
               <Row
@@ -193,7 +193,7 @@ export function SearchAllDialog() {
           />
         </div>
         <div className='border-b border-accent-light' />
-        <div className='my-2 max-h-[730px] overflow-y-scroll'>
+        <div className='mt-2 mb-1 max-h-[730px] overflow-y-scroll'>
           { /*<div className='my-2 overflow-y-scroll'>*/ }
           <Pages />
         </div>

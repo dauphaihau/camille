@@ -1,5 +1,5 @@
 import { stripe } from 'lib/stripe';
-import { getWorkspaceSubscriptionPlan } from 'lib/request-server/subscription';
+import { getWorkspaceSubscriptionPlan } from 'services/server-actions/subscription';
 import { BillingCard } from 'components/dashboard/billing-card';
 import { DashboardSettingsShell } from 'components/dashboard/settings/shell';
 import { DashboardSettingsHeader } from 'components/dashboard/settings/header';
@@ -21,7 +21,10 @@ export default async function PlansPage({ params }) {
         text='Manage billing and your subscription plan.'
       />
       <div className='grid gap-10'>
-        <BillingCard subscriptionPlan={ { ...subscriptionPlan, isCanceled } } />
+        <BillingCard
+          isCanceled={ isCanceled }
+          subscriptionPlan={ subscriptionPlan }
+        />
 
         <div>
           <div className='text-xl font-semibold mb-2'>

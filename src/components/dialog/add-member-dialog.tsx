@@ -4,14 +4,14 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useQueryClient } from '@tanstack/react-query';
+import { StatusCodes } from 'http-status-codes';
 import {
-  Button, Dialog, Icons, Input
+  Button, Dialog, Icons, Input, toast
 } from 'core/components';
-import { toast } from 'core/components';
-import { useAddMember } from 'lib/request-client/settings-member';
 import { ROLE_USER_ON_WORKSPACE } from 'config/const';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
 import { IAddMember } from 'types/member';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
+import { useAddMember } from 'services/query-hooks/member';
 
 export default function AddMemberDialog() {
   const queryClient = useQueryClient();
@@ -28,12 +28,12 @@ export default function AddMemberDialog() {
   async function onSubmit({ email }: IAddMember) {
     if (!workspace) return;
 
-    await addMember({
+    const response = await addMember({
       workspaceId: workspace.id,
       email,
     });
 
-    if (isErrorAddMember) {
+    if (isErrorAddMember || response.code !== StatusCodes.CREATED) {
       toast({
         title: 'Something went wrong.',
         message: 'Your member was not added. Please try again.',

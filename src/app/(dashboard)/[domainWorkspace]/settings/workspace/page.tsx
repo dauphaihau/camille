@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormUpdateWorkspace } from 'components/dashboard/settings/workspace/form-update-workspace';
+import { UpdateWorkspaceForm } from 'components/dashboard/settings/workspace/update-workspace-form';
 import { DashboardSettingsHeader } from 'components/dashboard/settings/header';
 import { DashboardSettingsShell } from 'components/dashboard/settings/shell';
 import { DeleteWorkspaceButton } from 'components/dashboard/settings/workspace/delete-workspace-button';
@@ -26,7 +26,7 @@ export default async function WorkspaceSettingPage() {
 
         <div className='space-y-3 w-1/2'>
           <div className='text-base'>General</div>
-          <FormUpdateWorkspace />
+          <UpdateWorkspaceForm />
         </div>
         <div className='border-gray-200 border-b' />
 

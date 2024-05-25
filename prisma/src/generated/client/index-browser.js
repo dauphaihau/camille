@@ -15,11 +15,11 @@ exports.Prisma = Prisma
 
 /**
  * Prisma Client JS version: 4.16.2
- * Query Engine version: e9771e62de70f79a5e1c604a2d7c8e2a0a874b48
+ * Query Engine version: 4bc8b6e1b66cb932731fb1bdbbc550d1e010de81
  */
 Prisma.prismaVersion = {
   client: "4.16.2",
-  engine: "e9771e62de70f79a5e1c604a2d7c8e2a0a874b48"
+  engine: "4bc8b6e1b66cb932731fb1bdbbc550d1e010de81"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -154,7 +154,6 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
 exports.Prisma.TrackingUserAccessOnWorkspaceScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
-  lastAccessNotebookId: 'lastAccessNotebookId',
   lastAccessPageId: 'lastAccessPageId',
   userId: 'userId',
   workspaceId: 'workspaceId'
@@ -186,18 +185,6 @@ exports.Prisma.TeamspaceScalarFieldEnum = {
   createdBy: 'createdBy'
 };
 
-exports.Prisma.NotebookScalarFieldEnum = {
-  id: 'id',
-  title: 'title',
-  description: 'description',
-  published: 'published',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  workspaceId: 'workspaceId',
-  teamspaceId: 'teamspaceId',
-  createdBy: 'createdBy'
-};
-
 exports.Prisma.PageScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -206,10 +193,11 @@ exports.Prisma.PageScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt',
-  notebookId: 'notebookId',
+  workspaceId: 'workspaceId',
+  teamspaceId: 'teamspaceId',
   createdBy: 'createdBy',
-  deletedBy: 'deletedBy',
-  updatedBy: 'updatedBy'
+  updatedBy: 'updatedBy',
+  deletedBy: 'deletedBy'
 };
 
 exports.Prisma.FavoriteScalarFieldEnum = {
@@ -269,7 +257,6 @@ exports.Prisma.ModelName = {
   TrackingUserAccessOnWorkspace: 'TrackingUserAccessOnWorkspace',
   Workspace: 'Workspace',
   Teamspace: 'Teamspace',
-  Notebook: 'Notebook',
   Page: 'Page',
   Favorite: 'Favorite',
   UserOnWorkspace: 'UserOnWorkspace',

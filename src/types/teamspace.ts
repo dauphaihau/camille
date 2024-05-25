@@ -1,9 +1,4 @@
 import { z } from 'zod';
-import { createTeamspaceSchema } from 'lib/validations/teamspace';
-import { ARCHIVED_TEAMSPACE } from 'config/const';
+import { createTeamspaceSchema } from 'validations/teamspace';
 
 export type ICreateTeamspace = z.infer<typeof createTeamspaceSchema>;
-
-export type IArchiveTeamspace = {
-  status: ARCHIVED_TEAMSPACE
-}

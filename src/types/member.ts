@@ -1,13 +1,8 @@
-import { User, Workspace } from '@prisma/client';
-import { ROLE_USER_ON_WORKSPACE } from 'config/const';
+import { z } from 'zod';
+import { addMemberSchema, deleteMemberSchema, updateRoleMemberSchema } from 'validations/member';
 
-export type IAddMember = {
-  workspaceId: Workspace['id']
-  email: User['email']
-}
+export type IAddMember = z.infer<typeof addMemberSchema>;
 
-export type IUpdateRoleMember = {
-  userId: User['id']
-  workspaceId: Workspace['id']
-  role: ROLE_USER_ON_WORKSPACE
-}
+export type IDeleteMember = z.infer<typeof deleteMemberSchema>;
+
+export type IUpdateRoleMember = z.infer<typeof updateRoleMemberSchema>;

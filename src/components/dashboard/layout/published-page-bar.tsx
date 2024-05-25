@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React from 'react';
 import { Icons, Row } from 'core/components';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
-import { PATH, SUFFIX_DOMAIN_SHARE_TO_WEB } from 'config/const';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
+import { PATH, SUFFIX_DOMAIN_SHARE_PUBLIC } from 'config/const';
 import { DashboardSlugs } from 'types/workspace';
-import { useGetCurrentPage } from 'lib/request-client/page';
+import { useGetCurrentPage } from 'services/query-hooks/page';
 
 export function PublishedPageBar() {
   const { data: { workspace } = {} } = useGetDetailWorkspace();
@@ -21,7 +21,7 @@ export function PublishedPageBar() {
         gap={ 2 }
         classes='text-[#4281db] text-center py-2 text-sm font-medium bg-[#f0f6fc] h-12'
       >
-        <div>This page is live on { slugs?.domainWorkspace }{ SUFFIX_DOMAIN_SHARE_TO_WEB }.</div>
+        <div>This page is live on { slugs?.domainWorkspace }{ SUFFIX_DOMAIN_SHARE_PUBLIC }.</div>
         <Link
           href={ `/${workspace?.domain}${PATH.SETTINGS}/plans` }
           className='text-[#4281db] py-0.5 px-2.5 rounded-sm cursor-pointer flex items-center gap-2 hover:underline hover:underline-offset-2'

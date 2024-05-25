@@ -1,10 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useReducer } from 'react';
 import * as React from 'react';
+import { useReducer } from 'react';
 import { User, UserOnWorkspace } from '@prisma/client';
 
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import {
   Button, DropdownMenu, Icons, Row, toast
 } from 'core/components';
@@ -12,10 +13,13 @@ import { Alert } from 'core/components/alert';
 import { cn } from 'core/helpers';
 import { PATH, ROLE_USER_ON_WORKSPACE } from 'config/const';
 import {
-  useDeleteMember, useGetMembersByCurWorkspace, useLeaveWorkspace, useUpdateRoleMember
-} from 'lib/request-client/settings-member';
+  useDeleteMember,
+  useGetMembersByCurWorkspace,
+  useLeaveWorkspace,
+  useUpdateRoleMember
+} from 'services/query-hooks/member';
 import { LoadingDialog } from 'components/dialog/loading-dialog';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 
 interface MemberOperationsProps {
   member: Pick<User, 'id' | 'name'> & Pick<UserOnWorkspace, 'role'>,
@@ -47,7 +51,6 @@ export function MemberOperations(
   const {
     isPending: isPendingDeleteMember,
     mutateAsync: deleteMember,
-    isError: isErrorDeleteMember,
   } = useDeleteMember(member.id);
 
   const {
@@ -77,17 +80,9 @@ export function MemberOperations(
     if (!workspace || !member) return;
     const response = await deleteMember();
 
-    if (isErrorDeleteMember) {
+    if (response.code !== StatusCodes.NO_CONTENT) {
       toast({
         message: 'Something went wrong, please try again.',
-        type: 'error',
-      });
-      return;
-    }
-
-    if (response?.code === '403') {
-      toast({
-        message: response.message,
         type: 'error',
       });
       return;
@@ -109,9 +104,9 @@ export function MemberOperations(
       return;
     }
 
-    if (response?.code === '403') {
+    if (response?.code === StatusCodes.FORBIDDEN) {
       toast({
-        message: response.message,
+        message: ReasonPhrases.FORBIDDEN,
         type: 'error',
       });
       return;

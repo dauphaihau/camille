@@ -53,7 +53,7 @@ DropdownMenu.Item = React.forwardRef<
     <DropdownMenuPrimitive.Item
       ref={ ref }
       className={ cn(
-        'flex items-center cursor-pointer select-none outline-none rounded-md py-2 px-3',
+        'group/dropdown flex items-center cursor-pointer select-none outline-none rounded-md py-2 px-3',
         'text-sm text-secondary focus:text-black font-medium',
         'hover:bg-accent-light',
         props.disabled && 'opacity-50 cursor-not-allowed',

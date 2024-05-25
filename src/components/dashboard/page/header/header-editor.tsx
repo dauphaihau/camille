@@ -3,9 +3,9 @@
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Icons, Row } from 'core/components';
-import { useStoreMulti } from 'lib/store';
-import { useGetCurrentPage } from 'lib/request-client/page';
-import { PageOperations } from '../../page-operations';
+import { useStoreMulti } from 'stores/layout-store';
+import { useGetCurrentPage } from 'services/query-hooks/page';
+import { PageOperations } from './page-operations';
 import { PageBreadcrumb } from './page-breadcrumb';
 import FavoriteButton from './favorite-button';
 import ShareButton from './share-button';
@@ -18,7 +18,7 @@ export default function HeaderEditor() {
   const { showSidebar, setShowSidebar } = useStoreMulti('showSidebar', 'setShowSidebar');
 
   return (
-    <div className='sticky top-0 z-40 bg-white px-4'>
+    <div className='sticky top-0 z-1 bg-white px-4'>
       <Row
         align='center'
         justify='between'
@@ -43,7 +43,7 @@ export default function HeaderEditor() {
           align='center'
           gap={ 2 }
         >
-          <div className='text-[14px] text-[#9b9a97] font-medium'>
+          <div className='text-sm text-[#9b9a97] font-medium'>
             Edited { dayjs(pageData?.updatedAt).fromNow() }
           </div>
           <ShareButton />

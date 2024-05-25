@@ -9,16 +9,16 @@ datasource db {
   relationMode = "prisma"
 }
 
-// generator zod {
-//   provider              = "zod-prisma"
-//   output                = "./zod" // (default) the directory where generated zod schemas will be saved
-//   relationModel         = true // (default) Create and export both plain and related models.
-//   modelCase             = "camelCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
-//   modelSuffix           = "Schema" // (default) Suffix to apply to your prisma models when naming Zod schemas
-//   useDecimalJs          = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
-//   imports               = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
-//   prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
-// }
+generator zod {
+  provider              = "zod-prisma"
+  output                = "./zod" // (default) the directory where generated zod schemas will be saved
+  relationModel         = true // (default) Create and export both plain and related models.
+  modelCase             = "camelCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
+  modelSuffix           = "Schema" // (default) Suffix to apply to your prisma models when naming Zod schemas
+  useDecimalJs          = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
+  imports               = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
+  prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
+}
 
 model Account {
   id                String   @id @default(cuid())
@@ -72,7 +72,6 @@ model User {
   userOnTeamspace    UserOnTeamspace[]               @relation("UserOnTeamspace")
   trackingUserAccess TrackingUserAccessOnWorkspace[] @relation("TrackingUser")
   favorites          Favorite[]
-  notebooks          Notebook[]
   PagesCreated       Page[]                          @relation("PageCreatedBy")
   PagesUpdated       Page[]                          @relation("PageUpdatedBy")
   PagesDeleted       Page[]                          @relation("PageDeletedBy")
@@ -96,10 +95,9 @@ model VerificationToken {
 }
 
 model TrackingUserAccessOnWorkspace {
-  id                   String   @id @default(cuid())
-  createdAt            DateTime @default(now()) @map("created_at")
-  lastAccessNotebookId String?
-  lastAccessPageId     String?
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now()) @map("created_at")
+  lastAccessPageId String?
 
   userId      String
   user        User      @relation("TrackingUser", fields: [userId], references: [id])
@@ -130,7 +128,7 @@ model Workspace {
   trackingUserAccessOnWorkspace TrackingUserAccessOnWorkspace?
   userOnWorkspace               UserOnWorkspace[]              @relation("WorkspaceOnUser")
   teamspaces                    Teamspace[]
-  notebooks                     Notebook[]
+  pages                         Page[]
   favorites                     Favorite[]
 
   @@map("workspaces")
@@ -150,34 +148,10 @@ model Teamspace {
 
   createdBy       String
   userOnTeamspace UserOnTeamspace[] @relation("TeamspaceOnUser")
-  notebooks       Notebook[]
+  pages           Page[]
 
   @@index([workspaceId])
   @@map("teamspaces")
-}
-
-model Notebook {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  published   Boolean  @default(false)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
-  pages       Page[]
-
-  workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
-  teamspaceId String?
-  teamspace   Teamspace? @relation(fields: [teamspaceId], references: [id])
-
-  createdBy String
-  user      User   @relation(fields: [createdBy], references: [id])
-
-  @@index([createdBy])
-  @@index([workspaceId])
-  @@index([teamspaceId])
-  @@map("notebooks")
 }
 
 model Page {
@@ -189,17 +163,21 @@ model Page {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  notebookId    String
-  notebook      Notebook   @relation(fields: [notebookId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  workspaceId String
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  teamspaceId String?
+  teamspace   Teamspace? @relation(fields: [teamspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
   createdBy     String
   createdByUser User       @relation("PageCreatedBy", fields: [createdBy], references: [id])
-  deletedBy     String?
-  deletedByUser User?      @relation("PageDeletedBy", fields: [deletedBy], references: [id])
   updatedBy     String
   updatedByUser User       @relation("PageUpdatedBy", fields: [updatedBy], references: [id])
+  deletedBy     String?
+  deletedByUser User?      @relation("PageDeletedBy", fields: [deletedBy], references: [id])
   favorites     Favorite[]
 
-  @@index([notebookId])
+  @@index([workspaceId])
+  @@index([teamspaceId])
   @@index([deletedBy])
   @@index([updatedBy])
   @@index([createdBy])

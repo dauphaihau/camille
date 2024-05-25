@@ -8,7 +8,8 @@ export default function BackButton() {
   return (
     <Button
       iconLeft={ <Icons.arrowLeftSline /> }
-      variant='text' color='gray'
+      variant='text'
+      color='gray'
       size='sm'
       // size='xs'
       onClick={ () => {

@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation';
 
 import { Button, Col, Input } from 'core/components';
 import { toast } from 'core/components';
-import { useUpdateProfile } from 'lib/request-client/settings-account-profile';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import { IUpdateProfile } from 'types/user';
+import { useUpdateProfile } from 'services/query-hooks/user';
 
 export default function UpdateProfileForm() {
   const router = useRouter();

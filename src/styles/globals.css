@@ -58,7 +58,7 @@
 
   /* #endregion  /**======== Default Typography =========== */
   .item-sidebar {
-    @apply hover:bg-accent py-0.5 rounded-sm h-[28px] max-h-[28px] cursor-pointer;
+    @apply hover:bg-accent py-0.5 rounded h-[28px] max-h-[28px] cursor-pointer;
   }
 
   .btn-icon {

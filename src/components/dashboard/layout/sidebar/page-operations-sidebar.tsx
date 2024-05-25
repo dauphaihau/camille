@@ -4,36 +4,38 @@ import React, { useReducer } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import hotToast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  Favorite, Notebook, Page, User
-} from '@prisma/client';
+import { Page, Teamspace, User } from '@prisma/client';
 
+import { StatusCodes } from 'http-status-codes';
+import {
+  useAddPageToFavorite,
+  useCreatePage,
+  useDeletePage,
+  useGetPagesByTeamspace,
+  useGetPrivatePages,
+  useUpdatePage
+} from 'services/query-hooks/page';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import {
   Col, DropdownMenu, Icons, Input, Popover, Toast, toast, Tooltip
 } from 'core/components';
 import {
-  useAddPageToFavorite, useCreatePage, useDeletePage, useUpdatePage
-} from 'lib/request-client/page';
-import {
   cn, formatDate, getValueOfLastBracketInString
 } from 'core/helpers';
-import { DELETE_PAGE_TYPE, PATH } from 'config/const';
-import { useStoreMulti } from 'lib/store';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { DELETE_PAGE_TYPE } from 'config/const';
+import { useStoreMulti } from 'stores/layout-store';
 import { useDebounce } from 'core/hooks';
 import { DashboardSlugs } from 'types/workspace';
 import { IUpdatePage } from 'types/page';
+import { freePlan } from 'config/subscriptions';
 
 interface PageOperationsSidebarProps {
-  page: Pick<Page, 'id' | 'title' | 'content' | 'updatedAt' | 'updatedBy' | 'notebookId'> & {
-    favorites?: Favorite[]
-    createdByUser: Pick<User, 'email'>
+  page: Pick<Page, 'id' | 'title' | 'content' | 'updatedAt' | 'workspaceId'> & {
+    updatedByUser: Pick<User, 'email'>
     isFavorite: boolean
   };
-  notebook: Pick<Notebook, 'id' | 'title'>;
-  classesTrigger?: string;
-  classesContent?: string;
   placeOnGroup?: 'private' | 'favorites' | 'teamspace';
+  teamspaceId?: Teamspace['id'] | null
 }
 
 interface State {
@@ -44,21 +46,31 @@ interface State {
 
 export function PageOperationsSidebar({
   page,
-  classesContent,
-  notebook,
+  teamspaceId = null,
   placeOnGroup,
 }: PageOperationsSidebarProps) {
   const router = useRouter();
   const slugs = useParams<DashboardSlugs>();
   const queryClient = useQueryClient();
 
-  const { setPage } = useStoreMulti('setPage');
+  const {
+    workspace: wsTemp,
+    setWorkspace,
+    setPage,
+    setShowLimitedPagesBar,
+  } = useStoreMulti('setWorkspace', 'workspace', 'setShowLimitedPagesBar', 'setPage');
 
   const { data: { workspace } = {} } = useGetDetailWorkspace();
 
+  const { data: privatePages, refetch: refetchGetPrivatePages } = useGetPrivatePages();
+
+  const {
+    data: pagesOfTeamspace,
+    refetch: refetchGetPagesByTeamspace,
+  } = useGetPagesByTeamspace(teamspaceId ?? undefined);
+
   const {
     mutateAsync: deletePage,
-    isError: isErrorDeletePage,
   } = useDeletePage();
 
   const {
@@ -70,13 +82,12 @@ export function PageOperationsSidebar({
 
   const {
     mutateAsync: createPage,
-    isError: isErrorCreatePage,
   } = useCreatePage();
 
   const {
     mutateAsync: updatePage,
     isError: isErrorUpdatePage,
-  } = useUpdatePage(page?.id);
+  } = useUpdatePage();
 
   const [state, setState] = useReducer(
     (state: State, newState: Partial<State>) => ({
@@ -89,14 +100,26 @@ export function PageOperationsSidebar({
     }
   );
 
-  async function handleUndo() {
+  async function invalidatePagesSidebar() {
     if (!page) return;
-    await deletePage({
+    if (teamspaceId) {
+      await refetchGetPagesByTeamspace();
+    }
+    else {
+      await refetchGetPrivatePages();
+    }
+  }
+
+  async function handleUndo() {
+    if (!page || !workspace) return;
+
+    const response = await deletePage({
+      workspaceId: workspace?.id,
       pageId: page.id,
       type: DELETE_PAGE_TYPE.RECOVER,
     });
 
-    if (isErrorDeletePage) {
+    if (response.code !== StatusCodes.NO_CONTENT) {
       toast({
         title: 'Something went wrong.',
         message: 'Your page was not undo. Please try again.',
@@ -104,20 +127,21 @@ export function PageOperationsSidebar({
       });
       return;
     }
-    queryClient.invalidateQueries({
-      queryKey: ['notebook', notebook.id],
-    });
+
+    await invalidatePagesSidebar();
   }
 
   async function handleDelete() {
-    if (!page) return;
+    if (!page || !workspace || !wsTemp) return;
     setState({ showDropdown: false });
-    await deletePage({
+
+    const response = await deletePage({
+      workspaceId: workspace?.id,
       pageId: page.id,
       type: DELETE_PAGE_TYPE.SOFT_DELETE,
     });
 
-    if (isErrorDeletePage) {
+    if (response.code !== StatusCodes.NO_CONTENT) {
       toast({
         title: 'Something went wrong.',
         message: 'Your page was not deleted. Please try again.',
@@ -144,17 +168,47 @@ export function PageOperationsSidebar({
       ),
       { duration: 300, position: 'bottom-center' }
     );
-    queryClient.invalidateQueries({
-      queryKey: ['notebook', notebook.id],
-    });
+
+    if (workspace.isLimitedPages) {
+      setWorkspace({ ...wsTemp, totalPages: wsTemp.totalPages - 1 });
+    }
+
+    await invalidatePagesSidebar();
+
+    if (page.isFavorite) {
+      await queryClient.invalidateQueries({
+        queryKey: ['favorites-pages', workspace.id],
+      });
+    }
 
     if (slugs?.pageId === page.id) {
-      router.push(slugs?.domainWorkspace ? `/${slugs.domainWorkspace}` : PATH.HOME);
+      if (!teamspaceId && privatePages && privatePages.length > 1) {
+        for (let i = privatePages.length - 1; i >= 0; i--) {
+          if (privatePages[i].id !== page.id) {
+            router.push(`/${slugs?.domainWorkspace}/${privatePages[i].id}`);
+            return;
+          }
+        }
+      }
+      else if(teamspaceId && pagesOfTeamspace && pagesOfTeamspace.length > 0) {
+        for (let i = pagesOfTeamspace.length - 1; i >= 0; i--) {
+          if (pagesOfTeamspace[i].id !== page.id) {
+            router.push(`/${slugs?.domainWorkspace}/${pagesOfTeamspace[i].id}`);
+            return;
+          }
+        }
+      }
+
+      await queryClient.invalidateQueries({
+        queryKey: ['page', page.id],
+      });
     }
+
   }
 
   async function handleUpdatePage(values: IUpdatePage) {
     if (!page) return;
+    values.id = page.id;
     await updatePage(values);
 
     if (isErrorUpdatePage) {
@@ -165,13 +219,24 @@ export function PageOperationsSidebar({
       });
       return;
     }
+    if (slugs?.pageId === page.id) {
+      await queryClient.invalidateQueries({
+        queryKey: ['page', page.id],
+      });
+    }
     await queryClient.invalidateQueries({
-      queryKey: ['notebook', notebook.id],
+      queryKey: ['private-pages', workspace?.id],
     });
   }
 
   async function handleDuplicatePage() {
-    if (!page) return;
+    if (!page || !workspace || !wsTemp) return;
+
+    if (workspace.isLimitedPages && wsTemp.totalPages >= freePlan.limitedPages) {
+      setShowLimitedPagesBar(true);
+      return;
+    }
+
     let pageTitle = getValueOfLastBracketInString(page.title);
 
     if (!pageTitle) {
@@ -181,14 +246,14 @@ export function PageOperationsSidebar({
       pageTitle = page.title.substring(0, page.title.length - 3) + `(${increase})`;
     }
 
-    console.log('page', page);
     const response = await createPage({
-      notebookId: page.notebookId,
+      workspaceId: page.workspaceId,
+      teamspaceId,
       title: pageTitle,
       content: page.content,
     });
 
-    if (isErrorCreatePage) {
+    if (response.code !== StatusCodes.CREATED) {
       toast({
         title: 'Something went wrong.',
         message: 'Your page was not duplicate. Please try again.',
@@ -196,12 +261,14 @@ export function PageOperationsSidebar({
       });
     }
 
-    await queryClient.invalidateQueries({
-      queryKey: ['notebook', notebook.id],
-    });
+    if (workspace.isLimitedPages) {
+      setWorkspace({ ...wsTemp, totalPages: wsTemp.totalPages + 1 });
+    }
+
+    await invalidatePagesSidebar();
 
     if (response?.data?.pageId && slugs?.domainWorkspace) {
-      router.push(`/${slugs.domainWorkspace}/${page.notebookId}/${response.data.pageId}`);
+      router.push(`/${slugs.domainWorkspace}/${response.data.pageId}`);
     }
   }
 
@@ -227,12 +294,14 @@ export function PageOperationsSidebar({
     await queryClient.invalidateQueries({
       queryKey: ['favorites-pages', workspace.id],
     });
-    await queryClient.invalidateQueries({
-      queryKey: ['notebook', slugs?.notebookId],
-    });
-    await queryClient.invalidateQueries({
-      queryKey: ['page', slugs?.pageId],
-    });
+
+    await invalidatePagesSidebar();
+
+    if (slugs?.pageId === page.id) {
+      await queryClient.invalidateQueries({
+        queryKey: ['page', slugs?.pageId],
+      });
+    }
   }
 
   async function copyToClipBoard() {
@@ -245,7 +314,7 @@ export function PageOperationsSidebar({
 
       if (!slugs?.domainWorkspace) return;
 
-      pageURL = window.location.origin + `/${slugs.domainWorkspace}/${page.notebookId}/${page.id}`;
+      pageURL = window.location.origin + `/${slugs.domainWorkspace}/${page.id}`;
     }
 
     try {
@@ -271,7 +340,10 @@ export function PageOperationsSidebar({
 
   async function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement>) {
     setPage({ ...page, title: e.target.value });
-    await debouncedChangeTitle({ title: e.target.value });
+    await debouncedChangeTitle({
+      id: page?.id,
+      title: e.target.value,
+    });
   }
 
   return (
@@ -299,13 +371,9 @@ export function PageOperationsSidebar({
             }
           </Tooltip>
         </DropdownMenu.Trigger>
+
         <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            className={ cn('absolute w-[265px] top-0',
-              '-left-2',
-              classesContent
-            ) }
-          >
+          <DropdownMenu.Content className={ cn('absolute w-[265px] top-0 left-[-1rem]') }>
             {
               placeOnGroup !== 'favorites' && (
                 <>
@@ -329,7 +397,7 @@ export function PageOperationsSidebar({
             <DropdownMenu.Item className='hover:bg-white'>
               <Col>
                 <p className='text-xs text-[#9b9a98] mb-1.5'>Last edited
-                  by { page?.createdByUser?.email && page?.createdByUser?.email.split('@')[0] }
+                  by { page?.updatedByUser?.email && page.updatedByUser.email.split('@')[0] }
                 </p>
                 {
                   page?.updatedAt && <p className='text-xs text-[#9b9a98]'>{ formatDate(page.updatedAt) }</p>
@@ -350,7 +418,7 @@ export function PageOperationsSidebar({
         <Popover.Content
           onPointerDownOutside={ () => setState({ showRenameForm: false }) }
           side='bottom'
-          className='w-[414px] ml-12 mt-22'
+          className='w-[414px] ml-12 mt-22 p-1.5'
         >
           <Input
             id='pageTitle'

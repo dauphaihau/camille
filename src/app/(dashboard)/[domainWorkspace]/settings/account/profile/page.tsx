@@ -5,7 +5,7 @@ import { DashboardSettingsShell } from 'components/dashboard/settings/shell';
 import { Grid } from 'core/components';
 import UpdateProfileForm from 'components/dashboard/settings/account/profile/update-profile-form';
 import UpdateAvatar from 'components/dashboard/settings/account/profile/upload-avatar';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 
 export default async function ProfilePage() {
   const { data: { user } = {} } = useGetDetailWorkspace();

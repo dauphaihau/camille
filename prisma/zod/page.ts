@@ -1,6 +1,6 @@
 import * as z from "zod"
 import * as imports from "../null"
-import { CompleteNotebook, relatedNotebookSchema, CompleteUser, relatedUserSchema, CompleteFavorite, relatedFavoriteSchema } from "./index"
+import { CompleteWorkspace, relatedWorkspaceSchema, CompleteTeamspace, relatedTeamspaceSchema, CompleteUser, relatedUserSchema, CompleteFavorite, relatedFavoriteSchema } from "./index"
 
 // Helper schema for JSON fields
 type Literal = boolean | number | string
@@ -16,17 +16,19 @@ export const pageSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullish(),
-  notebookId: z.string(),
+  workspaceId: z.string(),
+  teamspaceId: z.string().nullish(),
   createdBy: z.string(),
-  deletedBy: z.string().nullish(),
   updatedBy: z.string(),
+  deletedBy: z.string().nullish(),
 })
 
 export interface CompletePage extends z.infer<typeof pageSchema> {
-  notebook: CompleteNotebook
+  workspace: CompleteWorkspace
+  teamspace?: CompleteTeamspace | null
   createdByUser: CompleteUser
-  deletedByUser?: CompleteUser | null
   updatedByUser: CompleteUser
+  deletedByUser?: CompleteUser | null
   favorites: CompleteFavorite[]
 }
 
@@ -36,9 +38,10 @@ export interface CompletePage extends z.infer<typeof pageSchema> {
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
 export const relatedPageSchema: z.ZodSchema<CompletePage> = z.lazy(() => pageSchema.extend({
-  notebook: relatedNotebookSchema,
+  workspace: relatedWorkspaceSchema,
+  teamspace: relatedTeamspaceSchema.nullish(),
   createdByUser: relatedUserSchema,
-  deletedByUser: relatedUserSchema.nullish(),
   updatedByUser: relatedUserSchema,
+  deletedByUser: relatedUserSchema.nullish(),
   favorites: relatedFavoriteSchema.array(),
 }))

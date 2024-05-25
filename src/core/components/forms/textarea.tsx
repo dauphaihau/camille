@@ -38,11 +38,11 @@ export function Textarea({
   ...others
 }: TextareaProps) {
 
-  const arrSize = [
-    size === 'xs' && ['px-[14px] text-xs'],
-    size === 'sm' && ['px-4 text-sm'],
-    size === 'md' && ['px-[22px] text-base'],
-  ];
+  const arrSize = {
+    xs: 'px-[14px] text-xs',
+    sm: 'px-4 text-sm',
+    md: 'px-[22px] text-base',
+  };
 
   return (
     <div className='w-full'>
@@ -50,7 +50,7 @@ export function Textarea({
         label &&
         <label
           htmlFor={ id }
-          className='text-sm font-medium text-[#3c4149] dark:text-white'
+          className='text-sm font-medium text-[#3c4149] dark:text-white mb-1'
         >
           { label }
         </label>
@@ -62,7 +62,7 @@ export function Textarea({
         { /*<div className='input__contentLeft'>{contentLeft}</div>*/ }
         <span
           className={ cn('absolute flex items-center justify-center top-0 left-0 bottom-0',
-            arrSize,
+            arrSize[size],
             classesLabelLeft
           ) }
         >{ labelLeft }
@@ -72,7 +72,7 @@ export function Textarea({
         <textarea
           className={ cn(
             `
-          bg-[#f7f7f7] focus:bg-white
+          bg-[#f7f7f5] focus:bg-white
           border border-solid border-gray-300 hover:border-black
           rounded placeholder-gray-500
           transition duration-200 ease-in-out
@@ -87,7 +87,7 @@ export function Textarea({
           disabled:bg-[#e5e5e5] 
           disabled:text-[#aeb5bc]
         `,
-            arrSize,
+            arrSize[size],
             'p-2.5 md:pr-5',
             // { 'pl-10': contentLeft },
             classes

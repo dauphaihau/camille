@@ -1,17 +1,11 @@
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-
 import { Row } from 'core/components';
-import useStore, { useStoreMulti } from 'lib/store';
+import useStore from 'stores/layout-store';
 import Title from 'components/common/title';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
-import { DashboardSlugs } from 'types/workspace';
+import { useGetCurrentPage } from 'services/query-hooks/page';
 
 export function PageBreadcrumb() {
-  const slugs = useParams<DashboardSlugs>();
   const page = useStore(state => state.page);
-  const { statePageBreadcrumb } = useStoreMulti('statePageBreadcrumb');
-  const { data: { workspace } = {} } = useGetDetailWorkspace();
+  const { data: pageData } = useGetCurrentPage();
 
   return (
     <Row
@@ -20,38 +14,24 @@ export function PageBreadcrumb() {
       classes='min-w-0 flex-grow-0 font-medium'
     >
       {
-        workspace?.domain && statePageBreadcrumb?.notebook?.id && (
-          <Link
-            href={ `/${workspace.domain}/${statePageBreadcrumb.notebook?.id}` }
-            className='hover:bg-accent-light p-0.5 px-1.5 rounded'
-          >
-            <Title maxW={ 160 }>{ statePageBreadcrumb?.notebook?.title }</Title>
-          </Link>
-        )
-      }
-      { /*{*/ }
-      { /*  slugs?.pageId &&*/ }
-      { /*    (*/ }
-      { /*      <>*/ }
-      { /*        <p>/</p>*/ }
-      { /*        <Title*/ }
-      { /*          maxW={ 240 }*/ }
-      { /*          className='p-0.5 px-1.5'*/ }
-      { /*        >*/ }
-      { /*          { slugs.pageId === page.id ? page.title : statePageBreadcrumb?.pageData?.title }*/ }
-      { /*        </Title>*/ }
-      { /*      </>*/ }
-      { /*    )*/ }
-      { /*}*/ }
-
-      {
-        slugs?.pageId === page?.id && page?.title && (
+        pageData?.teamspace?.name && (
           <>
-            <p>/</p>
             <Title
               maxW={ 240 }
-              className='p-0.5 px-1.5'
-            >{ page.title }
+              className='hover:bg-accent-light p-0.5 px-1.5 rounded'
+            >{ pageData?.teamspace.name }
+            </Title>
+            <div>/</div>
+          </>
+        )
+      }
+      {
+        pageData?.title && (
+          <>
+            <Title
+              maxW={ 240 }
+              className='hover:bg-accent-light p-0.5 px-1.5 rounded'
+            >{ page?.title || pageData.title }
             </Title>
           </>
         )

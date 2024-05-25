@@ -3,7 +3,7 @@
 import Image from 'next/image';
 
 import { Tooltip } from 'core/components';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 
 export default function UpdateAvatar() {
   const { data: { user } = {} } = useGetDetailWorkspace();

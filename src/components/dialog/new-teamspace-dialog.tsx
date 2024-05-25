@@ -9,10 +9,10 @@ import {
   Button, Col, Dialog, Icons, Input, Textarea, Tooltip
 } from 'core/components';
 import { toast } from 'core/components';
-import { createTeamspaceSchema } from 'lib/validations/teamspace';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { createTeamspaceSchema } from 'validations/teamspace';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import { ICreateTeamspace } from 'types/teamspace';
-import { useCreateTeamspace } from 'lib/request-client/teamspace';
+import { useCreateTeamspace } from 'services/query-hooks/teamspace';
 
 export default function NewTeamspaceDialog() {
   const router = useRouter();
@@ -71,7 +71,7 @@ export default function NewTeamspaceDialog() {
         <Tooltip>
           <Tooltip.Trigger asChild>
             <div>
-              <Icons.plus className='btn-icon invisible group-hover:visible' />
+              <Icons.plus className='btn-icon stroke-[0.5px] invisible group-hover/sidebar:visible' />
             </div>
           </Tooltip.Trigger>
           <Tooltip.Content>New teamspace</Tooltip.Content>

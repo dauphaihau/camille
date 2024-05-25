@@ -3,9 +3,9 @@ import { redirect } from 'next/navigation';
 
 import Navigate from 'components/marketing/header/navigate';
 import { getCurrentUser } from 'lib/session';
-import { getTrackingUserAccess } from 'lib/request-server/tracking';
 import { Col } from 'core/components';
 import { PATH } from 'config/const';
+import { getTrackingUserByWorkspace } from 'services/server-actions/user';
 
 interface MarketingProps {
   children: React.ReactNode;
@@ -21,17 +21,12 @@ export default async function MarketingLayout({
     if (!user.workspaceLastVisited) {
       redirect(PATH.WORKSPACE);
     }
+    const response = await getTrackingUserByWorkspace(user.workspaceLastVisited.id);
 
-    const track = await getTrackingUserAccess(user.workspaceLastVisited.id as string, user.id);
     const domain = user.workspaceLastVisited.domain;
 
-    if (track) {
-      if (track.lastAccessNotebookId && !track.lastAccessPageId) {
-        return redirect(`/${domain}/${track.lastAccessNotebookId}`);
-      }
-      if (track.lastAccessPageId && track.lastAccessNotebookId) {
-        return redirect(`/${domain}/${track.lastAccessNotebookId}/${track.lastAccessPageId}`);
-      }
+    if (response?.data?.lastAccessPageId) {
+      redirect(`/${domain}/${response.data.lastAccessPageId}`);
     }
     redirect(`/${domain}`);
   }

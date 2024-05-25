@@ -1,6 +1,6 @@
 import * as z from "zod"
 import * as imports from "../null"
-import { CompleteAccount, relatedAccountSchema, CompleteSession, relatedSessionSchema, CompleteUserOnWorkspace, relatedUserOnWorkspaceSchema, CompleteUserOnTeamspace, relatedUserOnTeamspaceSchema, CompleteTrackingUserAccessOnWorkspace, relatedTrackingUserAccessOnWorkspaceSchema, CompleteFavorite, relatedFavoriteSchema, CompleteNotebook, relatedNotebookSchema, CompletePage, relatedPageSchema } from "./index"
+import { CompleteAccount, relatedAccountSchema, CompleteSession, relatedSessionSchema, CompleteUserOnWorkspace, relatedUserOnWorkspaceSchema, CompleteUserOnTeamspace, relatedUserOnTeamspaceSchema, CompleteTrackingUserAccessOnWorkspace, relatedTrackingUserAccessOnWorkspaceSchema, CompleteFavorite, relatedFavoriteSchema, CompletePage, relatedPageSchema } from "./index"
 
 export const userSchema = z.object({
   id: z.string(),
@@ -21,7 +21,6 @@ export interface CompleteUser extends z.infer<typeof userSchema> {
   userOnTeamspace: CompleteUserOnTeamspace[]
   trackingUserAccess: CompleteTrackingUserAccessOnWorkspace[]
   favorites: CompleteFavorite[]
-  notebooks: CompleteNotebook[]
   PagesCreated: CompletePage[]
   PagesUpdated: CompletePage[]
   PagesDeleted: CompletePage[]
@@ -39,7 +38,6 @@ export const relatedUserSchema: z.ZodSchema<CompleteUser> = z.lazy(() => userSch
   userOnTeamspace: relatedUserOnTeamspaceSchema.array(),
   trackingUserAccess: relatedTrackingUserAccessOnWorkspaceSchema.array(),
   favorites: relatedFavoriteSchema.array(),
-  notebooks: relatedNotebookSchema.array(),
   PagesCreated: relatedPageSchema.array(),
   PagesUpdated: relatedPageSchema.array(),
   PagesDeleted: relatedPageSchema.array(),

@@ -12,7 +12,7 @@ import {
   Button, Col, Icons, Input
 } from 'core/components';
 import { toast } from 'core/components';
-import { loginSchema } from 'lib/validations/auth';
+import { loginSchema } from 'validations/auth';
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -62,8 +62,8 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
     e.preventDefault();
     clearErrors();
     reset();
-    await signIn(provider);
     setIsLoadingOAuth(true);
+    await signIn(provider);
   };
 
   return (

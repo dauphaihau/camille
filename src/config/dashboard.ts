@@ -40,10 +40,5 @@ export const dashboardConfig: DashboardConfig = {
       href: '/dashboard/settings',
       icon: 'settings',
     },
-    {
-      title: 'Notebooks',
-      href: '/dashboard/notebooks',
-      icon: 'post',
-    },
   ],
 };

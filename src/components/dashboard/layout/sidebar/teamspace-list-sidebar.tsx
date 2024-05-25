@@ -5,7 +5,7 @@ import { useState } from 'react';
 import * as React from 'react';
 import NewTeamspaceDialog from 'components/dialog/new-teamspace-dialog';
 import { Box, Row } from 'core/components';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 import TeamspaceItemSidebar from './teamspace-item-sidebar';
 import { TitleOfItemsSidebar } from './title-of-items-sidebar';
 

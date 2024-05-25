@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { updateProfileSchema, updateUserTrackingSchema } from '../lib/validations/user';
+import { updateProfileSchema, updateUserTrackingSchema } from '../validations/user';
 
 export type IUpdateProfile = z.infer<typeof updateProfileSchema>;
 

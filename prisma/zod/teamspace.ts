@@ -1,6 +1,6 @@
 import * as z from "zod"
 import * as imports from "../null"
-import { CompleteWorkspace, relatedWorkspaceSchema, CompleteUserOnTeamspace, relatedUserOnTeamspaceSchema, CompleteNotebook, relatedNotebookSchema } from "./index"
+import { CompleteWorkspace, relatedWorkspaceSchema, CompleteUserOnTeamspace, relatedUserOnTeamspaceSchema, CompletePage, relatedPageSchema } from "./index"
 
 export const teamspaceSchema = z.object({
   id: z.string(),
@@ -17,7 +17,7 @@ export const teamspaceSchema = z.object({
 export interface CompleteTeamspace extends z.infer<typeof teamspaceSchema> {
   workspace?: CompleteWorkspace | null
   userOnTeamspace: CompleteUserOnTeamspace[]
-  notebooks: CompleteNotebook[]
+  pages: CompletePage[]
 }
 
 /**
@@ -28,5 +28,5 @@ export interface CompleteTeamspace extends z.infer<typeof teamspaceSchema> {
 export const relatedTeamspaceSchema: z.ZodSchema<CompleteTeamspace> = z.lazy(() => teamspaceSchema.extend({
   workspace: relatedWorkspaceSchema.nullish(),
   userOnTeamspace: relatedUserOnTeamspaceSchema.array(),
-  notebooks: relatedNotebookSchema.array(),
+  pages: relatedPageSchema.array(),
 }))

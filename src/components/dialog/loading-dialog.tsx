@@ -14,7 +14,10 @@ export function LoadingDialog({ open, message }: LoadingDialogProps) {
         className='!w-fit py-3'
         // classesOverlay='opacity-90'
       >
-        <Row align='center' gap={ 1 }>
+        <Row
+          align='center'
+          gap={ 1 }
+        >
           <div className='text-[#80807c] text-sm'>
             { message }
           </div>

@@ -25,8 +25,9 @@ export function ItemSidebar({
       <Tooltip.Trigger asChild>
         <Row
           onClick={ onClick }
-          align='center' gap={ 2 }
-          classes='hover:bg-accent rounded px-3 py-1 cursor-pointer'
+          align='center'
+          gap={ 2 }
+          classes='hover:bg-accent rounded pl-1.5 pr-2 py-1 cursor-pointer'
         >
           <Row
             justify='center'

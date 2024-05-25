@@ -1,30 +1,28 @@
-'use client';
+// import { redirect } from 'next/navigation';
+// import { PATH } from 'config/const';
+// import { getTrackingUserByWorkspace } from 'services/server-actions/user';
+// import { DashboardSlugs } from 'types/workspace';
+// import { getCurrentUser } from 'lib/session';
 
-import { DashboardHeader } from 'components/dashboard/header';
-import { DashboardShell } from 'components/dashboard/shell';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
-import { NotebookItem } from 'components/dashboard/notebooks/notebook-item';
+// interface DashboardPageProps {
+//   params: DashboardSlugs;
+// }
 
-export default async function DashboardPage() {
-  const { data: { workspace } = {} } = useGetDetailWorkspace();
-  return (
-    <DashboardShell>
-      <DashboardHeader
-        heading='Notebooks'
-        text='Create and manage notebooks.'
-      />
-      <div>
-        {
-          workspace?.notebooks &&
-          workspace.notebooks.length > 0 &&
-          workspace.notebooks.map(notebook => (
-            <NotebookItem
-              key={ notebook.id }
-              notebook={ notebook }
-            />
-          ))
-        }
-      </div>
-    </DashboardShell>
-  );
+export default async function DashboardPage(
+  // { params }: DashboardPageProps
+) {
+  // const user = await getCurrentUser();
+  // if (user) {
+  //   if (!user.workspaceLastVisited) {
+  //     redirect(PATH.WORKSPACE);
+  //   }
+  //   const response = await getTrackingUserByWorkspace(user.workspaceLastVisited.id);
+  //
+  //   const domain = user.workspaceLastVisited.domain;
+  //
+  //   if (response?.data?.lastAccessPageId) {
+  //     redirect(`/${domain}/${response.data.lastAccessPageId}`);
+  //   }
+  //   redirect(`/${domain}`);
+  // }
 }

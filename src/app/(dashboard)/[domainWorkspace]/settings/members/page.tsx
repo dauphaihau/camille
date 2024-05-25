@@ -4,7 +4,7 @@ import React from 'react';
 import { DashboardSettingsHeader } from 'components/dashboard/settings/header';
 import { DashboardSettingsShell } from 'components/dashboard/settings/shell';
 import { Col } from 'core/components';
-import { getListMembersByWorkspace } from 'lib/request-server/settings';
+import { getListMembersByWorkspace } from 'services/server-actions/settings';
 import { MemberList } from 'components/dashboard/settings/member/member-list';
 import { DashboardSlugs } from 'types/workspace';
 

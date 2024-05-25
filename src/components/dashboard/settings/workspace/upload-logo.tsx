@@ -1,7 +1,7 @@
 'use client';
 
 import { Tooltip } from 'core/components';
-import { useGetDetailWorkspace } from 'lib/request-client/workspace';
+import { useGetDetailWorkspace } from 'services/query-hooks/workspace';
 
 export function UpdateLogo() {
   const { data: { workspace } = {} } = useGetDetailWorkspace();
