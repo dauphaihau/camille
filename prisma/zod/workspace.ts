@@ -1,5 +1,4 @@
 import * as z from "zod"
-import * as imports from "../null"
 import { CompleteTrackingUserAccessOnWorkspace, relatedTrackingUserAccessOnWorkspaceSchema, CompleteUserOnWorkspace, relatedUserOnWorkspaceSchema, CompleteTeamspace, relatedTeamspaceSchema, CompletePage, relatedPageSchema, CompleteFavorite, relatedFavoriteSchema } from "./index"
 
 export const workspaceSchema = z.object({

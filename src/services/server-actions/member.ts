@@ -138,24 +138,29 @@ export const deleteMember = async (values: IDeleteMember) => {
 
     const validatedValues = deleteMemberSchema.parse(values);
 
-    const record = await db.userOnWorkspace.findFirst({
+    const member = await db.userOnWorkspace.findFirst({
       where: {
-        AND: [
-          { userId: { equals: validatedValues.userId } },
-          { workspaceId: { equals: validatedValues.workspaceId } },
-        ],
+        userId: validatedValues.userId,
+        workspaceId: validatedValues.workspaceId,
       },
     });
-    if (!record) return { code: StatusCodes.NOT_FOUND };
-    console.log('record', record);
+    if (!member) return { code: StatusCodes.NOT_FOUND };
 
-    if (record) {
-      await db.userOnWorkspace.delete({
-        where: { id: record.id },
-      });
-    }
+    const deletePrivatePages = db.page.deleteMany({
+      where: {
+        workspaceId: validatedValues.workspaceId,
+        teamspaceId: null,
+        createdBy: validatedValues.userId,
+      },
+    });
 
-    await db.userOnTeamspace.deleteMany({
+    const deleteUserOnWorkspace = db.userOnWorkspace.delete({
+      where: {
+        id: member.id,
+      },
+    });
+
+    const deleteUserOnTeamspace = db.userOnTeamspace.deleteMany({
       where: {
         AND: [
           { userId: { equals: validatedValues.userId } },
@@ -170,8 +175,9 @@ export const deleteMember = async (values: IDeleteMember) => {
       },
     });
 
-    return { code: StatusCodes.NO_CONTENT };
+    await db.$transaction([deletePrivatePages, deleteUserOnWorkspace, deleteUserOnTeamspace]);
 
+    return { code: StatusCodes.NO_CONTENT };
   } catch (error) {
     return { code: StatusCodes.INTERNAL_SERVER_ERROR };
   }

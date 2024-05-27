@@ -4,25 +4,27 @@ A note-taking web application where you can think, write, and plan
 ![Screenshot](./public/marketing/app.png)
 
 ## Technologies
-1. Next.js (React.js)
-2. Tailwind (Styling)
-3. Typescript (Statically Checked Types)
-4. NextAuth.js (Authentication)
-5. Stripe (Payment)
-6. Prisma (Object-Relational Mapping)
-7. MySQL (Relational Database)
+1. Next.js ( web framework base on React.js)
+2. Tailwind ( utility-first CSS framework )
+3. React Query ( managing and caching asynchronous data )
+4. Zustand ( state-management )
+5. Typescript ( statically checked types )
+6. NextAuth.js ( authentication )
+7. Stripe ( payment )
+8. Prisma ( object-relational mapping )
+9. MySQL ( relational database )
 
 ## Work In Progress
 The app is being under maintenance, as more work needs to be done.
 
 Current functionality includes:
 - Sign in, Sign out, Email Verification, OAuth via GitHub, Google
-- CURD workspace, teamspace, notebook, page
+- CURD workspace, teamspace, page
 - Soft delete, undo delete, hard delete page
 - Add to favorite, duplicate, share to web, copy link page
 - Add, remove, change role member in workspace
 - Quick open and search all pages by dialog 
-- Redirecting user to previous workspace, notebook, page after login
+- Redirecting user to previous workspace, page after login
 - Upgrade plan for workspace via Stripe (Testing Mode)
 
 ## Known Bugs

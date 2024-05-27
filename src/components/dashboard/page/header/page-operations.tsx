@@ -167,24 +167,24 @@ export function PageOperations({
   }
 
   async function handleDuplicatePage() {
-    if (!page || !workspace || !wsTemp) return;
-    let pageTitle = getValueOfLastBracketInString(page.title);
+    if (!page?.title || !workspace || !wsTemp) return;
 
     if (workspace.isLimitedPages && wsTemp.totalPages >= freePlan.limitedPages) {
       setShowLimitedPagesBar(true);
       return;
     }
 
-    if (!pageTitle || !page?.title) {
-      pageTitle = page.title + ' (1)';
+    const num = getValueOfLastBracketInString(page.title);
+    if (!num) {
+      page.title = page.title + ' (1)';
     } else {
-      const increase = Number(pageTitle) + 1;
-      pageTitle = page.title.substring(0, page.title.length - 3) + `(${increase})`;
+      const increase = num + 1;
+      page.title = page.title.substring(0, page.title.length - 3) + `(${increase})`;
     }
 
     const response = await createPage({
       workspaceId: workspace.id,
-      title: pageTitle,
+      title: page.title,
       content: page.content,
     });
 
