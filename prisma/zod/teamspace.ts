@@ -1,5 +1,4 @@
 import * as z from "zod"
-import * as imports from "../null"
 import { CompleteWorkspace, relatedWorkspaceSchema, CompleteUserOnTeamspace, relatedUserOnTeamspaceSchema, CompletePage, relatedPageSchema } from "./index"
 
 export const teamspaceSchema = z.object({

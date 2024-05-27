@@ -1,32 +1,35 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "inlineSourceMap": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "noEmitOnError": true,
-    "esModuleInterop": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "strictNullChecks": true,
+
+    "target": "ES2020",
+    "inlineSourceMap": true,
+
+    "esModuleInterop": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "noEmitOnError": true,
+
     "jsx": "preserve",
+    "noEmit": true,
+    "isolatedModules": true,
     "incremental": true,
+
     "plugins": [
       {
         "name": "next"
       }
     ],
+
     "baseUrl": "./src",
-    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",
@@ -36,6 +39,6 @@
     ".eslintrc.cjs"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
   ]
 }

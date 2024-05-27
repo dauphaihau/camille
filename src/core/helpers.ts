@@ -44,13 +44,13 @@ export async function fetcher<TResponseBody = unknown>(
 
 export const capitalize = s => (s && s[0].toUpperCase() + s.slice(1)) || '';
 
-export function getValueOfLastBracketInString(str) {
-  if (!str) {
-    return '';
-  }
+export function getValueOfLastBracketInString(str: string): number | undefined {
+  if (!str) return;
   const isStringHaveBrackets = str.match(/(.*)\(.*\)/);
-  if (isStringHaveBrackets) {
-    return str.match(/\(([^)]+)\)?(){1}$/)[1];
+  if (isStringHaveBrackets) return ;
+  const arr = str.match(/\(([^)]+)\)?(){1}$/);
+  if (arr?.length) {
+    return Number(arr[1]);
   }
 }
 

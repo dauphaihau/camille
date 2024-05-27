@@ -1,12 +1,6 @@
 import {
-  useCallback, useEffect, useMemo, useRef 
+  useCallback, useEffect, useMemo, useRef
 } from 'react';
-
-// import {
-//   overrideSystemHandling,
-//   checkHeldKeysRecursive,
-//   uniq_fast,
-// } from "./utils";
 
 export const overrideSystemHandling = (e) => {
   if (e) {
@@ -21,9 +15,9 @@ export const overrideSystemHandling = (e) => {
 
 // Function stolen from this Stack Overflow answer:
 // https: stackoverflow.com/a/9229821
-export const uniq_fast = (a) => {
+export const uniq_fast = (a: string[]) => {
   const seen = {};
-  const out = [];
+  const out = [] as string[];
   const len = a.length;
   let j = 0;
   for (let i = 0; i < len; i++) {
@@ -41,12 +35,12 @@ export const uniq_fast = (a) => {
 // I.E if the shortcut array is ["Shift", "E", "A"], this function will ensure
 // that "E" is held down before "A", and "Shift" is held down before "E".
 export const checkHeldKeysRecursive = (
-  shortcutKey,
+  shortcutKey: string,
   // Tracks the call interation for the recursive function,
   // based on the previous index;
   shortcutKeyRecursionIndex = 0,
-  shortcutArray,
-  heldKeysArray
+  shortcutArray: string[],
+  heldKeysArray: string[]
 ) => {
   const shortcutIndexOfKey = shortcutArray.indexOf(shortcutKey);
   const keyPartOfShortCut = shortcutArray.indexOf(shortcutKey) >= 0;
@@ -98,6 +92,12 @@ export const checkHeldKeysRecursive = (
 
 const BLACKLISTED_DOM_TARGETS = ['TEXTAREA', 'INPUT'];
 
+type Options = {
+  overrideSystem?: boolean,
+  ignoreInputFields?: boolean,
+  repeatOnHold?: boolean,
+}
+
 const DEFAULT_OPTIONS = {
   overrideSystem: false,
   ignoreInputFields: true,
@@ -105,7 +105,11 @@ const DEFAULT_OPTIONS = {
 };
 
 
-export const useKeyboardShortcut = (shortcutKeys, callback, userOptions) => {
+export const useKeyboardShortcut = (
+  shortcutKeys: string[],
+  callback: () => void,
+  userOptions: Options
+) => {
   const options = { ...DEFAULT_OPTIONS, ...userOptions };
   if (!Array.isArray(shortcutKeys))
     throw new Error(
@@ -134,16 +138,17 @@ export const useKeyboardShortcut = (shortcutKeys, callback, userOptions) => {
     [shortcutKeysId]
   );
   // useRef to avoid a constant re-render on keydown and keyup.
-  const heldKeys = useRef([]);
+  const heldKeys = useRef<string[]>([]);
 
   const keydownListener = useCallback(
-    (keydownEvent) => {
+    (keydownEvent: KeyboardEvent) => {
       const loweredKey = String(keydownEvent.key).toLowerCase();
       if (!(shortcutArray.indexOf(loweredKey) >= 0)) return;
+      if (!keydownEvent.target) return;
 
       if (
         options.ignoreInputFields &&
-        BLACKLISTED_DOM_TARGETS.indexOf(keydownEvent.target.tagName) >= 0
+        BLACKLISTED_DOM_TARGETS.indexOf((keydownEvent.target as Element).tagName) >= 0
       ) {
         return;
       }
@@ -162,7 +167,7 @@ export const useKeyboardShortcut = (shortcutKeys, callback, userOptions) => {
       // "A" is being observed for our custom behavior shortcut.
       const isHeldKeyCombinationValid = checkHeldKeysRecursive(
         loweredKey,
-        null,
+        undefined,
         shortcutArray,
         heldKeys.current
       );
@@ -173,7 +178,8 @@ export const useKeyboardShortcut = (shortcutKeys, callback, userOptions) => {
 
       const nextHeldKeys = [...heldKeys.current, loweredKey];
       if (nextHeldKeys.join() === shortcutArray.join()) {
-        callback(shortcutKeys);
+        callback();
+        // callback(shortcutKeys);
         return false;
       }
 
@@ -191,15 +197,15 @@ export const useKeyboardShortcut = (shortcutKeys, callback, userOptions) => {
   );
 
   const keyupListener = useCallback(
-    (keyupEvent) => {
+    (keyupEvent: KeyboardEvent) => {
       const raisedKey = String(keyupEvent.key).toLowerCase();
       if (!(shortcutArray.indexOf(raisedKey) >= 0)) return;
 
       const raisedKeyHeldIndex = heldKeys.current.indexOf(raisedKey);
       if (!(raisedKeyHeldIndex >= 0)) return;
 
-      const nextHeldKeys = [];
-      let loopIndex;
+      const nextHeldKeys = [] as string[];
+      let loopIndex: number;
       for (loopIndex = 0; loopIndex < heldKeys.current.length; ++loopIndex) {
         if (loopIndex !== raisedKeyHeldIndex) {
           nextHeldKeys.push(heldKeys.current[loopIndex]);

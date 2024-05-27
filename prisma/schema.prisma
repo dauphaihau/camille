@@ -16,7 +16,7 @@ generator zod {
   modelCase             = "camelCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
   modelSuffix           = "Schema" // (default) Suffix to apply to your prisma models when naming Zod schemas
   useDecimalJs          = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
-  imports               = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
+  // imports               = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
   prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
 }
 

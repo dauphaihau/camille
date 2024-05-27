@@ -69,7 +69,6 @@ export function Editor({ readOnly = false }: EditorProps) {
         },
         // onChange: async (api: API, event: CustomEvent) => {
         onChange: async () => {
-          console.log('-page-data-deleted-at-', !(pageData?.deletedAt));
           if (editorInstance.current && !readOnly && !(pageData?.deletedAt) && pageData?.id) {
             const blocks = await editorInstance.current.save();
             await handleUpdatePage({ id: pageData.id, content: blocks });
@@ -99,7 +98,8 @@ export function Editor({ readOnly = false }: EditorProps) {
   }
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && pageData) {
+    // if (typeof window !== 'undefined' && pageData) {
+    if (typeof window !== 'undefined') {
       setIsMounted(true);
     }
   }, []);
@@ -108,6 +108,7 @@ export function Editor({ readOnly = false }: EditorProps) {
     if (isMounted && pageData && pageData?.title) {
       setPage(pageData);
       initializeEditor();
+
       if (titleInstance.current) {
         const end = pageData.title.length;
         titleInstance.current.setSelectionRange(end, end);
@@ -117,7 +118,6 @@ export function Editor({ readOnly = false }: EditorProps) {
       return () => {
         editorInstance.current?.destroy();
         editorInstance.current = undefined;
-        // editorInstance.current = null
       };
     }
   }, [isMounted]);
@@ -186,6 +186,10 @@ export function Editor({ readOnly = false }: EditorProps) {
     setPage({ ...pageData, title: event.target.value });
     await debouncedUpdatePage({ id: pageData?.id, title: event.target.value });
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div

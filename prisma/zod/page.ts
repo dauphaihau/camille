@@ -1,5 +1,4 @@
 import * as z from "zod"
-import * as imports from "../null"
 import { CompleteWorkspace, relatedWorkspaceSchema, CompleteTeamspace, relatedTeamspaceSchema, CompleteUser, relatedUserSchema, CompleteFavorite, relatedFavoriteSchema } from "./index"
 
 // Helper schema for JSON fields
